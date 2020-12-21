@@ -1,0 +1,20 @@
+/* You can add global styles to this file, and also import other style files */
+@import './variables.less';
+
+body, html{
+    height: 100%;
+}
+
+.form-group{
+    label{
+        color: @text-muted;
+        margin-bottom: 0.1rem;
+        font-size: small;
+    }
+}
+
+.form-control{
+    &.ng-invalid.ng-dirty{
+        border-color: @border-danger;
+    }
+}

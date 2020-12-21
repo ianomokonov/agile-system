@@ -1,0 +1,33 @@
+<div class="container-fluid">
+  <span class="header">Вход</span>
+  <form [formGroup]="form">
+    <div class="form-group">
+      <input placeholder="Email" type="text" class="form-control" formControlName="email" />
+    </div>
+    <div class="form-group">
+      <input placeholder="Пароль" type="password" class="form-control" formControlName="password" />
+    </div>
+    <small class="text-danger">{{ errorText }}</small>
+    <div class="d-flex justify-content-between mt-3" [ngClass]="{ 'mt-5': !errorText }">
+      <a routerLink="/sign-up" class="btn btn-link pl-0">Создать аккаунт</a>
+      <button type="button" class="btn btn-primary" (click)="onPrimaryBtnClick()">Войти</button>
+    </div>
+    <div class="d-flex justify-content-around border-top pt-3 mt-3 nets">
+      <div class="position-relative d-flex justify-content-center">
+        <img class="social-net" src="../../../assets/logos/GitHub-Mark-120px-plus.png" />
+      </div>
+      <div class="position-relative d-flex justify-content-center">
+        <img class="social-net" src="../../../assets/logos/search.svg" />
+      </div>
+      <div class="position-relative d-flex justify-content-center">
+        <img class="social-net" src="../../../assets/logos/vk-1.svg" />
+      </div>
+    </div>
+
+    <div class="text-center mt-4">
+      <a routerLink="/reset-password" class="btn-link text-muted"
+        ><small>Восстановить пароль</small></a
+      >
+    </div>
+  </form>
+</div>
