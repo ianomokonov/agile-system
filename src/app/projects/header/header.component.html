@@ -1,0 +1,18 @@
+<div class="header">
+  <div class="container-fluid d-flex justify-content-between h-100 align-items-center">
+    <div class="left d-flex align-items-center">
+      <a class="item h2" routerLink="/projects">{{ header }}</a>
+      <a class="item" *ngFor="let item of menuItems" [routerLink]="[item.link]" [routerLinkActive]="'active'">{{
+        item.displayName
+      }}</a>
+
+      <button class="btn btn-info ml-3">Создать</button>
+    </div>
+    <div class="right h-100">
+      <div class="d-flex h-100 user-info">
+        <span class="mr-3">Номоконов Иван</span>
+        <img src="../../assets/ava.jpg" alt="" />
+      </div>
+    </div>
+  </div>
+</div>

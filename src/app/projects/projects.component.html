@@ -1,24 +1,7 @@
-<div class="header">
-  <div class="container-fluid d-flex justify-content-between h-100 align-items-center">
-    <div class="left d-flex">
-      <h2 class="mr-3">Проекты</h2>
-      <button class="btn btn-info">Создать</button>
-    </div>
-    <div class="right h-100">
-      <div class="d-flex h-100 user-info">
-        <span class="mr-3">Номоконов Иван</span>
-        <img src="../../assets/ava.jpg" alt="" />
-      </div>
-    </div>
-  </div>
-</div>
+<app-header [header]="'Проекты'"></app-header>
 <div class="container-fluid">
   <div class="input-group my-3 w-50">
-    <input
-      type="text"
-      class="form-control"
-      placeholder="Поиск по проектам"
-    />
+    <input type="text" class="form-control" placeholder="Поиск по проектам" />
     <span class="input-group-text"><i class="fas fa-search"></i></span>
   </div>
   <table class="table">
@@ -34,7 +17,7 @@
     </thead>
     <tbody>
       <tr>
-        <th scope="row">Agile system</th>
+        <th scope="row"><a routerLink="1">Agile system</a></th>
         <td>AGILE</td>
         <td>Software</td>
         <td>Номоконов Иван</td>
