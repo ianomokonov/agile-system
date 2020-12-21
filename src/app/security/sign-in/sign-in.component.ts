@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { SecurityBaseModel } from '../security-base-model';
 
 @Component({
@@ -8,7 +9,7 @@ import { SecurityBaseModel } from '../security-base-model';
   styleUrls: ['./sign-in.component.less'],
 })
 export class SignInComponent extends SecurityBaseModel {
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private router: Router) {
     super(
       fb.group({
         email: [null, [Validators.required, Validators.email]],
@@ -24,8 +25,8 @@ export class SignInComponent extends SecurityBaseModel {
       return;
     }
 
-    const formValue = this.form.getRawValue();
+    // const formValue = this.form.getRawValue();
 
-    console.log(formValue);
+    this.router.navigate(['/projects']);
   }
 }
