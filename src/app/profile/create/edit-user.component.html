@@ -1,0 +1,12 @@
+<h5 class="text-center py-3">Редактирование профиля</h5>
+<form [formGroup]="userForm" class="px-3 pb-3" (submit)="onFormSubmit()">
+  <input type="text" class="form-control mb-3" placeholder="Имя" formControlName="name"/>
+  <input type="text" class="form-control mb-3" placeholder="Фамилия" formControlName="surname"/>
+  <input type="text" class="form-control mb-3" placeholder="Email" formControlName="email"/>
+  <input type="text" class="form-control mb-3" placeholder="Ссылка на ВК" formControlName="vk"/>
+  <input type="text" class="form-control mb-3" placeholder="Ссылка на GitHub" formControlName="gitHub"/>
+  <div class="btns pt-4">
+    <button class="btn btn-outline-primary" type="button" (click)="onCancelClick()">Отменить</button>
+    <button class="btn btn-primary">Сохранить</button>
+  </div>
+</form>

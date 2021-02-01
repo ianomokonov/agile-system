@@ -26,11 +26,6 @@ export class SingUpComponent extends SecurityBaseModel {
     if (this.form.invalid) {
       this.markInvalidFields();
       this.errorText = this.getErrorText();
-      return;
     }
-
-    const formValue = this.form.getRawValue();
-
-    console.log(formValue);
   }
 }

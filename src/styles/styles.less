@@ -18,12 +18,6 @@ html {
   }
 }
 
-.form-control {
-  &.ng-invalid.ng-dirty {
-    border-color: @border-danger;
-  }
-}
-
 .btn-info {
   background: @bg-info;
   border-color: @bg-info;
@@ -34,5 +28,28 @@ html {
     background: @bg-info-hover !important;
     border-color: @bg-info-hover !important;
     box-shadow: none;
+  }
+}
+
+.btn-outline-primary {
+  color: @primary-color;
+  border-color: @primary-color;
+
+  &:hover {
+    color: #fff;
+    background-color: @primary-color;
+    border-color: @primary-color;
+  }
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: @primary-color;
+  border-color: @primary-color;
+}
+
+.form-control{
+  &.ng-touched.ng-invalid{
+    border-color: @border-danger;
   }
 }

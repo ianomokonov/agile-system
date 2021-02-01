@@ -27,6 +27,6 @@ export class SignInComponent extends SecurityBaseModel {
 
     // const formValue = this.form.getRawValue();
 
-    this.router.navigate(['/projects']);
+    this.router.navigate(['/profile']);
   }
 }

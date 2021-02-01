@@ -8,13 +8,10 @@ import { AppComponent } from './app.component';
 import { SingUpComponent } from './security/sing-up/sing-up.component';
 import { SignInComponent } from './security/sign-in/sign-in.component';
 import { ResetPasswordComponent } from './security/reset-password/reset-password.component';
-import { ProjectsComponent } from './projects/projects.component';
-import { ProjectComponent } from './projects/project/project.component';
-import { HeaderComponent } from './projects/header/header.component';
-import { TasksComponent } from './projects/project/tasks/tasks.component';
-import { TeamComponent } from './projects/project/team/team.component';
-import { StatisticsComponent } from './projects/project/statistics/statistics.component';
-import { DashboardsComponent } from './projects/project/dashboards/dashboards.component';
+import { ProfileComponent } from './profile/profile.component';
+import { ProjectsComponent } from './profile/projects/projects.component';
+import { CreateComponent } from './profile/projects/create/create.component';
+import { EditUserComponent } from './profile/create/edit-user.component';
 
 @NgModule({
   declarations: [
@@ -22,13 +19,10 @@ import { DashboardsComponent } from './projects/project/dashboards/dashboards.co
     SingUpComponent,
     SignInComponent,
     ResetPasswordComponent,
+    ProfileComponent,
     ProjectsComponent,
-    ProjectComponent,
-    HeaderComponent,
-    TasksComponent,
-    TeamComponent,
-    StatisticsComponent,
-    DashboardsComponent,
+    CreateComponent,
+    EditUserComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, NgbModule, FormsModule, ReactiveFormsModule],
   providers: [FormBuilder],
