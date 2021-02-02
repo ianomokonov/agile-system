@@ -1,5 +1,9 @@
 module.exports = {
   root: true,
+  env: {
+    es6: true,
+  },
+  ignorePatterns: ['*.js'],
   overrides: [
     // Добавьте эти настройки, если вы задаёте шаблоны внутри файлов *.component.ts
     {
@@ -28,17 +32,17 @@ module.exports = {
         sourceType: 'module',
       },
       rules: {
-        "prettier/prettier": [
-          "error",
+        'prettier/prettier': [
+          'error',
           {
-            "endOfLine": "auto"
+            endOfLine: 'auto',
           },
         ],
         'import/no-unresolved': 'off',
         'import/prefer-default-export': 'off',
         'class-methods-use-this': 'off',
         'lines-between-class-members': 'off',
-        "@typescript-eslint/lines-between-class-members": ["off"],
+        '@typescript-eslint/lines-between-class-members': ['off'],
         '@typescript-eslint/unbound-method': [
           'error',
           {
