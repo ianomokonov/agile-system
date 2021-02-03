@@ -1,13 +1,14 @@
 const dbConnection = require("./db-connection");
 
 class UserRepository {
-    constructor() {
-        dbConnection.query(
+    constructor(){
+        this.getUsers();
+    }
+    async getUsers() {
+        const [result,] = await dbConnection.query(
             'SELECT * FROM `user`',
-            function (err, results) {
-                console.log(results);
-            }
         );
+        console.log(result);
     }
 }
 
