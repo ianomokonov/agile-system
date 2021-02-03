@@ -2,6 +2,7 @@
 
 const bcrypt = require(`bcrypt`);
 const {nanoid} = require(`nanoid`);
+const userRepository = require("../repositories/user.repository");
 
 const saltRounds = 10;
 

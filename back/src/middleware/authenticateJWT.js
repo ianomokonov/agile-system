@@ -1,27 +1,27 @@
 'use strict';
 
 const { StatusCodes } = require(`http-status-codes`);
+const userService = require("../services/user-service");
 
-module.exports = (store) => (
-    async (req, res, next) => {
-        const { username, password } = req.body;
-        const existsUser = await store.findByEmail(username);
+module.exports = async (req, res, next) => {
+    console.log(111);
+    const { username, password } = req.body;
+    const existsUser = await userService.findByEmail(username);
 
-        if (!existsUser) {
-            res.status(StatusCodes.FORBIDDEN)
-                .json({ message: `Пользователь не нацден`});
+    if (!existsUser) {
+        res.status(StatusCodes.FORBIDDEN)
+            .json({ message: `Пользователь не найден` });
 
-            return;
-        }
-
-        if (! await store.checkUser(existsUser, password)) {
-            res.status(StatusCodes.FORBIDDEN)
-                .json({message: `Неправильный пароль`});
-
-            return;
-        }
-
-        res.locals.user = existsUser;
-        next();
+        return;
     }
-);
+
+    if (! await userService.checkUser(existsUser, password)) {
+        res.status(StatusCodes.FORBIDDEN)
+            .json({ message: `Неправильный пароль` });
+
+        return;
+    }
+
+    res.locals.user = existsUser;
+    next();
+}
