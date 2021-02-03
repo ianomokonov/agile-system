@@ -1,6 +1,6 @@
-const mysql = require('mysql2/promise');
+import mysql from 'mysql2/promise';
 
-module.exports = mysql.createPool({
+export default mysql.createPool({
     host: 'localhost',
     user: 'root',
     database: 'agile',

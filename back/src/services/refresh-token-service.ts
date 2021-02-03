@@ -1,7 +1,8 @@
 'use strict';
 
 class RefreshTokenService {
-    constructor () {
+    private _refreshTokens;
+    constructor() {
         this._refreshTokens = [];
     }
 
@@ -10,7 +11,7 @@ class RefreshTokenService {
     }
 
     async find(token) {
-        return this._refreshTokens.find( (refreshToken) => refreshToken === token);
+        return this._refreshTokens.find((refreshToken) => refreshToken === token);
     }
 
     async drop(token) {
@@ -19,4 +20,4 @@ class RefreshTokenService {
     }
 }
 
-module.exports = new RefreshTokenService();
+export default new RefreshTokenService();

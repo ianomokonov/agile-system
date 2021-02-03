@@ -1,4 +1,4 @@
-const dbConnection = require("./db-connection");
+import dbConnection from "./db-connection";
 
 class UserRepository {
     constructor(){

@@ -1,22 +1,20 @@
 "use strict"
 
-const express = require("express");
+import userRouter from "./controllers/user";
+import logger from "./logger";
 
-const articlesRoutes = require("./controllers/project");
-const userRouter = require("./controllers/user");
-const logger = require("../logger");
+const express = require("express");
 
 const DEFAULT_PORT = 3000;
 
 const app = express();
 app.use(express.json())
-app.use("/project", articlesRoutes);
 app.use("/user", userRouter);
 
 app
   .listen(DEFAULT_PORT, () => {
     logger.success(`Приложение запущено на http://localhost:${DEFAULT_PORT}`);
   })
-  .on(`error`, (err) => {
+  .on(`error`, (err: any) => {
     logger.error(`Не удалось запустить приложение. Ошибка: ${err}`);
   });

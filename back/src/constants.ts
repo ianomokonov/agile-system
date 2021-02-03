@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = {
+export const constants = {
   API_PREFIX : `/api`,
   MAX_ID_LENGTH : 6,
   JWT_ACCESS_SECRET: `tempCode`, //TODO заменить код

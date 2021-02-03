@@ -1,5 +1,5 @@
-const refreshTokenService = require("../../services/refresh-token-service");
-const { makeTokens } = require("../../utils");
+import refreshTokenService from "../../services/refresh-token-service";
+import { makeTokens } from "../../utils";
 
 module.exports = async (userId) => {
     const { accessToken, refreshToken } = makeTokens({ userId });

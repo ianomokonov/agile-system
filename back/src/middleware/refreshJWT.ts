@@ -1,8 +1,7 @@
-const { HttpCode, JWT_REFRESH_SECRET } = require('../constants');
-const refreshTokenService = require(`../services/refresh-token-service`);
-const jwt = require(`jsonwebtoken`);
-const { makeTokens } = require('../utils');
+import refreshTokenService from "../services/refresh-token-service";
+import { makeTokens } from "../utils";
 
+const { JWT_REFRESH_SECRET } = require('../constants');
 module.exports = async (req, res) => {
   const { token } = req.body;
   if (!token) {
