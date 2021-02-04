@@ -1,5 +1,7 @@
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import { Project } from '../models/project';
 import { User } from '../models/user';
+import { UserInfo } from '../models/user-info';
 import dbConnection from './db-connection';
 
 class UserRepository {
@@ -13,6 +15,18 @@ class UserRepository {
       `SELECT * FROM user WHERE email='${email}'`,
     );
     return (result[0] as unknown) as User;
+  }
+
+  public async getUserById(userId: number) {
+    const [[user]] = await dbConnection.query<RowDataPacket[]>(
+      `SELECT name, surname, email, vk, github FROM user WHERE id='${userId}'`,
+    );
+    if (!user) {
+      return null;
+    }
+    user.projects = this.getUserProjects(userId);
+
+    return (user as unknown) as UserInfo;
   }
 
   public async isTokenActual(token: string) {
@@ -36,6 +50,13 @@ class UserRepository {
 
   public async deleteToken(token: string) {
     await dbConnection.query('DELETE FROM refreshtokens WHERE token=?;', [token]);
+  }
+
+  public async getUserProjects(userId: number) {
+    const [projects] = await dbConnection.query<RowDataPacket[]>(
+      `SELECT * FROM project WHERE userId='${userId}'`,
+    );
+    return (projects as unknown) as Project[];
   }
 }
 

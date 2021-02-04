@@ -14,6 +14,10 @@ class UserService {
     return userRepository.getUserByEmail(email);
   }
 
+  public async getUserById(userId: number) {
+    return userRepository.getUserById(userId);
+  }
+
   public async checkUser(user: User, password: string) {
     const match = await bcrypt.compare(password, user.password);
     return match;

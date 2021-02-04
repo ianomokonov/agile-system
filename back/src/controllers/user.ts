@@ -6,9 +6,15 @@ import loginHandler from '../handlers/user/login.handler';
 import logOutHandler from '../handlers/user/log-out.handler';
 import authenticateJWT from '../middleware/authenticateJWT';
 import signUpHandler from '../handlers/user/sign-up.handler';
+import getProfileInfoHandler from '../handlers/user/get-profile-info.handler';
 
 const userRouter = Router();
-userRouter.get(`/profile`, authJWT, (req, res) => res.send(`user profile`));
+userRouter.get(`/profile`, authJWT, async (req, res) => {
+  const { userId } = res.locals.user;
+
+  const result = await getProfileInfoHandler(userId);
+  res.json(result);
+});
 userRouter.post(`/sign-up`, async (req, res) => {
   const result = await signUpHandler(req.body);
   res.json(result);
