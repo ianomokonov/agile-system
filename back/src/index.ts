@@ -1,5 +1,6 @@
 "use strict"
 
+import projectRouter from "./controllers/project";
 import userRouter from "./controllers/user";
 import logger from "./logger";
 
@@ -10,6 +11,7 @@ const DEFAULT_PORT = 3000;
 const app = express();
 app.use(express.json())
 app.use("/user", userRouter);
+app.use("/project", projectRouter)
 
 app
   .listen(DEFAULT_PORT, () => {

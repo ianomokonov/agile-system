@@ -1,6 +1,8 @@
 export interface Project {
   name: string;
   roles: string[];
-  date: Date;
+  repository: string;
+  description: string;
   isClosed: boolean;
+  ownerId: number;
 }
