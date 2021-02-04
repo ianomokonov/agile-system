@@ -1,30 +1,34 @@
-import refreshTokenService from "../services/refresh-token-service";
-import { makeTokens } from "../utils";
+/* eslint-disable consistent-return */
+import { StatusCodes } from 'http-status-codes';
+import jwt from 'jsonwebtoken';
+import { constants } from '../constants';
+import refreshTokenService from '../services/refresh-token-service';
+import { makeTokens } from '../utils';
 
-const { JWT_REFRESH_SECRET } = require('../constants');
-module.exports = async (req, res) => {
+export default async (req, res) => {
   const { token } = req.body;
   if (!token) {
-      return res.sendStatus(HttpCode.BAD_REQUEST);
-  };
+    return res.sendStatus(StatusCodes.BAD_REQUEST);
+  }
 
-  const existToken = await refreshTokenService.find(token);
+  const isTokenActual = await refreshTokenService.find(token);
 
-  // if (!existToken) {
-  //     return res.sendStatus(HttpCode.NOT_FOUND);
-  // }
+  if (!isTokenActual) {
+    return res.sendStatus(StatusCodes.NOT_FOUND);
+  }
 
-  jwt.verify(token, JWT_REFRESH_SECRET, async (err, userData) => {
-      if (err) {
-          return res.sendStatus(HttpCode.FORBIDDEN);
-      }
+  jwt.verify(token, constants.JWT_REFRESH_SECRET, async (err, userData) => {
+    if (err) {
+      console.log(err);
+      return res.sendStatus(StatusCodes.FORBIDDEN);
+    }
 
-      const {id} = userData;
-      const {accessToken, refreshToken}  = makeTokens({id});
+    const { id } = userData;
+    const { accessToken, refreshToken } = makeTokens({ id });
 
-      // await refreshTokenService.drop(existToken);
-      // await refreshTokenService.add(refreshToken);
-      console.log({accessToken, refreshToken});
-      res.json({accessToken, refreshToken});
+    await refreshTokenService.drop(token);
+    await refreshTokenService.add(refreshToken);
+
+    res.json({ accessToken, refreshToken });
   });
 };

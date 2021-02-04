@@ -1,23 +1,17 @@
-'use strict';
+import userRepository from '../repositories/user.repository';
 
 class RefreshTokenService {
-    private _refreshTokens;
-    constructor() {
-        this._refreshTokens = [];
-    }
+  public async add(token) {
+    await userRepository.addToken(token);
+  }
 
-    async add(token) {
-        this._refreshTokens.push(token);
-    }
+  public async find(token) {
+    return userRepository.isTokenActual(token);
+  }
 
-    async find(token) {
-        return this._refreshTokens.find((refreshToken) => refreshToken === token);
-    }
-
-    async drop(token) {
-        this._refreshTokens = this._refreshTokens
-            .filter((refreshToken) => token !== refreshToken);
-    }
+  public async drop(token) {
+    await userRepository.deleteToken(token);
+  }
 }
 
 export default new RefreshTokenService();

@@ -1,15 +1,13 @@
-'use strict';
-
 export const constants = {
-  API_PREFIX : `/api`,
-  MAX_ID_LENGTH : 6,
-  JWT_ACCESS_SECRET: `tempCode`, //TODO заменить код
+  API_PREFIX: `/api`,
+  MAX_ID_LENGTH: 6,
+  JWT_ACCESS_SECRET: `tempCode`, // TODO заменить код
   JWT_REFRESH_SECRET: `tempRefreshCode`,
-  Env : {
+  Env: {
     DEVELOPMENT: `development`,
-    PRODUCTION: `production`
+    PRODUCTION: `production`,
   },
-  HttpCode : {
+  HttpCode: {
     OK: 200,
     CREATED: 201,
     NOT_FOUND: 404,
@@ -18,7 +16,7 @@ export const constants = {
     UNAUTHORIZED: 401,
     BAD_REQUEST: 400,
   },
-  ExitCode : {
+  ExitCode: {
     error: 1,
     success: 0,
   },

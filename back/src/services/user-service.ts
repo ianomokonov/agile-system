@@ -1,28 +1,23 @@
-'use strict';
-
-const bcrypt = require(`bcrypt`);
-const { nanoid } = require(`nanoid`);
-const userRepository = require("../repositories/user.repository");
+import bcrypt from 'bcrypt';
+import { User } from '../models/user';
+import userRepository from '../repositories/user.repository';
 
 const saltRounds = 10;
 
 class UserService {
-    constructor() {
-        this.add('vanika', '111');
-    }
+  public async add(user: User) {
+    const hash = await bcrypt.hash(user.password, saltRounds);
+    return userRepository.addUser({ ...user, password: hash });
+  }
 
-    async add(username: string, password: string) {
-        const hash = await bcrypt.hash(password, saltRounds);
-        const id = nanoid();
-    }
+  public async findByEmail(email) {
+    return userRepository.getUserByEmail(email);
+  }
 
-    async findByEmail() {
-    }
-
-    async checkUser(user: { email: string, password: string }, password: string) {
-        const match = await bcrypt.compare(password, user.password);
-        return match;
-    }
+  public async checkUser(user: User, password: string) {
+    const match = await bcrypt.compare(password, user.password);
+    return match;
+  }
 }
 
-module.exports = new UserService();
+export default new UserService();

@@ -1,15 +1,18 @@
-`use strict`;
-
-const { Router } = require(`express`);
-const authJWT = require('../middleware/authJWT');
-const refreshJWT = require('../middleware/refreshJWT');
-const loginHandler = require('../handlers/user/login.handler');
-const logOutHandler = require('../handlers/user/log-out.handler');
-const authenticateJWT = require('../middleware/authenticateJWT');
+import { Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
-const userRouter = new Router();
+import authJWT from '../middleware/authJWT';
+import refreshJWT from '../middleware/refreshJWT';
+import loginHandler from '../handlers/user/login.handler';
+import logOutHandler from '../handlers/user/log-out.handler';
+import authenticateJWT from '../middleware/authenticateJWT';
+import signUpHandler from '../handlers/user/sign-up.handler';
+
+const userRouter = Router();
 userRouter.get(`/profile`, authJWT, (req, res) => res.send(`user profile`));
-userRouter.post(`/sign-up`, (req, res) => res.send(`user signed up`));
+userRouter.post(`/sign-up`, async (req, res) => {
+  const result = await signUpHandler(req.body);
+  res.json(result);
+});
 userRouter.post(`/login`, authenticateJWT, async (req, res) => {
   const { id } = res.locals.user;
   const result = await loginHandler(id);
@@ -20,6 +23,6 @@ userRouter.delete(`/logout`, authJWT, async (req, res) => {
   const { token } = req.body;
   await logOutHandler(token);
   res.sendStatus(StatusCodes.NO_CONTENT);
-})
+});
 
 export default userRouter;

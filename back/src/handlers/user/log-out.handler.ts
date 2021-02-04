@@ -1,6 +1,5 @@
-import refreshTokenService from "../../services/refresh-token-service";
+import refreshTokenService from '../../services/refresh-token-service';
 
-
-module.exports = (token) => {
-    refreshTokenService.drop(token);
-}
+export default (token) => {
+  refreshTokenService.drop(token);
+};

@@ -1,10 +1,10 @@
-import refreshTokenService from "../../services/refresh-token-service";
-import { makeTokens } from "../../utils";
+import refreshTokenService from '../../services/refresh-token-service';
+import { makeTokens } from '../../utils';
 
-module.exports = async (userId) => {
-    const { accessToken, refreshToken } = makeTokens({ userId });
+export default async (userId) => {
+  const { accessToken, refreshToken } = makeTokens({ userId });
 
-    await refreshTokenService.add(refreshToken);
+  await refreshTokenService.add(refreshToken);
 
-    return { accessToken, refreshToken };
-}
+  return { accessToken, refreshToken };
+};
