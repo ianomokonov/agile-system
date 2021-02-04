@@ -67,6 +67,7 @@ DROP TABLE IF EXISTS `projectRoles`;
 CREATE TABLE `projectRoles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
+  `projectId` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) COMMENT 'Роли участников проекта, открывающие им функционал в сисетме';
 
@@ -250,6 +251,7 @@ CREATE TABLE `projectSprint` (
 
 ALTER TABLE `project` ADD FOREIGN KEY (ownerId) REFERENCES `user` (`id`) ON DELETE CASCADE;
 ALTER TABLE `projectUser` ADD FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
+ALTER TABLE `projectRoles` ADD FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
 ALTER TABLE `projectUser` ADD FOREIGN KEY (userId) REFERENCES `user` (`id`) ON DELETE CASCADE;
 ALTER TABLE `projectUserRole` ADD FOREIGN KEY (projectRoleId) REFERENCES `projectRoles` (`id`) ON DELETE CASCADE;
 ALTER TABLE `projectUserRole` ADD FOREIGN KEY (projectUserId) REFERENCES `projectUser` (`id`) ON DELETE CASCADE;

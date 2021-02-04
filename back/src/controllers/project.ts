@@ -9,9 +9,9 @@ projectRouter.get(`/:id`, authJWT, async (req, res) => {
   res.json({ message: "Проект ОК" });
 });
 
-projectRouter.post(`/create`, authJWT, async (req, res) => {
-  const { userId } = res.locals.user;
-  const projectId = await createProjectHandler(userId, req.body);
+projectRouter.post(`/create`, async (req, res) => {
+  // const { userId } = res.locals.user;
+  const projectId = await createProjectHandler(1, req.body);
   res.json({ id: projectId });
 });
 
