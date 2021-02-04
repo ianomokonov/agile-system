@@ -7,6 +7,7 @@ import logOutHandler from '../handlers/user/log-out.handler';
 import authenticateJWT from '../middleware/authenticateJWT';
 import signUpHandler from '../handlers/user/sign-up.handler';
 import getProfileInfoHandler from '../handlers/user/get-profile-info.handler';
+import editProfileHandler from '../handlers/user/edit-profile.handler';
 
 const userRouter = Router();
 userRouter.get(`/profile`, authJWT, async (req, res) => {
@@ -15,7 +16,15 @@ userRouter.get(`/profile`, authJWT, async (req, res) => {
   const result = await getProfileInfoHandler(userId);
   res.json(result);
 });
+userRouter.put(`/profile`, authJWT, async (req, res) => {
+  const { userId } = res.locals.user;
+
+  await editProfileHandler(userId, req.body);
+  res.sendStatus(StatusCodes.OK);
+});
 userRouter.post(`/sign-up`, async (req, res) => {
+  console.log(req.body);
+
   const result = await signUpHandler(req.body);
   res.json(result);
 });

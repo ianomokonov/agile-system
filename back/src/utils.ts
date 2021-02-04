@@ -6,3 +6,5 @@ export const makeTokens = (tokenData) => {
   const refreshToken = jwt.sign(tokenData, constants.JWT_REFRESH_SECRET);
   return { accessToken, refreshToken };
 };
+
+export const getQueryText = (text: string) => text.replace(/\$\d+/g, '?');

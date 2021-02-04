@@ -5,7 +5,7 @@ import { constants } from '../constants';
 // eslint-disable-next-line consistent-return
 export default (req, res, next): any => {
   const { authorization } = req.headers;
-
+  
   if (!authorization) {
     return res.sendStatus(StatusCodes.UNAUTHORIZED);
   }
