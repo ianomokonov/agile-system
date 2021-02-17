@@ -8,3 +8,7 @@ export const makeTokens = (tokenData) => {
 };
 
 export const getQueryText = (text: string) => text.replace(/\$\d+/g, '?');
+
+export enum Permissions {
+  CanEditProject = 'edit-project',
+}

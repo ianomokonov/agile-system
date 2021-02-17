@@ -86,6 +86,33 @@ CREATE TABLE `projectUserRole` (
 ) COMMENT 'Роли пользователя проетка';
 
 -- ---
+-- Table 'projectRolePermission'
+-- Разрешения для ролей проекта
+-- ---
+
+DROP TABLE IF EXISTS `permission`;
+		
+CREATE TABLE `permission` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) COMMENT 'Разрешения';
+
+-- ---
+-- Table 'projectRolePermission'
+-- Разрешения для ролей проекта
+-- ---
+
+DROP TABLE IF EXISTS `projectRolePermission`;
+		
+CREATE TABLE `projectRolePermission` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `projectRoleId` int(11) NOT NULL,
+  `permissionId` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) COMMENT 'Разрешения для ролей проекта';
+
+-- ---
 -- Table 'projectLinks'
 -- Важные ссылки проекта
 -- ---
@@ -255,6 +282,8 @@ ALTER TABLE `projectRoles` ADD FOREIGN KEY (projectId) REFERENCES `project` (`id
 ALTER TABLE `projectUser` ADD FOREIGN KEY (userId) REFERENCES `user` (`id`) ON DELETE CASCADE;
 ALTER TABLE `projectUserRole` ADD FOREIGN KEY (projectRoleId) REFERENCES `projectRoles` (`id`) ON DELETE CASCADE;
 ALTER TABLE `projectUserRole` ADD FOREIGN KEY (projectUserId) REFERENCES `projectUser` (`id`) ON DELETE CASCADE;
+ALTER TABLE `projectRolePermission` ADD FOREIGN KEY (projectRoleId) REFERENCES `projectRoles` (`id`) ON DELETE CASCADE;
+ALTER TABLE `projectRolePermission` ADD FOREIGN KEY (permissionId) REFERENCES `permission` (`id`) ON DELETE CASCADE;
 ALTER TABLE `projectLinks` ADD FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
 ALTER TABLE `projectTask` ADD FOREIGN KEY (statusId) REFERENCES `projectTaskStatus` (`id`) ON DELETE CASCADE;
 ALTER TABLE `projectTask` ADD FOREIGN KEY (epicId) REFERENCES `epics` (`id`) ON DELETE NO ACTION;
