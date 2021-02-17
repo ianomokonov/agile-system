@@ -1,17 +1,25 @@
 import { Router } from 'express';
+import { StatusCodes } from 'http-status-codes';
 import createProjectHandler from '../handlers/project/create-project.handler';
+import getProjectHandler from '../handlers/project/get-project.handler';
 import authJWT from '../middleware/authJWT';
 
 const projectRouter = Router();
 
 projectRouter.get(`/:id`, authJWT, async (req, res) => {
   const { userId } = res.locals.user;
-  res.json({ message: 'Проект ОК' });
+  const project = await getProjectHandler(userId, Number.parseInt(req.params.id, 10));
+
+  if (!project) {
+    res.status(StatusCodes.NOT_FOUND).json('Проект не найден');
+    return;
+  }
+  res.status(StatusCodes.OK).json(project);
 });
 
-projectRouter.post(`/create`, async (req, res) => {
-  // const { userId } = res.locals.user;
-  const projectId = await createProjectHandler(1, req.body);
+projectRouter.post(`/create`, authJWT, async (req, res) => {
+  const { userId } = res.locals.user;
+  const projectId = await createProjectHandler(userId, req.body);
   res.json({ id: projectId });
 });
 

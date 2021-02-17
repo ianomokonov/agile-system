@@ -93,6 +93,18 @@ class ProjectRepository {
 
     await dbConnection.query(query);
   }
+
+  public async getUserProject(userId: number, projectId: number) {
+    if (!userId || !projectId) {
+      return null;
+    }
+
+    const query = `SELECT * FROM project p WHERE p.Id=${projectId} AND p.ownerId=${userId} OR 0 < (SELECT COUNT(*) from projectuser pu where pu.userId=${userId} AND pu.projectId=p.id)`;
+
+    const [projects] = await dbConnection.query(query);
+
+    return projects[0];
+  }
 }
 
 export default new ProjectRepository();

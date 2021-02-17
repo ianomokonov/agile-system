@@ -28,8 +28,10 @@ class ProjectService {
     return projectId;
   }
 
-  public async get(userId: number, projectId: number){
-      
+  public async get(userId: number, projectId: number) {
+    const project = projectRepository.getUserProject(userId, projectId);
+
+    return project;
   }
 }
 
