@@ -6,29 +6,27 @@ import userRepository from '../repositories/user.repository';
 const saltRounds = 10;
 
 class UserService {
-    public async add(user: User) {
-        console.log(user);
+  public async add(user: User) {
+    const hash = await bcrypt.hash(user.password, saltRounds);
+    return userRepository.addUser({ ...user, password: hash });
+  }
 
-        const hash = await bcrypt.hash(user.password, saltRounds);
-        return userRepository.addUser({ ...user, password: hash });
-    }
+  public async edit(userId: number, user: UserInfo) {
+    return userRepository.editUser(userId, user);
+  }
 
-    public async edit(userId: number, user: UserInfo) {
-        return userRepository.editUser(userId, user)
-    }
+  public async findByEmail(email) {
+    return userRepository.getUserByEmail(email);
+  }
 
-    public async findByEmail(email) {
-        return userRepository.getUserByEmail(email);
-    }
+  public async getUserById(userId: number) {
+    return userRepository.getUserById(userId);
+  }
 
-    public async getUserById(userId: number) {
-        return userRepository.getUserById(userId);
-    }
-
-    public async checkUser(user: User, password: string) {
-        const match = await bcrypt.compare(password, user.password);
-        return match;
-    }
+  public async checkUser(user: User, password: string) {
+    const match = await bcrypt.compare(password, user.password);
+    return match;
+  }
 }
 
 export default new UserService();

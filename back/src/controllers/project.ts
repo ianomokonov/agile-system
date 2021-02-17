@@ -1,12 +1,12 @@
-import { Router } from "express";
-import createProjectHandler from "../handlers/project/create-project.handler";
-import authJWT from "../middleware/authJWT";
+import { Router } from 'express';
+import createProjectHandler from '../handlers/project/create-project.handler';
+import authJWT from '../middleware/authJWT';
 
 const projectRouter = Router();
 
 projectRouter.get(`/:id`, authJWT, async (req, res) => {
   const { userId } = res.locals.user;
-  res.json({ message: "Проект ОК" });
+  res.json({ message: 'Проект ОК' });
 });
 
 projectRouter.post(`/create`, async (req, res) => {
@@ -15,4 +15,4 @@ projectRouter.post(`/create`, async (req, res) => {
   res.json({ id: projectId });
 });
 
-export default projectRouter; 
+export default projectRouter;

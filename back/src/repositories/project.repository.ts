@@ -1,10 +1,11 @@
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import { link } from '../models/link';
+import { Link } from '../models/link';
 import { Project } from '../models/project';
 import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
 
 const sql = require('sql-query-generator');
+
 sql.use('mysql');
 
 class ProjectRepository {
@@ -17,35 +18,38 @@ class ProjectRepository {
   }
 
   public async create(project: Project) {
-    const query = sql.insert('project', { name: project.name, description: project.description, ownerId: project.ownerId, repository: project.repository });
-    const result = await dbConnection.query(
-      getQueryText(query.text),
-      query.values
-    );
+    const query = sql.insert('project', {
+      name: project.name,
+      description: project.description,
+      ownerId: project.ownerId,
+      repository: project.repository,
+    });
+    const result = await dbConnection.query(getQueryText(query.text), query.values);
     return (result[0] as ResultSetHeader).insertId;
   }
 
   public async createProjectRoles(projectId: number, roles: string[]) {
     if (!roles?.length) {
-      return;
+      return [];
     }
 
-    const query = `${`INSERT INTO projectroles (projectId, name) VALUES ${roles.map(role => `(${projectId}, ?), `).join('')}`.replace(/,\s$/, '')};`;
+    const query = `${`INSERT INTO projectroles (projectId, name) VALUES ${roles
+      .map(() => `(${projectId}, ?), `)
+      .join('')}`.replace(/,\s$/, '')};`;
 
-    await dbConnection.query(
-      query,
-      roles
-    );
+    await dbConnection.query(query, roles);
 
     return this.getProjectRoles(projectId);
   }
 
-  public async createProjectUsers(projectId: number, userIds: number[]) {
+  public async createProjectUsers(projectId: number, userIds: number[]): Promise<RowDataPacket[]> {
     if (!userIds?.length) {
-      return;
+      return [];
     }
 
-    const query = `${`INSERT INTO projectuser (projectId, userId) VALUES ${userIds.map(id => `(${projectId}, ?), `).join('')}`.replace(/,\s$/, '')};`;
+    const query = `${`INSERT INTO projectuser (projectId, userId) VALUES ${userIds
+      .map(() => `(${projectId}, ?), `)
+      .join('')}`.replace(/,\s$/, '')};`;
     await dbConnection.query(query, userIds);
     return this.getProjectUsers(projectId);
   }
@@ -66,28 +70,28 @@ class ProjectRepository {
     return users;
   }
 
-  public async createProjectLinks(projectId: number, links: link[]) {
+  public async createProjectLinks(projectId: number, links: Link[]) {
     if (!links?.length) {
       return;
     }
 
-    const query = `INSERT INTO projectlinks (projectId, name, url) VALUES ${links.map(link => `(${projectId}, '${link.name}', '${link.url}'), `).join('')}`.replace(/,\s$/, '');
+    const query = `INSERT INTO projectlinks (projectId, name, url) VALUES ${links
+      .map((link) => `(${projectId}, '${link.name}', '${link.url}'), `)
+      .join('')}`.replace(/,\s$/, '');
 
-    await dbConnection.query(
-      query,
-    );
+    await dbConnection.query(query);
   }
 
-  public async createProjectUserRoles(roles: { projectUserId: number, projectRoleId: number }[]) {
+  public async createProjectUserRoles(roles: { projectUserId: number; projectRoleId: number }[]) {
     if (!roles?.length) {
       return;
     }
 
-    const query = `INSERT INTO projectuserrole (projectUserId, projectRoleId) VALUES ${roles.map(role => `('${role.projectUserId}', '${role.projectRoleId}'), `).join('')}`.replace(/,\s$/, '');
+    const query = `INSERT INTO projectuserrole (projectUserId, projectRoleId) VALUES ${roles
+      .map((role) => `('${role.projectUserId}', '${role.projectRoleId}'), `)
+      .join('')}`.replace(/,\s$/, '');
 
-    await dbConnection.query(
-      query,
-    );
+    await dbConnection.query(query);
   }
 }
 

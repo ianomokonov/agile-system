@@ -23,8 +23,6 @@ userRouter.put(`/profile`, authJWT, async (req, res) => {
   res.sendStatus(StatusCodes.OK);
 });
 userRouter.post(`/sign-up`, async (req, res) => {
-  console.log(req.body);
-
   const result = await signUpHandler(req.body);
   res.json(result);
 });
