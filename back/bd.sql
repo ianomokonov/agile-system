@@ -54,7 +54,8 @@ CREATE TABLE `projectUser` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `projectId` int(11) NOT NULL,
   `userId` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  CONSTRAINT uniqPU UNIQUE (projectId, userId)
 ) COMMENT 'Пользователи в команде проекта';
 
 -- ---
@@ -82,7 +83,8 @@ CREATE TABLE `projectUserRole` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `projectRoleId` int(11) NOT NULL,
   `projectUserId` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  CONSTRAINT uniqPUR UNIQUE (projectRoleId, projectUserId)
 ) COMMENT 'Роли пользователя проетка';
 
 -- ---

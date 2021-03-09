@@ -1,7 +1,11 @@
 import { Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import addProjectUserHandler from '../handlers/project/add-project-user.handler';
 import createProjectHandler from '../handlers/project/create-project.handler';
+import editProjectUserHandler from '../handlers/project/edit-project-user.handler';
 import getProjectHandler from '../handlers/project/get-project.handler';
+import projectRolesHandler from '../handlers/project/project-roles.handler';
+import removeProjectUserHandler from '../handlers/project/remove-project-user.handler';
 import authJWT from '../middleware/authJWT';
 import checkPermissions from '../middleware/check-permissions';
 import { Permissions } from '../utils';
@@ -57,7 +61,8 @@ projectRouter.post(
   authJWT,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    res.json({ message: 'заглушка' });
+    await addProjectUserHandler(req.body);
+    res.status(StatusCodes.OK).json('Пользователь добавлен');
   },
 );
 
@@ -66,7 +71,8 @@ projectRouter.put(
   authJWT,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    res.json({ message: 'заглушка' });
+    await editProjectUserHandler(req.body);
+    res.status(StatusCodes.OK).json('Пользователь обновлен');
   },
 );
 
@@ -75,7 +81,8 @@ projectRouter.delete(
   authJWT,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    res.json({ message: 'заглушка' });
+    await removeProjectUserHandler(+req.query.projectUserId);
+    res.status(StatusCodes.OK).json('Пользователь удален');
   },
 );
 
@@ -84,7 +91,8 @@ projectRouter.post(
   authJWT,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    res.json({ message: 'заглушка' });
+    await projectRolesHandler.create({ projectId: req.params.id, ...req.body });
+    res.status(StatusCodes.OK).json('Роль добавлена');
   },
 );
 
@@ -93,7 +101,8 @@ projectRouter.put(
   authJWT,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    res.json({ message: 'заглушка' });
+    await projectRolesHandler.update({ projectId: req.params.id, ...req.body });
+    res.status(StatusCodes.OK).json('Роль обновлена');
   },
 );
 
@@ -102,7 +111,18 @@ projectRouter.delete(
   authJWT,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    res.json({ message: 'заглушка' });
+    await projectRolesHandler.delete(+req.query.projectRoleId);
+    res.status(StatusCodes.OK).json('Роль удалена');
+  },
+);
+
+projectRouter.get(
+  `/:id/roles`,
+  authJWT,
+  checkPermissions(Permissions.CanReadProject),
+  async (req, res) => {
+    const roles = await projectRolesHandler.read(+req.params.id);
+    res.status(StatusCodes.OK).json(roles);
   },
 );
 

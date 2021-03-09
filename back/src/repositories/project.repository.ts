@@ -1,20 +1,20 @@
-import e from 'express';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import * as sql from 'sql-query-generator';
+import { AddProjectUserRequest } from '../models/add-project-user-request';
 import { CreateProjectRequest } from '../models/create-project-request';
+import { EditProjectUserRequest } from '../models/edit-project-user-request';
 import { Link } from '../models/link';
 import { Project } from '../models/project';
+import { CreateProjectRoleRequest, UpdateProjectRoleRequest } from '../models/project-role.models';
 import { getQueryText, Permissions } from '../utils';
 import dbConnection from './db-connection';
-
-const sql = require('sql-query-generator');
 
 sql.use('mysql');
 
 class ProjectRepository {
   public async getUserProjects(userId: number) {
-    const [projects] = await dbConnection.query<RowDataPacket[]>(
-      `SELECT * FROM project WHERE ownerId='${userId}'`,
-    );
+    const query = sql.select('project', '*').where({ ownerId: userId });
+    const [projects] = await dbConnection.query<RowDataPacket[]>(query.text, query.values);
 
     return (projects as unknown) as Project[];
   }
@@ -28,6 +28,75 @@ class ProjectRepository {
     });
     const result = await dbConnection.query(getQueryText(query.text), query.values);
     return (result[0] as ResultSetHeader).insertId;
+  }
+
+  public async addProjectUser(request: AddProjectUserRequest) {
+    const query = sql.insert('projectuser', {
+      projectId: request.projectId,
+      userId: request.userId,
+    });
+    const result = await dbConnection.query(getQueryText(query.text), query.values);
+    const projectUserId = (result[0] as ResultSetHeader).insertId;
+
+    await this.addProjectUserRoles(projectUserId, request.roleIds);
+    return projectUserId;
+  }
+
+  public async editProjectUser(request: EditProjectUserRequest) {
+    await this.removeProjectUserRoles(request.projectUserId);
+    this.addProjectUserRoles(request.projectUserId, request.roleIds);
+  }
+
+  public async removeProjectUser(projectUserId: number) {
+    if (!projectUserId) {
+      console.error('Укажите id пользователя проекта');
+      return;
+    }
+
+    const query = sql.deletes('projectuser').where({ id: projectUserId });
+
+    await dbConnection.query(getQueryText(query.text), query.values);
+  }
+
+  public async addProjectRole(request: CreateProjectRoleRequest) {
+    const query = sql.insert('projectroles', {
+      projectId: request.projectId,
+      name: request.roleName,
+    });
+    const result = await dbConnection.query(getQueryText(query.text), query.values);
+    const projectRoleId = (result[0] as ResultSetHeader).insertId;
+
+    await this.addProjectRolePermissions(projectRoleId, request.permissionIds);
+    return projectRoleId;
+  }
+
+  public async getFullProjectUsers(projectId: number) {
+    const [users] = await dbConnection.query<
+      RowDataPacket[]
+    >(`SELECT pu.id, u.name, u.surname, u.image, u.email 
+        FROM projectuser pu JOIN user u ON pu.userId = u.id 
+        WHERE pu.projectId=${projectId}`);
+    return users;
+  }
+
+  public async editProjectRole(request: UpdateProjectRoleRequest) {
+    const query = sql
+      .update('projectroles', { name: request.projectRoleName })
+      .where({ id: request.projectRoleId });
+    dbConnection.query(getQueryText(query.text), query.values);
+    await this.removeProjectRolePermissions(request.projectRoleId);
+    this.addProjectRolePermissions(request.projectRoleId, request.permissionIds);
+  }
+
+  public async removeProjectRole(projectRoleId: number) {
+    if (!projectRoleId) {
+      console.error('Укажите id роли проекта');
+      return;
+    }
+
+    const query = sql.deletes('projectroles').where({ id: projectRoleId });
+
+    await dbConnection.query(getQueryText(query.text), query.values);
   }
 
   public async createProjectUsers(projectId: number, userIds: number[]) {
@@ -57,6 +126,62 @@ class ProjectRepository {
     return users;
   }
 
+  private async addProjectUserRoles(projectUserId: number, roleIds: number[]) {
+    if (!projectUserId) {
+      console.error('Укажите id пользователя проекта');
+      return;
+    }
+    if (!roleIds?.length) {
+      console.error('Список ролей не может быть пустым');
+      return;
+    }
+
+    const query = `INSERT INTO projectuserrole (projectRoleId, projectUserId) VALUES ${roleIds
+      .map((id) => `(${id}, '${projectUserId}'), `)
+      .join('')}`.replace(/,\s$/, '');
+
+    await dbConnection.query(query);
+  }
+
+  private async addProjectRolePermissions(projectRoleId: number, permissionIds: number[]) {
+    if (!projectRoleId) {
+      console.error('Укажите id роли проекта');
+      return;
+    }
+    if (!permissionIds?.length) {
+      console.error('Список разрешений не может быть пустым');
+      return;
+    }
+
+    const query = `INSERT INTO projectrolepermission (projectRoleId, permissionId) VALUES ${permissionIds
+      .map((id) => `(${projectRoleId}, '${id}'), `)
+      .join('')}`.replace(/,\s$/, '');
+
+    await dbConnection.query(query);
+  }
+
+  private async removeProjectUserRoles(projectUserId: number) {
+    if (!projectUserId) {
+      console.error('Укажите id пользователя проекта');
+      return;
+    }
+
+    const query = sql.deletes('projectuserrole').where({ projectUserId });
+
+    await dbConnection.query(getQueryText(query.text), query.values);
+  }
+
+  private async removeProjectRolePermissions(projectRoleId: number) {
+    if (!projectRoleId) {
+      console.error('Укажите id роли проекта');
+      return;
+    }
+
+    const query = sql.deletes('projectrolepermission').where({ projectRoleId });
+
+    await dbConnection.query(getQueryText(query.text), query.values);
+  }
+
   public async createProjectLinks(projectId: number, links: Link[]) {
     if (!links?.length) {
       return;
@@ -82,7 +207,7 @@ class ProjectRepository {
   }
 
   public async checkUserPermission(userId: number, projectId: number, permission: Permissions) {
-    if (!userId || !projectId || permission) {
+    if (!userId || !projectId || !permission) {
       return false;
     }
     let query = `SELECT * FROM project p WHERE p.Id=${projectId} AND p.ownerId=${userId}`;
