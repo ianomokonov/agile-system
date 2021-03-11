@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import addProjectUserHandler from '../handlers/project/add-project-user.handler';
 import createProjectHandler from '../handlers/project/create-project.handler';
 import editProjectUserHandler from '../handlers/project/edit-project-user.handler';
+import getProjectPermissionsHandler from '../handlers/project/get-project-permissions.handler';
 import getProjectHandler from '../handlers/project/get-project.handler';
 import projectRolesHandler from '../handlers/project/project-roles.handler';
 import removeProjectUserHandler from '../handlers/project/remove-project-user.handler';
@@ -119,10 +120,20 @@ projectRouter.delete(
 projectRouter.get(
   `/:id/roles`,
   authJWT,
-  checkPermissions(Permissions.CanReadProject),
+  checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
     const roles = await projectRolesHandler.read(+req.params.id);
     res.status(StatusCodes.OK).json(roles);
+  },
+);
+
+projectRouter.get(
+  `/:id/permissions`,
+  authJWT,
+  checkPermissions(Permissions.CanEditProject),
+  async (req, res) => {
+    const permissions = await getProjectPermissionsHandler();
+    res.status(StatusCodes.OK).json(permissions);
   },
 );
 

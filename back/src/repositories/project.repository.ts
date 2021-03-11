@@ -118,6 +118,12 @@ class ProjectRepository {
     return roles;
   }
 
+  public async getProjectPermissions() {
+    const [permissions] = await dbConnection.query<RowDataPacket[]>(`SELECT * FROM permission`);
+
+    return permissions;
+  }
+
   public async getProjectUsers(projectId: number) {
     const [users] = await dbConnection.query<RowDataPacket[]>(
       `SELECT * FROM projectuser WHERE projectId='${projectId}'`,

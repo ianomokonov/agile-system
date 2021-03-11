@@ -1,74 +1,71 @@
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import { Project } from '../models/project';
+import * as sql from 'sql-query-generator';
 import { User } from '../models/user';
 import { UserInfo } from '../models/user-info';
 import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
 import projectRepository from './project.repository';
 
-const sql = require('sql-query-generator');
 sql.use('mysql');
 
 class UserRepository {
-    public async getUsers() {
-        const [result] = await dbConnection.query('SELECT * FROM `user`');
-        return result;
-    }
+  public async getUsers() {
+    const [result] = await dbConnection.query('SELECT * FROM `user`');
+    return result;
+  }
 
-    public async getUserByEmail(email: string) {
-        const query = sql.select('user', "*").where({ email: email });
-        const [result] = await dbConnection.query<RowDataPacket[]>(
-            getQueryText(query.text),
-            query.values
-        );
-        return (result[0] as unknown) as User;
-    }
+  public async getUserByEmail(email: string) {
+    const query = sql.select('user', '*').where({ email });
+    const [result] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    return (result[0] as unknown) as User;
+  }
 
-    public async getUserById(userId: number) {
-        const query = sql.select('user', ['name', 'surname', 'email', 'vk', 'github']).where({ id: userId });
-        const [[user]] = await dbConnection.query<RowDataPacket[]>(
-            getQueryText(query.text),
-            query.values
-        );
-        if (!user) {
-            return null;
-        }
-        user.projects = await projectRepository.getUserProjects(userId);
-
-        return (user as unknown) as UserInfo;
+  public async getUserById(userId: number) {
+    const query = sql
+      .select('user', ['name', 'surname', 'email', 'vk', 'github'])
+      .where({ id: userId });
+    const [[user]] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    if (!user) {
+      return null;
     }
+    user.projects = await projectRepository.getUserProjects(userId);
 
-    public async isTokenActual(token: string) {
-        const [result] = await dbConnection.query<[]>(
-            `SELECT * FROM refreshtokens WHERE token='${token}'`,
-        );
-        return !!result?.length;
-    }
+    return (user as unknown) as UserInfo;
+  }
 
-    public async addUser(user: User) {
-        const query = sql.insert('user', user);
-        const result = await dbConnection.query(
-            getQueryText(query.text),
-            query.values,
-        );
-        return (result[0] as ResultSetHeader).insertId;
-    }
+  public async isTokenActual(token: string) {
+    const [result] = await dbConnection.query<[]>(
+      `SELECT * FROM refreshtokens WHERE token='${token}'`,
+    );
+    return !!result?.length;
+  }
 
-    public async editUser(userId: number, user: UserInfo) {
-        const query = sql.update('user', user).where({ id: userId });
-        await dbConnection.query(
-            getQueryText(query.text),
-            query.values,
-        );
-    }
+  public async addUser(user: User) {
+    const query = sql.insert('user', user);
+    const result = await dbConnection.query(getQueryText(query.text), query.values);
+    return (result[0] as ResultSetHeader).insertId;
+  }
 
-    public async addToken(token: string) {
-        await dbConnection.query('INSERT INTO refreshtokens (token) VALUES (?);', [token]);
-    }
+  public async editUser(userId: number, user: UserInfo) {
+    const query = sql
+      .update('user', { name: user.name, surname: user.surname, vk: user.vk, gitHub: user.gitHub })
+      .where({ id: userId });
+    await dbConnection.query(getQueryText(query.text), query.values);
+  }
 
-    public async deleteToken(token: string) {
-        await dbConnection.query('DELETE FROM refreshtokens WHERE token=?;', [token]);
-    }
+  public async addToken(token: string) {
+    await dbConnection.query('INSERT INTO refreshtokens (token) VALUES (?);', [token]);
+  }
+
+  public async deleteToken(token: string) {
+    await dbConnection.query('DELETE FROM refreshtokens WHERE token=?;', [token]);
+  }
 }
 
 export default new UserRepository();

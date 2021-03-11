@@ -53,6 +53,10 @@ class ProjectService {
     return project;
   }
 
+  public async getPermissions() {
+    return projectRepository.getProjectPermissions();
+  }
+
   public async checkPermission(userId: number, projectId: number, permission: Permissions) {
     return projectRepository.checkUserPermission(userId, projectId, permission);
   }
