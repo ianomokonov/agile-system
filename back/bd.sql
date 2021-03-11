@@ -149,7 +149,7 @@ CREATE TABLE `projectTask` (
   `projectId` int(11) NOT NULL,
   `lastEditDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `createDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  `projectSprintId` int(11) NOT NULL,
+  `projectSprintId` int(11) NULL,
   PRIMARY KEY (`id`)
 ) COMMENT 'Задачи';
 
@@ -301,6 +301,20 @@ ALTER TABLE `comment` ADD FOREIGN KEY (projectTaskId) REFERENCES `projectTask` (
 ALTER TABLE `taskHistoryOperations` ADD FOREIGN KEY (projectUserId) REFERENCES `projectUser` (`id`) ON DELETE CASCADE;
 ALTER TABLE `taskHistoryOperations` ADD FOREIGN KEY (projectTaskId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
 ALTER TABLE `projectSprint` ADD FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
+
+
+INSERT INTO `projectTaskStatus` (`name`) VALUES
+('to do'), ('dev in progress'), ('under review'), ('dev completed'), ('testing'), ('test completed');
+
+DELIMITER $$
+CREATE TRIGGER create_project_user
+AFTER INSERT
+ON project FOR EACH ROW
+BEGIN
+    INSERT INTO projectUser(projectId, userId)
+    VALUES(new.id, new.ownerId);
+END$$
+DELIMITER ;
 
 -- ---
 -- Table Properties

@@ -58,6 +58,15 @@ class ProjectRepository {
     await dbConnection.query(getQueryText(query.text), query.values);
   }
 
+  public async getFullProjectUsers(projectId: number) {
+    const [users] = await dbConnection.query<
+      RowDataPacket[]
+    >(`SELECT pu.id, u.name, u.surname, u.image, u.email 
+        FROM projectuser pu JOIN user u ON pu.userId = u.id 
+        WHERE pu.projectId=${projectId}`);
+    return users;
+  }
+
   public async addProjectRole(request: CreateProjectRoleRequest) {
     const query = sql.insert('projectroles', {
       projectId: request.projectId,
@@ -68,15 +77,6 @@ class ProjectRepository {
 
     await this.addProjectRolePermissions(projectRoleId, request.permissionIds);
     return projectRoleId;
-  }
-
-  public async getFullProjectUsers(projectId: number) {
-    const [users] = await dbConnection.query<
-      RowDataPacket[]
-    >(`SELECT pu.id, u.name, u.surname, u.image, u.email 
-        FROM projectuser pu JOIN user u ON pu.userId = u.id 
-        WHERE pu.projectId=${projectId}`);
-    return users;
   }
 
   public async editProjectRole(request: UpdateProjectRoleRequest) {
@@ -200,16 +200,34 @@ class ProjectRepository {
     await dbConnection.query(query);
   }
 
-  public async getUserProject(userId: number, projectId: number) {
-    if (!userId || !projectId) {
+  public async getProject(projectId: number) {
+    if (!projectId) {
+      console.error('Укажите id проекта');
       return null;
     }
 
-    const query = `SELECT * FROM project p WHERE p.Id=${projectId} AND p.ownerId=${userId} OR 0 < (SELECT COUNT(*) from projectuser pu where pu.userId=${userId} AND pu.projectId=p.id)`;
+    const query = sql.select('project', '*').where({ id: projectId });
 
-    const [projects] = await dbConnection.query(query);
+    const [[project]] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    return project;
+  }
 
-    return projects[0];
+  public async getProjectTasks(projectId: number) {
+    if (!projectId) {
+      console.error('Укажите id проекта');
+      return null;
+    }
+
+    const query = sql.select('projecttask', '*').where({ projectId });
+
+    const [tasks] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    return tasks;
   }
 
   public async checkUserPermission(userId: number, projectId: number, permission: Permissions) {

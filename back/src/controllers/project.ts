@@ -7,22 +7,27 @@ import getProjectPermissionsHandler from '../handlers/project/get-project-permis
 import getProjectHandler from '../handlers/project/get-project.handler';
 import projectRolesHandler from '../handlers/project/project-roles.handler';
 import removeProjectUserHandler from '../handlers/project/remove-project-user.handler';
+import tasksHandler from '../handlers/task/tasks.handler';
 import authJWT from '../middleware/authJWT';
-import checkPermissions from '../middleware/check-permissions';
+import checkPermissions from '../middleware/check-project-permissions';
 import { Permissions } from '../utils';
 
 const projectRouter = Router();
 
-projectRouter.get(`/:id`, authJWT, async (req, res) => {
-  const { userId } = res.locals.user;
-  const project = await getProjectHandler(userId, Number.parseInt(req.params.id, 10));
+projectRouter.get(
+  `/:id`,
+  authJWT,
+  checkPermissions(Permissions.CanReadProject),
+  async (req, res) => {
+    const project = await getProjectHandler(Number.parseInt(req.params.id, 10));
 
-  if (!project) {
-    res.status(StatusCodes.NOT_FOUND).json('Проект не найден');
-    return;
-  }
-  res.status(StatusCodes.OK).json(project);
-});
+    if (!project) {
+      res.status(StatusCodes.NOT_FOUND).json('Проект не найден');
+      return;
+    }
+    res.status(StatusCodes.OK).json(project);
+  },
+);
 
 projectRouter.post(`/create`, authJWT, async (req, res) => {
   const { userId } = res.locals.user;
@@ -134,6 +139,16 @@ projectRouter.get(
   async (req, res) => {
     const permissions = await getProjectPermissionsHandler();
     res.status(StatusCodes.OK).json(permissions);
+  },
+);
+
+projectRouter.post(
+  `/:id/add-task`,
+  authJWT,
+  checkPermissions(Permissions.CanEditProject),
+  async (req, res) => {
+    const newTaskId = await tasksHandler.create({ projectId: +req.params.id, ...req.body });
+    res.status(StatusCodes.OK).json(newTaskId);
   },
 );
 

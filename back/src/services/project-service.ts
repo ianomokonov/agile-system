@@ -47,9 +47,12 @@ class ProjectService {
     return projectRepository.getFullProjectUsers(projectId);
   }
 
-  public async get(userId: number, projectId: number) {
-    const project = projectRepository.getUserProject(userId, projectId);
-
+  public async read(projectId: number) {
+    const [project, tasks] = await Promise.all([
+      projectRepository.getProject(projectId),
+      projectRepository.getProjectTasks(projectId),
+    ]);
+    project.tasks = tasks;
     return project;
   }
 
