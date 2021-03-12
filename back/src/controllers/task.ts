@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import tasksHandler from '../handlers/task/tasks.handler';
+import updateTaskStatusHandler from '../handlers/task/update-task-status.handler';
 import authJWT from '../middleware/authJWT';
 import checkTaskPermissions from '../middleware/check-task-permissions';
 import { Permissions } from '../utils';
@@ -11,8 +12,12 @@ taskRouter.get(
   authJWT,
   checkTaskPermissions(Permissions.CanReadProject),
   async (req, res) => {
-    const result = await tasksHandler.read(+req.params.id);
-    res.json(result);
+    try {
+      const result = await tasksHandler.read(+req.params.id);
+      res.status(StatusCodes.OK).json(result);
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
   },
 );
 
@@ -21,8 +26,12 @@ taskRouter.put(
   authJWT,
   checkTaskPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    await tasksHandler.update({ id: +req.params.id, ...req.body });
-    res.status(StatusCodes.OK).json('Задача обновлена');
+    try {
+      await tasksHandler.update({ id: +req.params.id, ...req.body });
+      res.status(StatusCodes.OK).json('Задача обновлена');
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
   },
 );
 
@@ -31,8 +40,26 @@ taskRouter.delete(
   authJWT,
   checkTaskPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    await tasksHandler.delete(+req.params.id);
-    res.status(StatusCodes.OK).json('Задача удалена');
+    try {
+      await tasksHandler.delete(+req.params.id);
+      res.status(StatusCodes.OK).json('Задача удалена');
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
+taskRouter.put(
+  `/:id/update-status`,
+  authJWT,
+  checkTaskPermissions(Permissions.CanEditProject),
+  async (req, res) => {
+    try {
+      await updateTaskStatusHandler(+req.params.id, req.body.statusId);
+      res.status(StatusCodes.OK).json('Статус задачи обновлен');
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
   },
 );
 

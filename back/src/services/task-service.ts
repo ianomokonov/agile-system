@@ -16,6 +16,9 @@ class TaskService implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
   public async update(request: UpdateTaskRequest) {
     taskRepository.update(request);
   }
+  public async updateTaskStatus(taskId: number, statusId: number) {
+    taskRepository.updateTaskStatus(taskId, statusId);
+  }
   public async read(id: number) {
     const task = await taskRepository.read(id);
     if (!task) {

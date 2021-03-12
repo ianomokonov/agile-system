@@ -48,6 +48,15 @@ class TaskRepository implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
     dbConnection.query(getQueryText(query.text), query.values);
   }
 
+  public async updateTaskStatus(taskId: number, statusId: number) {
+    const query = sql
+      .update('projecttask', {
+        statusId,
+      })
+      .where({ id: taskId });
+    dbConnection.query(getQueryText(query.text), query.values);
+  }
+
   public async delete(taskId: number) {
     if (!taskId) {
       console.error('Укажите id задачи');
