@@ -19,13 +19,17 @@ projectRouter.get(
   authJWT,
   checkPermissions(Permissions.CanReadProject),
   async (req, res) => {
-    const project = await getProjectHandler(Number.parseInt(req.params.id, 10));
+    try {
+      const project = await getProjectHandler(Number.parseInt(req.params.id, 10));
 
-    if (!project) {
-      res.status(StatusCodes.NOT_FOUND).json('Проект не найден');
-      return;
+      if (!project) {
+        res.status(StatusCodes.NOT_FOUND).json('Проект не найден');
+        return;
+      }
+      res.status(StatusCodes.OK).json(project);
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
     }
-    res.status(StatusCodes.OK).json(project);
   },
 );
 
@@ -40,7 +44,11 @@ projectRouter.post(
   authJWT,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    res.json({ message: 'заглушка' });
+    try {
+      res.json({ message: 'заглушка' });
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
   },
 );
 
@@ -49,7 +57,11 @@ projectRouter.put(
   authJWT,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    res.json({ message: 'заглушка' });
+    try {
+      res.json({ message: 'заглушка' });
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
   },
 );
 
@@ -58,7 +70,11 @@ projectRouter.delete(
   authJWT,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    res.json({ message: 'заглушка' });
+    try {
+      res.json({ message: 'заглушка' });
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
   },
 );
 
@@ -67,8 +83,12 @@ projectRouter.post(
   authJWT,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    await addProjectUserHandler(req.body);
-    res.status(StatusCodes.OK).json('Пользователь добавлен');
+    try {
+      await addProjectUserHandler(req.body);
+      res.status(StatusCodes.OK).json('Пользователь добавлен');
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
   },
 );
 
@@ -77,8 +97,12 @@ projectRouter.put(
   authJWT,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    await editProjectUserHandler(req.body);
-    res.status(StatusCodes.OK).json('Пользователь обновлен');
+    try {
+      await editProjectUserHandler(req.body);
+      res.status(StatusCodes.OK).json('Пользователь обновлен');
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
   },
 );
 
@@ -87,8 +111,12 @@ projectRouter.delete(
   authJWT,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    await removeProjectUserHandler(+req.query.projectUserId);
-    res.status(StatusCodes.OK).json('Пользователь удален');
+    try {
+      await removeProjectUserHandler(+req.query.projectUserId);
+      res.status(StatusCodes.OK).json('Пользователь удален');
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
   },
 );
 
@@ -97,8 +125,12 @@ projectRouter.post(
   authJWT,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    await projectRolesHandler.create({ projectId: req.params.id, ...req.body });
-    res.status(StatusCodes.OK).json('Роль добавлена');
+    try {
+      await projectRolesHandler.create({ projectId: req.params.id, ...req.body });
+      res.status(StatusCodes.OK).json('Роль добавлена');
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
   },
 );
 
@@ -107,8 +139,12 @@ projectRouter.put(
   authJWT,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    await projectRolesHandler.update({ projectId: req.params.id, ...req.body });
-    res.status(StatusCodes.OK).json('Роль обновлена');
+    try {
+      await projectRolesHandler.update({ projectId: req.params.id, ...req.body });
+      res.status(StatusCodes.OK).json('Роль обновлена');
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
   },
 );
 
@@ -117,8 +153,12 @@ projectRouter.delete(
   authJWT,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    await projectRolesHandler.delete(+req.query.projectRoleId);
-    res.status(StatusCodes.OK).json('Роль удалена');
+    try {
+      await projectRolesHandler.delete(+req.query.projectRoleId);
+      res.status(StatusCodes.OK).json('Роль удалена');
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
   },
 );
 
@@ -127,8 +167,12 @@ projectRouter.get(
   authJWT,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    const roles = await projectRolesHandler.read(+req.params.id);
-    res.status(StatusCodes.OK).json(roles);
+    try {
+      const roles = await projectRolesHandler.read(+req.params.id);
+      res.status(StatusCodes.OK).json(roles);
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
   },
 );
 
@@ -137,8 +181,12 @@ projectRouter.get(
   authJWT,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    const permissions = await getProjectPermissionsHandler();
-    res.status(StatusCodes.OK).json(permissions);
+    try {
+      const permissions = await getProjectPermissionsHandler();
+      res.status(StatusCodes.OK).json(permissions);
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
   },
 );
 
@@ -147,8 +195,12 @@ projectRouter.post(
   authJWT,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    const newTaskId = await tasksHandler.create({ projectId: +req.params.id, ...req.body });
-    res.status(StatusCodes.OK).json(newTaskId);
+    try {
+      const newTaskId = await tasksHandler.create({ projectId: +req.params.id, ...req.body });
+      res.status(StatusCodes.OK).json(newTaskId);
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
   },
 );
 

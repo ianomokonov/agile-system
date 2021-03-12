@@ -132,6 +132,17 @@ class ProjectRepository {
     return users;
   }
 
+  public async getProjectUser(projectId: number, userId: number) {
+    const query = sql.select('projectuser', '*').where({ projectId, id: userId });
+
+    const [[user]] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    return user;
+  }
+
   private async addProjectUserRoles(projectUserId: number, roleIds: number[]) {
     if (!projectUserId) {
       console.error('Укажите id пользователя проекта');
