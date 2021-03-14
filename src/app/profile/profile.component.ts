@@ -61,8 +61,8 @@ export class ProfileComponent implements OnInit {
   ) {}
 
   public ngOnInit(): void {
-    this.userService.getProfile().subscribe(() => {
-      // console.log(info);
+    this.userService.getProfile().subscribe((info) => {
+      this.userInfo = info;
     });
   }
   public onEditUserClick() {

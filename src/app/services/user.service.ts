@@ -6,6 +6,7 @@ import { environment } from 'src/environments/environment';
 import { tap } from 'rxjs/operators';
 import { TokensResponse } from 'back/src/models/responses/tokens.response';
 import { Observable } from 'rxjs';
+import { GetProfileInfoResponse } from 'back/src/models/responses/get-profile-info.response';
 import { TokenService } from './token.service';
 
 @Injectable()
@@ -32,15 +33,17 @@ export class UserService {
   }
 
   public refreshToken(token: string): Observable<TokensResponse> {
-    return this.http.post<TokensResponse>(`${this.baseUrl}/refresh`, token).pipe(
-      tap((tokens: TokensResponse) => {
-        this.tokenService.storeTokens(tokens);
-      }),
-    );
+    return this.http
+      .post<TokensResponse>(`${this.baseUrl}/refresh`, { token })
+      .pipe(
+        tap((tokens: TokensResponse) => {
+          this.tokenService.storeTokens(tokens);
+        }),
+      );
   }
 
   public getProfile() {
-    return this.http.get(`${this.baseUrl}/profile`);
+    return this.http.get<GetProfileInfoResponse>(`${this.baseUrl}/profile`);
   }
 
   public editProfile(user: UserInfo) {

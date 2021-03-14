@@ -7,6 +7,7 @@ import { makeTokens } from '../utils';
 
 export default async (req, res) => {
   const { token } = req.body;
+
   if (!token) {
     return res.sendStatus(StatusCodes.BAD_REQUEST);
   }
@@ -22,8 +23,8 @@ export default async (req, res) => {
       return res.sendStatus(StatusCodes.FORBIDDEN);
     }
 
-    const { id } = userData;
-    const { accessToken, refreshToken } = makeTokens({ id });
+    const { userId } = userData;
+    const { accessToken, refreshToken } = makeTokens({ userId });
 
     await refreshTokenService.drop(token);
     await refreshTokenService.add(refreshToken);
