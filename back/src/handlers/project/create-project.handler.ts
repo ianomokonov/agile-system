@@ -1,4 +1,4 @@
-import { CreateProjectRequest } from '../../models/create-project-request';
+import { CreateProjectRequest } from '../../models/requests/create-project-request';
 import projectService from '../../services/project-service';
 
 export default async (userId: number, project: CreateProjectRequest) => {

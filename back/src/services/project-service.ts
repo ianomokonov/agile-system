@@ -1,7 +1,10 @@
-import { AddProjectUserRequest } from '../models/add-project-user-request';
-import { CreateProjectRequest } from '../models/create-project-request';
-import { EditProjectUserRequest } from '../models/edit-project-user-request';
-import { CreateProjectRoleRequest, UpdateProjectRoleRequest } from '../models/project-role.models';
+import { AddProjectUserRequest } from '../models/requests/add-project-user-request';
+import { CreateProjectRequest } from '../models/requests/create-project-request';
+import { EditProjectUserRequest } from '../models/requests/edit-project-user-request';
+import {
+  CreateProjectRoleRequest,
+  UpdateProjectRoleRequest,
+} from '../models/requests/project-role.models';
 import projectRepository from '../repositories/project.repository';
 import { Permissions } from '../utils';
 

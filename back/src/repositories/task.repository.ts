@@ -1,7 +1,7 @@
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import * as sql from 'sql-query-generator';
 import { CRUD } from '../models/crud.interface';
-import { CreateTaskRequest, UpdateTaskRequest } from '../models/task.models';
+import { CreateTaskRequest, UpdateTaskRequest } from '../models/requests/task.models';
 import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
 

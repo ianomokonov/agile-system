@@ -4,6 +4,7 @@ export class SecurityBaseModel {
   public errorText = '';
   public form: FormGroup;
   public submitted = false;
+  protected rxAlive = true;
 
   constructor(formGroup: FormGroup) {
     this.form = formGroup;

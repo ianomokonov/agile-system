@@ -1,11 +1,14 @@
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import * as sql from 'sql-query-generator';
-import { AddProjectUserRequest } from '../models/add-project-user-request';
-import { CreateProjectRequest } from '../models/create-project-request';
-import { EditProjectUserRequest } from '../models/edit-project-user-request';
+import { AddProjectUserRequest } from '../models/requests/add-project-user-request';
+import { CreateProjectRequest } from '../models/requests/create-project-request';
+import { EditProjectUserRequest } from '../models/requests/edit-project-user-request';
 import { Link } from '../models/link';
 import { Project } from '../models/project';
-import { CreateProjectRoleRequest, UpdateProjectRoleRequest } from '../models/project-role.models';
+import {
+  CreateProjectRoleRequest,
+  UpdateProjectRoleRequest,
+} from '../models/requests/project-role.models';
 import { getQueryText, Permissions } from '../utils';
 import dbConnection from './db-connection';
 
@@ -14,7 +17,10 @@ sql.use('mysql');
 class ProjectRepository {
   public async getUserProjects(userId: number) {
     const query = sql.select('project', '*').where({ ownerId: userId });
-    const [projects] = await dbConnection.query<RowDataPacket[]>(query.text, query.values);
+    const [projects] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
 
     return (projects as unknown) as Project[];
   }

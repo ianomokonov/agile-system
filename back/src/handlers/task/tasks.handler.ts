@@ -1,5 +1,5 @@
 import { CRUD } from '../../models/crud.interface';
-import { CreateTaskRequest, UpdateTaskRequest } from '../../models/task.models';
+import { CreateTaskRequest, UpdateTaskRequest } from '../../models/requests/task.models';
 import taskService from '../../services/task-service';
 
 export class TasksHandler implements CRUD<CreateTaskRequest, UpdateTaskRequest> {

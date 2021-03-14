@@ -8,32 +8,33 @@ import authenticateJWT from '../middleware/authenticateJWT';
 import signUpHandler from '../handlers/user/sign-up.handler';
 import getProfileInfoHandler from '../handlers/user/get-profile-info.handler';
 import editProfileHandler from '../handlers/user/edit-profile.handler';
+import verifyRefreshToken from '../middleware/verifyRefreshToken';
 
 const userRouter = Router();
 userRouter.get(`/profile`, authJWT, async (req, res) => {
-  const { userId } = res.locals.user;
+  const { userId } = res.locals;
 
   const result = await getProfileInfoHandler(userId);
   res.json(result);
 });
 userRouter.put(`/profile`, authJWT, async (req, res) => {
-  const { userId } = res.locals.user;
+  const { userId } = res.locals;
 
   await editProfileHandler(userId, req.body);
-  res.sendStatus(StatusCodes.OK);
+  res.status(StatusCodes.OK).json('Профиль изменен');
 });
 userRouter.post(`/sign-up`, async (req, res) => {
   const result = await signUpHandler(req.body);
   res.json(result);
 });
 userRouter.post(`/login`, authenticateJWT, async (req, res) => {
-  const { id } = res.locals.user;
-  const result = await loginHandler(id);
+  const { userId } = res.locals;
+  const result = await loginHandler(userId);
   res.json(result);
 });
 userRouter.post(`/refresh`, refreshJWT);
-userRouter.delete(`/logout`, authJWT, async (req, res) => {
-  const { token } = req.body;
+userRouter.delete(`/logout`, verifyRefreshToken, async (req, res) => {
+  const { token } = req.query;
   await logOutHandler(token);
   res.sendStatus(StatusCodes.NO_CONTENT);
 });

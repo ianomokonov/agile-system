@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 import { CRUD } from '../models/crud.interface';
 import { WebError } from '../models/error';
-import { CreateTaskRequest, UpdateTaskRequest } from '../models/task.models';
+import { CreateTaskRequest, UpdateTaskRequest } from '../models/requests/task.models';
 import projectRepository from '../repositories/project.repository';
 import taskRepository from '../repositories/task.repository';
 

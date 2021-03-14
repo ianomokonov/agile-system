@@ -5,7 +5,7 @@ import { Permissions } from '../utils';
 
 export default (permission: Permissions) => async (req, res, next): Promise<any> => {
   const { id: taskId } = req.params;
-  const { userId } = res.locals.user;
+  const { userId } = res.locals;
   const projectId = await taskService.getTaskProjectId(taskId);
   if (!projectId) {
     return res.sendStatus(StatusCodes.NOT_FOUND);

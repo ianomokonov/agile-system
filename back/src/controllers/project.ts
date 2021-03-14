@@ -34,7 +34,7 @@ projectRouter.get(
 );
 
 projectRouter.post(`/create`, authJWT, async (req, res) => {
-  const { userId } = res.locals.user;
+  const { userId } = res.locals;
   const projectId = await createProjectHandler(userId, req.body);
   res.json({ id: projectId });
 });

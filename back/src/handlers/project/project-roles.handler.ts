@@ -2,7 +2,7 @@ import { CRUD } from '../../models/crud.interface';
 import {
   CreateProjectRoleRequest,
   UpdateProjectRoleRequest,
-} from '../../models/project-role.models';
+} from '../../models/requests/project-role.models';
 import projectService from '../../services/project-service';
 
 export class ProjectRoleHandler

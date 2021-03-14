@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SingUpComponent } from './security/sing-up/sing-up.component';
@@ -12,6 +13,10 @@ import { ProfileComponent } from './profile/profile.component';
 import { ProjectsComponent } from './profile/projects/projects.component';
 import { CreateComponent } from './profile/projects/create/create.component';
 import { EditUserComponent } from './profile/create/edit-user.component';
+import { AuthInterceptor } from './utils/auth.interceptor';
+import { UserService } from './services/user.service';
+import { TokenService } from './services/token.service';
+import { ContentTypeInterceptor } from './utils/content-type.interceptor';
 
 @NgModule({
   declarations: [
@@ -24,8 +29,21 @@ import { EditUserComponent } from './profile/create/edit-user.component';
     CreateComponent,
     EditUserComponent,
   ],
-  imports: [BrowserModule, AppRoutingModule, NgbModule, FormsModule, ReactiveFormsModule],
-  providers: [FormBuilder],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    NgbModule,
+    FormsModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+  ],
+  providers: [
+    FormBuilder,
+    UserService,
+    TokenService,
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ContentTypeInterceptor, multi: true },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
