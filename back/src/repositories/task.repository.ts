@@ -2,6 +2,7 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import * as sql from 'sql-query-generator';
 import { CRUD } from '../models/crud.interface';
 import { CreateTaskRequest, UpdateTaskRequest } from '../models/requests/task.models';
+import { TaskResponse } from '../models/responses/task.response';
 import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
 
@@ -23,7 +24,7 @@ class TaskRepository implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
     const [[task]] = await dbConnection.query<RowDataPacket[]>(`SELECT *
         FROM projecttask 
         WHERE id=${taskId}`);
-    return task;
+    return task as TaskResponse;
   }
 
   public async create(request: CreateTaskRequest) {
