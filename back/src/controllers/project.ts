@@ -36,7 +36,7 @@ projectRouter.get(
 projectRouter.post(`/create`, authJWT, async (req, res) => {
   const { userId } = res.locals;
   const projectId = await createProjectHandler(userId, req.body);
-  res.json({ id: projectId });
+  res.status(StatusCodes.CREATED).json(projectId);
 });
 
 projectRouter.post(
@@ -85,7 +85,7 @@ projectRouter.post(
   async (req, res) => {
     try {
       await addProjectUserHandler(req.body);
-      res.status(StatusCodes.OK).json('Пользователь добавлен');
+      res.status(StatusCodes.CREATED).json('Пользователь добавлен');
     } catch (error) {
       res.status(error.statusCode).json(error.error);
     }
@@ -176,19 +176,14 @@ projectRouter.get(
   },
 );
 
-projectRouter.get(
-  `/:id/permissions`,
-  authJWT,
-  checkPermissions(Permissions.CanEditProject),
-  async (req, res) => {
-    try {
-      const permissions = await getProjectPermissionsHandler();
-      res.status(StatusCodes.OK).json(permissions);
-    } catch (error) {
-      res.status(error.statusCode).json(error.error);
-    }
-  },
-);
+projectRouter.get(`/permissions`, authJWT, async (req, res) => {
+  try {
+    const permissions = await getProjectPermissionsHandler();
+    res.status(StatusCodes.OK).json(permissions);
+  } catch (error) {
+    res.status(error.statusCode).json(error.error);
+  }
+});
 
 projectRouter.post(
   `/:id/add-task`,

@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CreateUserRequest } from 'back/src/models/requests/create-user.request';
 import { UserInfo } from 'back/src/models/user-info';
@@ -11,9 +11,6 @@ import { TokenService } from './token.service';
 @Injectable()
 export class UserService {
   private readonly baseUrl = `${environment.baseUrl}/user`;
-  private readonly httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
-  };
   constructor(private http: HttpClient, private tokenService: TokenService) {}
 
   public signUp(user: CreateUserRequest): Observable<TokensResponse> {

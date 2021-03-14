@@ -12,13 +12,7 @@ import { Project } from './models/project';
   styleUrls: ['./profile.component.less'],
 })
 export class ProfileComponent implements OnInit {
-  public userInfo: GetProfileInfoResponse = {
-    name: 'Ванька',
-    surname: 'Номоконов',
-    email: 'vanika.koma@yandex.ru',
-    vk: 'https://vk.com/vanikakoma',
-    gitHub: 'https://github.com/ianomokonov',
-  };
+  public userInfo!: GetProfileInfoResponse;
   private projects: Project[] = [
     {
       name: 'Agile system',
@@ -67,8 +61,8 @@ export class ProfileComponent implements OnInit {
   ) {}
 
   public ngOnInit(): void {
-    this.userService.getProfile().subscribe((info) => {
-      console.log(info);
+    this.userService.getProfile().subscribe(() => {
+      // console.log(info);
     });
   }
   public onEditUserClick() {

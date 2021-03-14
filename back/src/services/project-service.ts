@@ -5,6 +5,7 @@ import {
   CreateProjectRoleRequest,
   UpdateProjectRoleRequest,
 } from '../models/requests/project-role.models';
+import { ProjectResponse } from '../models/responses/project.response';
 import projectRepository from '../repositories/project.repository';
 import { Permissions } from '../utils';
 
@@ -50,7 +51,7 @@ class ProjectService {
     return projectRepository.getFullProjectUsers(projectId);
   }
 
-  public async read(projectId: number) {
+  public async read(projectId: number): Promise<ProjectResponse> {
     const [project, tasks] = await Promise.all([
       projectRepository.getProject(projectId),
       projectRepository.getProjectTasks(projectId),

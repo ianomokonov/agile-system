@@ -11,6 +11,10 @@ import {
 } from '../models/requests/project-role.models';
 import { getQueryText, Permissions } from '../utils';
 import dbConnection from './db-connection';
+import { ProjectResponse } from '../models/responses/project.response';
+import { TaskShortView } from '../models/responses/task-short-view';
+import { ProjectRoleResponse } from '../models/responses/project-role.response';
+import { ProjectPermissionResponse } from '../models/responses/permission.response';
 
 sql.use('mysql');
 
@@ -118,16 +122,16 @@ class ProjectRepository {
 
   public async getProjectRoles(projectId: number) {
     const [roles] = await dbConnection.query<RowDataPacket[]>(
-      `SELECT * FROM projectroles WHERE projectId='${projectId}'`,
+      `SELECT id, name FROM projectroles WHERE projectId='${projectId}'`,
     );
 
-    return roles;
+    return roles as ProjectRoleResponse[];
   }
 
   public async getProjectPermissions() {
     const [permissions] = await dbConnection.query<RowDataPacket[]>(`SELECT * FROM permission`);
 
-    return permissions;
+    return permissions as ProjectPermissionResponse[];
   }
 
   public async getProjectUsers(projectId: number) {
@@ -217,19 +221,21 @@ class ProjectRepository {
     await dbConnection.query(query);
   }
 
-  public async getProject(projectId: number) {
+  public async getProject(projectId: number): Promise<ProjectResponse> {
     if (!projectId) {
       console.error('Укажите id проекта');
       return null;
     }
 
-    const query = sql.select('project', '*').where({ id: projectId });
+    const query = sql
+      .select('project', ['name', 'repository', 'description', 'isClosed'])
+      .where({ id: projectId });
 
     const [[project]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
     );
-    return project;
+    return project as ProjectResponse;
   }
 
   public async getProjectTasks(projectId: number) {
@@ -244,7 +250,7 @@ class ProjectRepository {
       getQueryText(query.text),
       query.values,
     );
-    return tasks;
+    return tasks as TaskShortView[];
   }
 
   public async checkUserPermission(userId: number, projectId: number, permission: Permissions) {
