@@ -24,7 +24,7 @@ export class UserService {
 
   public login(email: string, password: string): Observable<TokensResponse> {
     return this.http
-      .post<TokensResponse>(`${this.baseUrl}/login`, JSON.stringify({ email, password }))
+      .post<TokensResponse>(`${this.baseUrl}/login`, { email, password })
       .pipe(
         tap((tokens) => {
           this.tokenService.storeTokens(tokens);
