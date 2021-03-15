@@ -8,4 +8,5 @@ export interface Project {
   description: string;
   isClosed: boolean;
   ownerId: number;
+  lastEditDate: Date;
 }

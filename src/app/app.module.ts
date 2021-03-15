@@ -4,6 +4,8 @@ import { NgModule } from '@angular/core';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { TagInputModule } from 'ngx-chips';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SingUpComponent } from './security/sing-up/sing-up.component';
@@ -36,6 +38,8 @@ import { ContentTypeInterceptor } from './utils/content-type.interceptor';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
+    TagInputModule,
+    BrowserAnimationsModule,
   ],
   providers: [
     FormBuilder,

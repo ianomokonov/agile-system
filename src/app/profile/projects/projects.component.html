@@ -14,13 +14,13 @@
       <div class="item mb-3 mr-3" *ngFor="let project of items">
         <div class="mb-3">
           <h6 class="name m-0">{{ project.name }}</h6>
-          <small
+          <!-- <small
             ><ng-container *ngFor="let role of project.roles; let last = last"
               >{{ role }}<ng-container *ngIf="!last">, </ng-container></ng-container
             ></small
-          >
+          > -->
         </div>
-        <span class="date">{{ project.date | date: 'dd.MM.yyyy' }}</span>
+        <span class="date">{{ project.lastEditDate | date: 'dd.MM.yyyy' }}</span>
       </div>
     </ng-container>
   </div>

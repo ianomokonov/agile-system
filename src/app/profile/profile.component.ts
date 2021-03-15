@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Project } from 'back/src/models/project';
 import { GetProfileInfoResponse } from 'back/src/models/responses/get-profile-info.response';
 import { UserService } from '../services/user.service';
 import { EditUserComponent } from './create/edit-user.component';
-import { Project } from './models/project';
 
 @Component({
   selector: 'app-profile',
@@ -13,45 +13,19 @@ import { Project } from './models/project';
 })
 export class ProfileComponent implements OnInit {
   public userInfo!: GetProfileInfoResponse;
-  private projects: Project[] = [
-    {
-      name: 'Agile system',
-      roles: ['admin', 'developer'],
-      date: new Date(),
-      isClosed: false,
-    },
-    {
-      name: 'Agile system 1',
-      roles: ['admin', 'developer'],
-      date: new Date(),
-      isClosed: true,
-    },
-    {
-      name: 'Agile system 2',
-      roles: ['developer'],
-      date: new Date(),
-      isClosed: false,
-    },
-    {
-      name: 'Agile system 3',
-      roles: ['testing'],
-      date: new Date(),
-      isClosed: false,
-    },
-  ];
 
   private readonly ADMIN_ROLE = 'admin';
 
   public get myProjects(): Project[] {
-    return this.projects.filter((p) => !p.isClosed && p.roles.indexOf(this.ADMIN_ROLE) > -1);
+    return this.userInfo.projects;
   }
 
   public get othersProjects(): Project[] {
-    return this.projects.filter((p) => !p.isClosed && p.roles.indexOf(this.ADMIN_ROLE) < 0);
+    return this.userInfo.projects.filter((p) => !p.isClosed);
   }
 
   public get closedProjects(): Project[] {
-    return this.projects.filter((p) => p.isClosed);
+    return this.userInfo.projects.filter((p) => p.isClosed);
   }
 
   constructor(
