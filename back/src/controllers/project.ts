@@ -1,11 +1,14 @@
 import { Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import createProjectHandler from '../handlers/project/create-project.handler';
+import editProjectHandler from '../handlers/project/edit-project.handler';
+import getProjectEditInfoHandler from '../handlers/project/get-project-edit-info.handler';
 import getProjectPermissionsHandler from '../handlers/project/get-project-permissions.handler';
 import getProjectHandler from '../handlers/project/get-project.handler';
 import projectRolesHandler from '../handlers/project/project-roles.handler';
 import projectUsersHandler from '../handlers/project/project-users.handler';
 import tasksHandler from '../handlers/task/tasks.handler';
+import logger from '../logger';
 import authJWT from '../middleware/authJWT';
 import checkPermissions from '../middleware/check-project-permissions';
 import { Permissions } from '../utils';
@@ -26,6 +29,41 @@ projectRouter.get(
       }
       res.status(StatusCodes.OK).json(project);
     } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
+projectRouter.put(
+  `/:id`,
+  authJWT,
+  checkPermissions(Permissions.CanEditProject),
+  async (req, res) => {
+    try {
+      await editProjectHandler(Number.parseInt(req.params.id, 10), req.body);
+      res.status(StatusCodes.OK).json('Проект изменен');
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
+projectRouter.get(
+  `/:id/get-edit-info`,
+  authJWT,
+  checkPermissions(Permissions.CanEditProject),
+  async (req, res) => {
+    try {
+      const project = await getProjectEditInfoHandler(Number.parseInt(req.params.id, 10));
+
+      if (!project) {
+        res.status(StatusCodes.NOT_FOUND).json('Проект не найден');
+        return;
+      }
+      res.status(StatusCodes.OK).json(project);
+    } catch (error) {
+      logger.error(error);
+
       res.status(error.statusCode).json(error.error);
     }
   },

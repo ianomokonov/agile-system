@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { ProfileComponent } from './profile/profile.component';
 import { CreateComponent } from './profile/projects/create/create.component';
+import { ProjectComponent } from './project/project.component';
 import { ResetPasswordComponent } from './security/reset-password/reset-password.component';
 import { SignInComponent } from './security/sign-in/sign-in.component';
 import { SingUpComponent } from './security/sing-up/sing-up.component';
@@ -30,6 +31,14 @@ const routes: Routes = [
   },
   {
     path: 'create-project',
+    component: CreateComponent,
+  },
+  {
+    path: 'project/:id',
+    component: ProjectComponent,
+  },
+  {
+    path: 'project/:id/edit',
     component: CreateComponent,
   },
 ];

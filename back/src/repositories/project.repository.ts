@@ -4,7 +4,6 @@ import { AddProjectUserRequest } from '../models/requests/add-project-user-reque
 import { CreateProjectRequest } from '../models/requests/create-project-request';
 import { EditProjectUserRequest } from '../models/requests/edit-project-user-request';
 import { Link } from '../models/link';
-import { Project } from '../models/project';
 import {
   CreateProjectRoleRequest,
   UpdateProjectRoleRequest,
@@ -12,21 +11,25 @@ import {
 import { getQueryText, Permissions } from '../utils';
 import dbConnection from './db-connection';
 import { ProjectResponse } from '../models/responses/project.response';
+import { ProjectShortView } from '../models/responses/project-short-view';
 import { TaskShortView } from '../models/responses/task-short-view';
 import { ProjectRoleResponse } from '../models/responses/project-role.response';
 import { ProjectPermissionResponse } from '../models/responses/permission.response';
+import { UserShortView } from '../models/responses/user-short-view';
 
 sql.use('mysql');
 
 class ProjectRepository {
   public async getUserProjects(userId: number) {
-    const query = sql.select('project', '*').where({ ownerId: userId });
+    const query = sql
+      .select('project', ['id', 'name', 'repository', 'lastEditDate'])
+      .where({ ownerId: userId });
     const [projects] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
     );
 
-    return (projects as unknown) as Project[];
+    return projects as ProjectShortView[];
   }
 
   public async create(userId: number, project: CreateProjectRequest) {
@@ -98,6 +101,20 @@ class ProjectRepository {
     this.addProjectRolePermissions(request.projectRoleId, request.permissionIds);
   }
 
+  public async editProject(projectId, request: CreateProjectRequest) {
+    const query = sql
+      .update('project', {
+        name: request.name,
+        repository: request.repository,
+        description: request.description,
+      })
+      .where({ id: projectId });
+    dbConnection.query(getQueryText(query.text), query.values);
+    await Promise.all([this.removeProjectUsers(projectId), this.removeProjectLinks(projectId)]);
+    this.createProjectUsers(projectId, request.usersIds);
+    this.createProjectLinks(projectId, request.links);
+  }
+
   public async removeProjectRole(projectRoleId: number) {
     if (!projectRoleId) {
       console.error('Укажите id роли проекта');
@@ -136,10 +153,10 @@ class ProjectRepository {
 
   public async getProjectUsers(projectId: number) {
     const [users] = await dbConnection.query<RowDataPacket[]>(
-      `SELECT * FROM projectuser WHERE projectId='${projectId}'`,
+      `SELECT u.id, u.name, u.email, u.surname, u.image FROM projectuser pu JOIN user u ON pu.userId = u.id WHERE projectId='${projectId}'`,
     );
 
-    return users;
+    return users as UserShortView[];
   }
 
   public async getProjectUser(projectId: number, userId: number) {
@@ -209,6 +226,28 @@ class ProjectRepository {
     await dbConnection.query(getQueryText(query.text), query.values);
   }
 
+  private async removeProjectUsers(projectId: number) {
+    if (!projectId) {
+      console.error('Укажите id проекта');
+      return;
+    }
+
+    const query = sql.deletes('projectuser').where({ projectId });
+
+    await dbConnection.query(getQueryText(query.text), query.values);
+  }
+
+  private async removeProjectLinks(projectId: number) {
+    if (!projectId) {
+      console.error('Укажите id проекта');
+      return;
+    }
+
+    const query = sql.deletes('projectlinks').where({ projectId });
+
+    await dbConnection.query(getQueryText(query.text), query.values);
+  }
+
   public async createProjectLinks(projectId: number, links: Link[]) {
     if (!links?.length) {
       return;
@@ -228,7 +267,7 @@ class ProjectRepository {
     }
 
     const query = sql
-      .select('project', ['name', 'repository', 'description', 'isClosed'])
+      .select('project', ['name', 'repository', 'description'])
       .where({ id: projectId });
 
     const [[project]] = await dbConnection.query<RowDataPacket[]>(

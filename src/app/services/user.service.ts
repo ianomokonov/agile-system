@@ -7,7 +7,7 @@ import { tap } from 'rxjs/operators';
 import { TokensResponse } from 'back/src/models/responses/tokens.response';
 import { Observable } from 'rxjs';
 import { GetProfileInfoResponse } from 'back/src/models/responses/get-profile-info.response';
-import { UserShortView } from 'back/src/models/responses/check-user.response copy';
+import { UserShortView } from 'back/src/models/responses/user-short-view';
 import { TokenService } from './token.service';
 
 @Injectable()

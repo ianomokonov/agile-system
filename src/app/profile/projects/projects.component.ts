@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
-import { Project } from 'back/src/models/project';
+import { ProjectShortView } from 'back/src/models/responses/project-short-view';
 
 @Component({
   selector: 'app-projects',
@@ -11,7 +11,7 @@ export class ProjectsComponent {
   @Input() public canCreateProject = false;
   @Input() public hidable = false;
   @Input() public title = 'Мои проекты';
-  @Input() public items: Project[] = [];
+  @Input() public items: ProjectShortView[] = [];
 
   public isOpened = false;
 

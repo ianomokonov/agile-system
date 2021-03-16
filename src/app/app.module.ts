@@ -19,6 +19,8 @@ import { UserService } from './services/user.service';
 import { TokenService } from './services/token.service';
 import { ContentTypeInterceptor } from './utils/content-type.interceptor';
 import { TagsInputComponent } from './shared/tags-input/tags-input.component';
+import { ProjectService } from './services/project.service';
+import { ProjectComponent } from './project/project.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +33,7 @@ import { TagsInputComponent } from './shared/tags-input/tags-input.component';
     CreateComponent,
     EditUserComponent,
     TagsInputComponent,
+    ProjectComponent,
   ],
   imports: [
     BrowserModule,
@@ -45,6 +48,7 @@ import { TagsInputComponent } from './shared/tags-input/tags-input.component';
     FormBuilder,
     UserService,
     TokenService,
+    ProjectService,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ContentTypeInterceptor, multi: true },
   ],

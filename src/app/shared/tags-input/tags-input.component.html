@@ -10,15 +10,15 @@
       <i class="fas fa-times ml-1" (click)="remove(i)"></i>
     </span>
     <span
-      contenteditable="true"
+      [contentEditable]="!!availableTags?.length"
       class="placeholder"
       #input
       (keyup)="onKeyPress(input.innerText)"
     ></span>
   </div>
   <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-    <ng-container *ngIf="items?.length; else noData">
-      <button ngbDropdownItem *ngFor="let item of items" (click)="addTag(item, input)">
+    <ng-container *ngIf="availableTags?.length; else noData">
+      <button ngbDropdownItem *ngFor="let item of availableTags" (click)="addTag(item, input)">
         {{ item.key }}
       </button>
     </ng-container>

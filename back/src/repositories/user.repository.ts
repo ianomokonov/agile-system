@@ -2,7 +2,7 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import * as sql from 'sql-query-generator';
 import { CreateUserRequest } from '../models/requests/create-user.request';
 import { CheckUserResponse } from '../models/responses/check-user.response';
-import { UserShortView } from '../models/responses/check-user.response copy';
+import { UserShortView } from '../models/responses/user-short-view';
 import { GetProfileInfoResponse } from '../models/responses/get-profile-info.response';
 import { UserInfo } from '../models/user-info';
 import { getQueryText } from '../utils';

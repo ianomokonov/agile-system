@@ -13,6 +13,7 @@ import { ProjectPermissionResponse } from 'back/src/models/responses/permission.
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { CreateTaskRequest } from 'back/src/models/requests/task.models';
+import { ProjectEditInfo } from 'back/src/models/responses/project-edit-info';
 
 @Injectable()
 export class ProjectService {
@@ -21,6 +22,14 @@ export class ProjectService {
 
   public getProject(projectId: number): Observable<ProjectResponse> {
     return this.http.get<ProjectResponse>(`${this.baseUrl}/${projectId}`);
+  }
+
+  public updateProject(projectId: number, request: CreateProjectRequest): Observable<number> {
+    return this.http.put<number>(`${this.baseUrl}/${projectId}`, request);
+  }
+
+  public getProjectEditInfo(projectId: number): Observable<ProjectEditInfo> {
+    return this.http.get<ProjectEditInfo>(`${this.baseUrl}/${projectId}/get-edit-info`);
   }
 
   public createProject(project: CreateProjectRequest): Observable<number> {
