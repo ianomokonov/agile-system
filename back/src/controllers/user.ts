@@ -9,12 +9,17 @@ import signUpHandler from '../handlers/user/sign-up.handler';
 import getProfileInfoHandler from '../handlers/user/get-profile-info.handler';
 import editProfileHandler from '../handlers/user/edit-profile.handler';
 import verifyRefreshToken from '../middleware/verifyRefreshToken';
+import getUsersHandler from '../handlers/user/get-users.handler';
 
 const userRouter = Router();
 userRouter.get(`/profile`, authJWT, async (req, res) => {
   const { userId } = res.locals;
 
   const result = await getProfileInfoHandler(userId);
+  res.json(result);
+});
+userRouter.get(`/users`, authJWT, async (req, res) => {
+  const result = await getUsersHandler(req.query.searchString as string);
   res.json(result);
 });
 userRouter.put(`/profile`, authJWT, async (req, res) => {

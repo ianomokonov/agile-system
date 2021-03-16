@@ -2,6 +2,7 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import * as sql from 'sql-query-generator';
 import { CreateUserRequest } from '../models/requests/create-user.request';
 import { CheckUserResponse } from '../models/responses/check-user.response';
+import { UserShortView } from '../models/responses/check-user.response copy';
 import { GetProfileInfoResponse } from '../models/responses/get-profile-info.response';
 import { UserInfo } from '../models/user-info';
 import { getQueryText } from '../utils';
@@ -23,7 +24,7 @@ class UserRepository {
 
   public async getUserById(userId: number): Promise<GetProfileInfoResponse> {
     const query = sql
-      .select('user', ['name', 'surname', 'email', 'vk', 'github'])
+      .select('user', ['name', 'surname', 'email', 'vk', 'github', 'image'])
       .where({ id: userId });
     const [[user]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -35,6 +36,19 @@ class UserRepository {
     user.projects = await projectRepository.getUserProjects(userId);
 
     return (user as unknown) as GetProfileInfoResponse;
+  }
+
+  public async getUsers(searchString?: string): Promise<UserShortView[]> {
+    const query = sql
+      .select('user', ['id', 'name', 'surname', 'email', 'image'])
+      .where({ email: `${searchString}%` }, 'LIKE')
+      .limit(20, 0);
+    const [users] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    return users as UserShortView[];
   }
 
   public async isTokenActual(token: string) {

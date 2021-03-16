@@ -23,6 +23,10 @@ class UserService {
     return userRepository.getUserById(userId);
   }
 
+  public async getUsers(searchString?: string) {
+    return userRepository.getUsers(searchString);
+  }
+
   public async checkUser(userPassword: string, password: string) {
     const match = await bcrypt.compare(password, userPassword);
     return match;

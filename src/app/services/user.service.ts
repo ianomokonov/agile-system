@@ -7,6 +7,7 @@ import { tap } from 'rxjs/operators';
 import { TokensResponse } from 'back/src/models/responses/tokens.response';
 import { Observable } from 'rxjs';
 import { GetProfileInfoResponse } from 'back/src/models/responses/get-profile-info.response';
+import { UserShortView } from 'back/src/models/responses/check-user.response copy';
 import { TokenService } from './token.service';
 
 @Injectable()
@@ -44,6 +45,12 @@ export class UserService {
 
   public getProfile() {
     return this.http.get<GetProfileInfoResponse>(`${this.baseUrl}/profile`);
+  }
+
+  public getUsers(searchString?: string) {
+    return this.http.get<UserShortView[]>(
+      `${this.baseUrl}/users?searchString=${searchString ? encodeURI(searchString) : ''}`,
+    );
   }
 
   public editProfile(user: UserInfo) {

@@ -1,12 +1,10 @@
 import { Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import addProjectUserHandler from '../handlers/project/add-project-user.handler';
 import createProjectHandler from '../handlers/project/create-project.handler';
-import editProjectUserHandler from '../handlers/project/edit-project-user.handler';
 import getProjectPermissionsHandler from '../handlers/project/get-project-permissions.handler';
 import getProjectHandler from '../handlers/project/get-project.handler';
 import projectRolesHandler from '../handlers/project/project-roles.handler';
-import removeProjectUserHandler from '../handlers/project/remove-project-user.handler';
+import projectUsersHandler from '../handlers/project/project-users.handler';
 import tasksHandler from '../handlers/task/tasks.handler';
 import authJWT from '../middleware/authJWT';
 import checkPermissions from '../middleware/check-project-permissions';
@@ -84,7 +82,7 @@ projectRouter.post(
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
     try {
-      await addProjectUserHandler(req.body);
+      await projectUsersHandler.create(req.body);
       res.status(StatusCodes.CREATED).json('Пользователь добавлен');
     } catch (error) {
       res.status(error.statusCode).json(error.error);
@@ -98,7 +96,7 @@ projectRouter.put(
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
     try {
-      await editProjectUserHandler(req.body);
+      await projectUsersHandler.update(req.body);
       res.status(StatusCodes.OK).json('Пользователь обновлен');
     } catch (error) {
       res.status(error.statusCode).json(error.error);
@@ -112,8 +110,22 @@ projectRouter.delete(
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
     try {
-      await removeProjectUserHandler(+req.query.projectUserId);
+      await projectUsersHandler.delete(+req.query.projectUserId);
       res.status(StatusCodes.OK).json('Пользователь удален');
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
+projectRouter.get(
+  `/:id/users`,
+  authJWT,
+  checkPermissions(Permissions.CanReadProject),
+  async (req, res) => {
+    try {
+      const users = await projectUsersHandler.read(+req.params.id);
+      res.status(StatusCodes.OK).json(users);
     } catch (error) {
       res.status(error.statusCode).json(error.error);
     }
