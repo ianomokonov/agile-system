@@ -15,6 +15,14 @@ import { Permissions } from '../utils';
 
 const projectRouter = Router();
 
+projectRouter.get(`/permissions`, authJWT, async (req, res) => {
+  try {
+    const permissions = await getProjectPermissionsHandler();
+    res.status(StatusCodes.OK).json(permissions);
+  } catch (error) {
+    res.status(error.statusCode).json(error.error);
+  }
+});
 projectRouter.get(
   `/:id`,
   authJWT,
@@ -225,15 +233,6 @@ projectRouter.get(
     }
   },
 );
-
-projectRouter.get(`/permissions`, authJWT, async (req, res) => {
-  try {
-    const permissions = await getProjectPermissionsHandler();
-    res.status(StatusCodes.OK).json(permissions);
-  } catch (error) {
-    res.status(error.statusCode).json(error.error);
-  }
-});
 
 projectRouter.post(
   `/:id/add-task`,

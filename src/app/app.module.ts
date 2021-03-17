@@ -21,6 +21,9 @@ import { ContentTypeInterceptor } from './utils/content-type.interceptor';
 import { TagsInputComponent } from './shared/tags-input/tags-input.component';
 import { ProjectService } from './services/project.service';
 import { ProjectComponent } from './project/project.component';
+import { EditProjectFormComponent } from './project/edit-project-form/edit-project-form.component';
+import { EditRolesComponent } from './project/edit/edit-roles/edit-roles.component';
+import { EditUsersComponent } from './project/edit/edit-users/edit-users.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +37,9 @@ import { ProjectComponent } from './project/project.component';
     EditUserComponent,
     TagsInputComponent,
     ProjectComponent,
+    EditProjectFormComponent,
+    EditRolesComponent,
+    EditUsersComponent,
   ],
   imports: [
     BrowserModule,

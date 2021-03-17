@@ -1,0 +1,22 @@
+<h5>Роли проекта</h5>
+<ng-container *ngIf="roles?.length; else noData"></ng-container>
+<hr />
+<form [formGroup]="createRoleForm">
+  <h5>Добавление роли</h5>
+  <div class="form-group">
+    <input type="text" class="form-control" formControlName="name" />
+  </div>
+  <div class="row">
+    <div class="col-4" *ngFor="let control of permissionsArray; let index = index">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" [id]="index + 'permission'" />
+        <label class="form-check-label" [for]="index + 'permission'">
+          {{ control.get('name')?.value }}
+        </label>
+      </div>
+    </div>
+  </div>
+</form>
+<ng-template #noData>
+  <p class="m-0 py-4 text-muted">Роли отстутствуют</p>
+</ng-template>
