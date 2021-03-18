@@ -14,7 +14,7 @@ export class TaskService {
     return this.http.get<TaskResponse>(`${this.baseUrl}/${taskId}`);
   }
 
-  public editTask(taskId: number, task: UpdateTaskRequest): Observable<void> {
+  public editTask(taskId: number, task: Partial<UpdateTaskRequest>): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/${taskId}/edit`, task);
   }
 

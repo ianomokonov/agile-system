@@ -34,7 +34,8 @@ export class ProjectBoardComponent implements OnInit {
     });
   }
   private setTasks(tasks: TaskShortView[]) {
-    this.statuses.forEach((status) => {
+    this.tasks = [];
+    this.statuses?.forEach((status) => {
       this.tasks.push(tasks.filter((task) => task.statusId === status.id));
     });
   }

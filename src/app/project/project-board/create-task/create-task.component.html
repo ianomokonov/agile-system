@@ -18,7 +18,7 @@
   </div>
   <div class="form-group">
     <label>Описание</label>
-    <textarea type="text" class="form-control" formControlName="description" rows="5"></textarea>
+    <ckeditor [editor]="editor" formControlName="description"></ckeditor>
   </div>
   <div class="form-group">
     <label>Исполнитель</label>
@@ -39,6 +39,6 @@
   </div>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-outline-primary" (click)="dismiss()">Cancel</button>
-  <button type="button" ngbAutofocus class="btn btn-primary" (click)="close()">Ok</button>
+  <button type="button" class="btn btn-outline-primary" (click)="dismiss()">Отмена</button>
+  <button type="button" ngbAutofocus class="btn btn-primary" (click)="close()">Создать</button>
 </div>

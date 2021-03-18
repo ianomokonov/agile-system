@@ -200,6 +200,16 @@ class ProjectRepository {
     return user;
   }
 
+  public async getProjectUserByUserId(userId: number, projectId: number) {
+    const [[user]] = await dbConnection.query<
+      RowDataPacket[]
+    >(`SELECT pu.id, u.name, u.surname, u.image, u.email 
+    FROM projectuser pu JOIN user u ON pu.userId = u.id 
+    WHERE u.id=${userId} AND pu.projectId=${projectId}`);
+
+    return user;
+  }
+
   private async addProjectUserRoles(projectUserId: number, roleIds: number[]) {
     if (!projectUserId) {
       console.error('Укажите id пользователя проекта');

@@ -27,6 +27,10 @@ taskRouter.put(
   checkTaskPermissions(Permissions.CanEditProject),
   async (req, res) => {
     try {
+      const { userId } = res.locals;
+      if (+req.body.projectUserId < 0) {
+        req.body.userId = userId;
+      }
       await tasksHandler.update({ id: +req.params.id, ...req.body });
       res.status(StatusCodes.OK).json('Задача обновлена');
     } catch (error) {

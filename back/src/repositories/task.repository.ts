@@ -50,7 +50,11 @@ class TaskRepository implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
   }
 
   public async create(request: CreateTaskRequest) {
-    const query = sql.insert('projecttask', { ...request, statusId: 1 });
+    const { id: creatorId } = await projectRepository.getProjectUserByUserId(
+      request.creatorId,
+      request.projectId,
+    );
+    const query = sql.insert('projecttask', { ...request, statusId: 1, creatorId });
 
     const [{ insertId }] = await dbConnection.query<ResultSetHeader>(
       getQueryText(query.text),
@@ -61,13 +65,26 @@ class TaskRepository implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
   }
 
   public async update(request: UpdateTaskRequest) {
-    const query = sql
-      .update('projecttask', {
-        name: request.name,
-        description: request.description,
-        projectUserId: request.projectUserId,
-      })
-      .where({ id: request.id });
+    const model = {} as any;
+    if ('name' in request) {
+      model.name = request.name;
+    }
+    if ('description' in request) {
+      model.description = request.description;
+    }
+    if ('projectUserId' in request) {
+      if (+request.projectUserId < 0) {
+        const { id } = await projectRepository.getProjectUserByUserId(
+          request.userId,
+          request.projectId,
+        );
+
+        request.projectUserId = id;
+      }
+      model.projectUserId = request.projectUserId;
+    }
+    const query = sql.update('projecttask', model).where({ id: request.id });
+
     dbConnection.query(getQueryText(query.text), query.values);
   }
 

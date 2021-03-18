@@ -17,7 +17,7 @@
     <app-project-board
       *ngIf="project"
       [projectId]="project.id"
-      [info]="[project.tasks, project.statuses]"
+      [info]="boardInfo"
       (update)="getProjectInfo(project.id)"
     ></app-project-board>
   </div>

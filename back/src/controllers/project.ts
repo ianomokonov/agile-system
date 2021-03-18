@@ -240,9 +240,16 @@ projectRouter.post(
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
     try {
-      const newTaskId = await tasksHandler.create({ projectId: +req.params.id, ...req.body });
+      const { userId } = res.locals;
+      const newTaskId = await tasksHandler.create({
+        projectId: +req.params.id,
+        ...req.body,
+        creatorId: userId,
+      });
       res.status(StatusCodes.OK).json(newTaskId);
     } catch (error) {
+      console.log(error);
+
       res.status(error.statusCode).json(error.error);
     }
   },

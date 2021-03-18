@@ -5,9 +5,22 @@
   <div class="row pt-4">
     <div class="col-9">
       <small class="text-muted">#{{ task.id }}</small>
-      <h4 class="mb-5">{{ task.name }}</h4>
+      <h4 class="mb-5" *ngIf="task.name && !editingName" (click)="editingName = !editingName">
+        {{ task.name }}
+      </h4>
+      <div class="input-group mb-3" *ngIf="!task.name || editingName">
+        <input type="text" class="form-control" [formControl]="nameControl" />
+        <span class="input-group-text fas fa-save cursor-pointer" (click)="saveTaskName()"></span>
+        <span
+          class="input-group-text cursor-pointer"
+          *ngIf="task.name"
+          (click)="cancelNameEditing()"
+        >
+          <i class="fas fa-times"></i
+        ></span>
+      </div>
     </div>
-    <div class="col text-right">
+    <div class="col text-right pt-4">
       <button class="btn btn-outline-primary mb-1">Изменить</button>
       <button class="btn btn-primary ml-1 mb-1">Начать оценку</button>
     </div>
@@ -38,16 +51,37 @@
         </div>
       </section>
       <section>
-        <h5 class="section-header">Описание</h5>
+        <h5 class="section-header">
+          Описание
+          <i
+            *ngIf="!editingDescription"
+            class="fas fa-pencil-alt ml-2 cursor-pointer"
+            (click)="editingDescription = !editingDescription"
+          ></i>
+        </h5>
         <div class="section-body">
-          <p [innerHTML]="task.description"></p>
+          <p [innerHTML]="task.description" *ngIf="!editingDescription"></p>
+          <ckeditor
+            [editor]="editor"
+            [formControl]="descriptionControl"
+            *ngIf="editingDescription"
+          ></ckeditor>
+          <div class="text-right mt-2">
+            <button
+              class="btn btn-primary"
+              *ngIf="editingDescription"
+              (click)="saveTaskDescription()"
+            >
+              Сохранить
+            </button>
+          </div>
         </div>
       </section>
     </div>
     <div class="col border-left">
       <div>
         <small class="text-muted">Исполнитель</small>
-        <h6 *ngIf="false; else setTaskUser">
+        <h6 *ngIf="task.projectUser; else setTaskUser">
           {{ task.projectUser.name }} {{ task.projectUser.surname }}
         </h6>
       </div>
@@ -70,5 +104,5 @@
 </div>
 
 <ng-template #setTaskUser>
-  <button class="btn btn-link p-0 d-block">Стать исполнителем</button>
+  <button class="btn btn-link p-0 d-block" (click)="setDeveloper()">Стать исполнителем</button>
 </ng-template>

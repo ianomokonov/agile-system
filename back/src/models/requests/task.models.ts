@@ -3,6 +3,7 @@ export interface CreateTaskRequest {
   name: string;
   description: string;
   projectUserId?: number;
+  creatorId?: number;
 }
 
 export interface UpdateTaskRequest {
@@ -10,4 +11,6 @@ export interface UpdateTaskRequest {
   name: string;
   description: string;
   projectUserId?: number;
+  userId?: number;
+  projectId?: number;
 }
