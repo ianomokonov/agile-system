@@ -141,11 +141,13 @@ class ProjectRepository {
     let [roles] = await dbConnection.query<RowDataPacket[]>(
       `SELECT id, name FROM projectroles WHERE projectId='${projectId}'`,
     );
-    roles = roles.map((roleTemp) => {
-      const role = roleTemp;
-      role.permissionIds = this.getRolePermissionIds(role.id);
-      return role;
-    });
+    roles = await Promise.all(
+      roles.map(async (roleTemp) => {
+        const role = roleTemp;
+        role.permissionIds = await this.getRolePermissionIds(role.id);
+        return role;
+      }),
+    );
     return roles as ProjectRoleResponse[];
   }
 
@@ -308,9 +310,7 @@ class ProjectRepository {
     if (!userId || !projectId || !permission) {
       return false;
     }
-    console.log(userId, projectId, permission);
     let query = `SELECT * FROM project p WHERE p.Id=${projectId} AND p.ownerId=${userId}`;
-    
 
     const [projects] = await dbConnection.query(query);
     if (projects[0]) {

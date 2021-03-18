@@ -198,7 +198,7 @@ projectRouter.put(
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
     try {
-      await projectRolesHandler.update({ projectId: req.params.id, ...req.body });
+      await projectRolesHandler.update(req.body);
       res.status(StatusCodes.OK).json('Роль обновлена');
     } catch (error) {
       res.status(error.statusCode).json(error.error);
