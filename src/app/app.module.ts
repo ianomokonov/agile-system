@@ -25,6 +25,10 @@ import { ProjectComponent } from './project/project.component';
 import { EditProjectFormComponent } from './project/edit-project-form/edit-project-form.component';
 import { EditRolesComponent } from './project/edit/edit-roles/edit-roles.component';
 import { EditUsersComponent } from './project/edit/edit-users/edit-users.component';
+import { ProfileService } from './services/profile.service';
+import { ProjectBoardComponent } from './project/project-board/project-board.component';
+import { TaskService } from './services/task.service';
+import { CreateTaskComponent } from './project/project-board/create-task/create-task.component';
 
 @NgModule({
   declarations: [
@@ -41,6 +45,8 @@ import { EditUsersComponent } from './project/edit/edit-users/edit-users.compone
     EditProjectFormComponent,
     EditRolesComponent,
     EditUsersComponent,
+    ProjectBoardComponent,
+    CreateTaskComponent,
   ],
   imports: [
     BrowserModule,
@@ -57,6 +63,8 @@ import { EditUsersComponent } from './project/edit/edit-users/edit-users.compone
     UserService,
     TokenService,
     ProjectService,
+    ProfileService,
+    TaskService,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ContentTypeInterceptor, multi: true },
   ],

@@ -1,2 +1,24 @@
-<a class="btn btn-primary m-3" [routerLink]="['edit']">Редактировать</a>
-<a class="btn btn-primary m-3" [routerLink]="['/profile']">Профиль</a>
+<div class="d-flex flex-column h-100">
+  <div
+    class="container-fluid d-flex align-items-center justify-content-between pt-3 border-bottom pb-3 mb-3"
+  >
+    <h3 class="m-0">
+      {{ project?.name }} <i class="fas fa-cogs text-muted" routerLink="edit"></i>
+    </h3>
+    <div class="user-info d-flex" *ngIf="user" routerLink="/profile">
+      <div>
+        <h6 class="m-0">{{ user.name }} {{ user.surname }}</h6>
+        <small>{{ user.email }}</small>
+      </div>
+      <img src="../../assets/images/default_ava.png" class="h-100" alt="" />
+    </div>
+  </div>
+  <div class="board">
+    <app-project-board
+      *ngIf="project"
+      [projectId]="project.id"
+      [info]="[project.tasks, project.statuses]"
+      (update)="getProjectInfo(project.id)"
+    ></app-project-board>
+  </div>
+</div>

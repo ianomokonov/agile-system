@@ -16,6 +16,7 @@ import { TaskShortView } from '../models/responses/task-short-view';
 import { ProjectRoleResponse } from '../models/responses/project-role.response';
 import { ProjectPermissionResponse } from '../models/responses/permission.response';
 import { UserShortView } from '../models/responses/user-short-view';
+import { StatusResponse } from '../models/responses/status.response';
 
 sql.use('mysql');
 
@@ -297,7 +298,7 @@ class ProjectRepository {
     }
 
     const query = sql
-      .select('project', ['name', 'repository', 'description'])
+      .select('project', ['id', 'name', 'repository', 'description'])
       .where({ id: projectId });
 
     const [[project]] = await dbConnection.query<RowDataPacket[]>(
@@ -320,6 +321,16 @@ class ProjectRepository {
       query.values,
     );
     return tasks as TaskShortView[];
+  }
+
+  public async getProjectStatuses() {
+    const query = sql.select('projecttaskstatus', '*');
+
+    const [statuses] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    return statuses as StatusResponse[];
   }
 
   public async checkUserPermission(userId: number, projectId: number, permission: Permissions) {

@@ -56,11 +56,13 @@ class ProjectService {
   }
 
   public async read(projectId: number): Promise<ProjectResponse> {
-    const [project, tasks] = await Promise.all([
+    const [project, tasks, statuses] = await Promise.all([
       projectRepository.getProject(projectId),
       projectRepository.getProjectTasks(projectId),
+      projectRepository.getProjectStatuses(),
     ]);
     project.tasks = tasks;
+    project.statuses = statuses;
     return project;
   }
 

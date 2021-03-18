@@ -1,0 +1,17 @@
+<div class="scrollable">
+  <div class="headers">
+    <div class="header mx-1" *ngFor="let status of statuses">{{ status.name }}</div>
+  </div>
+  <div class="board px-1">
+    <div class="collumn mx-1 rounded" *ngFor="let tasksStatus of tasks; let first = first">
+      <div *ngIf="first" class="text-center create-task rounded" (click)="createTask()">
+        <i class="fas fa-plus mr-1"></i>
+        Создать задачу
+      </div>
+      <div class="task rounded" *ngFor="let task of tasksStatus">
+          <h6>{{task.name}}</h6>
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,5 @@
 export interface CreateTaskRequest {
-  projectId: number;
+  projectId?: number;
   name: string;
   description: string;
   projectUserId?: number;

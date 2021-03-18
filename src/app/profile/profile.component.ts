@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Project } from 'back/src/models/project';
 import { GetProfileInfoResponse } from 'back/src/models/responses/get-profile-info.response';
-import { UserService } from '../services/user.service';
+import { ProfileService } from '../services/profile.service';
 import { EditUserComponent } from './create/edit-user.component';
 
 @Component({
@@ -30,12 +30,12 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private modalService: NgbModal,
-    private userService: UserService,
+    private profileService: ProfileService,
     private router: Router,
   ) {}
 
   public ngOnInit(): void {
-    this.userService.getProfile().subscribe((info) => {
+    this.profileService.getUser().subscribe((info) => {
       this.userInfo = info;
     });
   }
@@ -48,7 +48,7 @@ export class ProfileComponent implements OnInit {
   }
 
   public onLogoutClick() {
-    this.userService.logout().subscribe(() => {
+    this.profileService.logout().subscribe(() => {
       this.router.navigate(['/sign-in']);
     });
   }
