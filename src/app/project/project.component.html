@@ -2,8 +2,8 @@
   <div
     class="container-fluid d-flex align-items-center justify-content-between pt-3 border-bottom pb-3 mb-3"
   >
-    <h3 class="m-0">
-      {{ project?.name }} <i class="fas fa-cogs text-muted" routerLink="edit"></i>
+    <h3 class="m-0 d-flex align-items-center">
+      {{ project?.name }} <i class="fas fa-cogs text-muted ml-2" routerLink="edit"></i>
     </h3>
     <div class="user-info d-flex" *ngIf="user" routerLink="/profile">
       <div>

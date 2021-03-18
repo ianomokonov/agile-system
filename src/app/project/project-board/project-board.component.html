@@ -9,8 +9,8 @@
         Создать задачу
       </div>
       <div class="task rounded" *ngFor="let task of tasksStatus">
-          <h6>{{task.name}}</h6>
-
+        <h6>{{ task.name }}</h6>
+        <small class="text-muted">{{ task.user?.name }} {{ task.user?.surname }}</small>
       </div>
     </div>
   </div>

@@ -190,13 +190,12 @@ class ProjectRepository {
     return users as UserShortView[];
   }
 
-  public async getProjectUser(projectId: number, userId: number) {
-    const query = sql.select('projectuser', '*').where({ projectId, id: userId });
-
-    const [[user]] = await dbConnection.query<RowDataPacket[]>(
-      getQueryText(query.text),
-      query.values,
-    );
+  public async getProjectUser(userId: number) {
+    const [[user]] = await dbConnection.query<
+      RowDataPacket[]
+    >(`SELECT pu.id, u.name, u.surname, u.image, u.email 
+    FROM projectuser pu JOIN user u ON pu.userId = u.id 
+    WHERE pu.id=${userId}`);
 
     return user;
   }
@@ -316,9 +315,14 @@ class ProjectRepository {
 
     const query = sql.select('projecttask', '*').where({ projectId });
 
-    const [tasks] = await dbConnection.query<RowDataPacket[]>(
-      getQueryText(query.text),
-      query.values,
+    let [tasks] = await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
+
+    tasks = await Promise.all(
+      tasks.map(async (taskTemp) => {
+        const task = taskTemp;
+        task.user = await this.getProjectUser(task.projectUserId);
+        return task;
+      }),
     );
     return tasks as TaskShortView[];
   }
