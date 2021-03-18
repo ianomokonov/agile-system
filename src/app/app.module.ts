@@ -29,6 +29,8 @@ import { ProfileService } from './services/profile.service';
 import { ProjectBoardComponent } from './project/project-board/project-board.component';
 import { TaskService } from './services/task.service';
 import { CreateTaskComponent } from './project/project-board/create-task/create-task.component';
+import { TaskComponent } from './project/project-board/task/task.component';
+import { ProjectDataService } from './services/project-data.service';
 
 @NgModule({
   declarations: [
@@ -47,6 +49,7 @@ import { CreateTaskComponent } from './project/project-board/create-task/create-
     EditUsersComponent,
     ProjectBoardComponent,
     CreateTaskComponent,
+    TaskComponent,
   ],
   imports: [
     BrowserModule,
@@ -64,6 +67,7 @@ import { CreateTaskComponent } from './project/project-board/create-task/create-
     TokenService,
     ProjectService,
     ProfileService,
+    ProjectDataService,
     TaskService,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ContentTypeInterceptor, multi: true },

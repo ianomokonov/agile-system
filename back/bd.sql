@@ -145,6 +145,7 @@ CREATE TABLE `projectTask` (
   `epicId` int(11),
   `parentId` int(11),
   `projectUserId` int(11),
+  `creatorId` int(11) NOT NULL,
   `points` int(11),
   `projectId` int(11) NOT NULL,
   `lastEditDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -290,7 +291,8 @@ ALTER TABLE `projectLinks` ADD FOREIGN KEY (projectId) REFERENCES `project` (`id
 ALTER TABLE `projectTask` ADD FOREIGN KEY (statusId) REFERENCES `projectTaskStatus` (`id`) ON DELETE CASCADE;
 ALTER TABLE `projectTask` ADD FOREIGN KEY (epicId) REFERENCES `epics` (`id`) ON DELETE NO ACTION;
 ALTER TABLE `projectTask` ADD FOREIGN KEY (parentId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectTask` ADD FOREIGN KEY (projectUserId) REFERENCES `projectUser` (`id`) ON DELETE CASCADE;
+ALTER TABLE `projectTask` ADD FOREIGN KEY (projectUserId) REFERENCES `projectUser` (`id`) ON DELETE NO ACTION;
+ALTER TABLE `projectTask` ADD FOREIGN KEY (creatorId) REFERENCES `projectUser` (`id`) ON DELETE NO ACTION;
 ALTER TABLE `projectTask` ADD FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
 ALTER TABLE `projectTask` ADD FOREIGN KEY (projectSprintId) REFERENCES `projectSprint` (`id`) ON DELETE CASCADE;
 ALTER TABLE `projectTaskLink` ADD FOREIGN KEY (linkTypeId) REFERENCES `linkType` (`id`) ON DELETE CASCADE;

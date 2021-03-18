@@ -2,9 +2,11 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import * as sql from 'sql-query-generator';
 import { CRUD } from '../models/crud.interface';
 import { CreateTaskRequest, UpdateTaskRequest } from '../models/requests/task.models';
+import { StatusResponse } from '../models/responses/status.response';
 import { TaskResponse } from '../models/responses/task.response';
 import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
+import projectRepository from './project.repository';
 
 sql.use('mysql');
 
@@ -20,10 +22,30 @@ class TaskRepository implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
     return project?.projectId;
   }
 
+  private async getStatus(statusId: number) {
+    const query = sql.select('projecttaskstatus', '*').where({ id: statusId });
+
+    const [[status]] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    return status as StatusResponse;
+  }
+
   public async read(taskId: number) {
     const [[task]] = await dbConnection.query<RowDataPacket[]>(`SELECT *
         FROM projecttask 
         WHERE id=${taskId}`);
+    const [status, user, creator] = await Promise.all([
+      await this.getStatus(task.statusId),
+      projectRepository.getProjectUser(task.projectUserId),
+      projectRepository.getProjectUser(task.creatorId),
+    ]);
+
+    task.status = status;
+    task.projectUser = user;
+    task.creator = creator;
     return task as TaskResponse;
   }
 

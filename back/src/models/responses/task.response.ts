@@ -1,11 +1,16 @@
+import { StatusResponse } from './status.response';
+import { UserShortView } from './user-short-view';
+
 export interface TaskResponse {
+  id: number;
   name: string;
   description: string;
-  statusId: number;
+  status: StatusResponse;
   typeId: number;
   epicId: number;
   parentId: number;
-  projectUserId: number;
+  projectUser: UserShortView;
+  creator: UserShortView;
   points: number;
   projectId: number;
   lastEditDate: Date;

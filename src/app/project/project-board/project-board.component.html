@@ -8,10 +8,11 @@
         <i class="fas fa-plus mr-1"></i>
         Создать задачу
       </div>
-      <div class="task rounded" *ngFor="let task of tasksStatus">
+      <a class="task rounded" *ngFor="let task of tasksStatus" [routerLink]="['/task', task.id]">
+        <small class="text-muted">#{{ task.id }}</small>
         <h6>{{ task.name }}</h6>
         <small class="text-muted">{{ task.user?.name }} {{ task.user?.surname }}</small>
-      </div>
+      </a>
     </div>
   </div>
 </div>

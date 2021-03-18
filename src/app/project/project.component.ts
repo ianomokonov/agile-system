@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { GetProfileInfoResponse } from 'back/src/models/responses/get-profile-info.response';
 import { ProjectResponse } from 'back/src/models/responses/project.response';
 import { ProfileService } from '../services/profile.service';
-import { ProjectService } from '../services/project.service';
+import { ProjectDataService } from '../services/project-data.service';
 
 @Component({
   selector: 'app-project',
@@ -14,7 +14,7 @@ export class ProjectComponent implements OnInit {
   public project: ProjectResponse;
   public user: GetProfileInfoResponse;
   constructor(
-    private projectService: ProjectService,
+    private projectDataService: ProjectDataService,
     private activatedRoute: ActivatedRoute,
     private profileService: ProfileService,
   ) {}
@@ -29,7 +29,7 @@ export class ProjectComponent implements OnInit {
   }
 
   public getProjectInfo(id: number) {
-    this.projectService.getProject(id).subscribe((info) => {
+    this.projectDataService.getProject(id).subscribe((info) => {
       this.project = info;
     });
   }

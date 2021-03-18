@@ -5,6 +5,7 @@ import { CreateComponent } from './profile/projects/create/create.component';
 import { EditProjectFormComponent } from './project/edit-project-form/edit-project-form.component';
 import { EditRolesComponent } from './project/edit/edit-roles/edit-roles.component';
 import { EditUsersComponent } from './project/edit/edit-users/edit-users.component';
+import { TaskComponent } from './project/project-board/task/task.component';
 import { ProjectComponent } from './project/project.component';
 import { ResetPasswordComponent } from './security/reset-password/reset-password.component';
 import { SignInComponent } from './security/sign-in/sign-in.component';
@@ -63,6 +64,10 @@ const routes: Routes = [
         component: EditUsersComponent,
       },
     ],
+  },
+  {
+    path: 'task/:id',
+    component: TaskComponent,
   },
 ];
 
