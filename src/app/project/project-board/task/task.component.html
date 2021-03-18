@@ -45,9 +45,9 @@
       </section>
     </div>
     <div class="col border-left">
-      <div class="form-group">
+      <div>
         <small class="text-muted">Исполнитель</small>
-        <h6 *ngIf="task.projectUser; else setTaskUser">
+        <h6 *ngIf="false; else setTaskUser">
           {{ task.projectUser.name }} {{ task.projectUser.surname }}
         </h6>
       </div>
@@ -56,7 +56,7 @@
         <h6>{{ task.creator.name }} {{ task.creator.surname }}</h6>
       </div>
       <div class="pt-3 mt-3 border-top">
-        <div class="form-group">
+        <div>
           <small class="text-muted">Дата создания</small>
           <h6>{{ task.createDate | date: 'dd.MM.yyyy' }}</h6>
         </div>
@@ -70,5 +70,5 @@
 </div>
 
 <ng-template #setTaskUser>
-  <button class="btn btn-link">Стать исполнителем</button>
+  <button class="btn btn-link p-0 d-block">Стать исполнителем</button>
 </ng-template>
