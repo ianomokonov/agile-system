@@ -1,1 +1,83 @@
-<p>edit-users works!</p>
+<h5>Участники проекта</h5>
+<ng-container *ngIf="projectUsers?.length; else noData">
+  <div class="d-flex flex-wrap">
+    <div
+      class="rounded border border-primary p-2 mr-3 mb-3 cursor-pointer"
+      [ngClass]="{ 'bg-primary text-white': user.id === editingUser?.id }"
+      *ngFor="let user of projectUsers"
+      (click)="onUserClick(user)"
+    >
+      <p class="m-0">{{ user.name }} {{ user.surname }}</p>
+      <small
+        [ngClass]="{
+          'text-white': user.id === editingUser?.id,
+          'text-muted': user.id !== editingUser?.id
+        }"
+        >{{ user.email }}</small
+      >
+    </div>
+    <div
+      *ngIf="!allUsersIncluded"
+      (click)="onUserClick()"
+      class="rounded border border-primary p-2 px-3 mr-3 mb-3 cursor-pointer d-flex align-items-center"
+      [ngClass]="{ 'bg-primary text-white': !editingUser, 'text-primary': editingUser }"
+    >
+      <i class="fas fa-plus"></i>
+    </div>
+  </div>
+</ng-container>
+<ng-container *ngIf="!allUsersIncluded || editingUser">
+  <hr />
+  <form [formGroup]="userForm" (submit)="saveProjectUser()">
+    <div class="d-flex justify-content-between align-items-center mb-3 header">
+      <h5 class="m-0">{{ editingUser ? 'Изменение ролей' : 'Добавление' }} участника</h5>
+      <button
+        type="button"
+        class="btn btn-outline-danger"
+        *ngIf="editingUser"
+        (click)="removeUser(editingUser.id)"
+      >
+        Удалить участника
+      </button>
+    </div>
+
+    <div class="form-group" *ngIf="!editingUser">
+      <label>Пользователь</label>
+      <ng-select
+        [items]="(searchedUsers$ | async) || []"
+        formControlName="user"
+        (search)="onSelectSearch($event)"
+        [typeahead]="searchUser$"
+        [hideSelected]="true"
+      >
+        <ng-template ng-label-tmp let-item="item">
+          {{ item.name }} {{ item.surname }} ({{ item.email }})
+        </ng-template>
+        <ng-template ng-option-tmp let-item="item">
+          <p class="m-0">{{ item.name }} {{ item.surname }}</p>
+          <small class="text-muted">{{ item.email }}</small>
+        </ng-template>
+      </ng-select>
+    </div>
+    <div class="form-group">
+      <label>Роли</label>
+      <ng-select
+        [multiple]="true"
+        [items]="roles"
+        formControlName="roleIds"
+        bindLabel="name"
+        bindValue="id"
+        [closeOnSelect]="false"
+      >
+      </ng-select>
+    </div>
+
+    <div class="text-right">
+      <button class="btn btn-primary">Сохранить</button>
+    </div>
+  </form>
+</ng-container>
+
+<ng-template #noData>
+  <p class="m-0 py-4 text-muted">Участники отстутствуют</p>
+</ng-template>

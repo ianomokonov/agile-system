@@ -5,6 +5,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SingUpComponent } from './security/sing-up/sing-up.component';
@@ -49,6 +50,7 @@ import { EditUsersComponent } from './project/edit/edit-users/edit-users.compone
     ReactiveFormsModule,
     HttpClientModule,
     BrowserAnimationsModule,
+    NgSelectModule,
   ],
   providers: [
     FormBuilder,

@@ -72,12 +72,20 @@ class ProjectRepository {
   }
 
   public async getFullProjectUsers(projectId: number) {
-    const [users] = await dbConnection.query<
+    let [users] = await dbConnection.query<
       RowDataPacket[]
     >(`SELECT pu.id, u.name, u.surname, u.image, u.email 
         FROM projectuser pu JOIN user u ON pu.userId = u.id 
         WHERE pu.projectId=${projectId}`);
-    return users;
+
+    users = await Promise.all(
+      users.map(async (userTemp) => {
+        const user = userTemp;
+        user.roleIds = await this.getProjectUserRoleIds(user.id);
+        return user;
+      }),
+    );
+    return users as UserShortView[];
   }
 
   public async addProjectRole(request: CreateProjectRoleRequest) {
@@ -163,6 +171,14 @@ class ProjectRepository {
     );
 
     return permissions.map((p) => p.permissionId) as number[];
+  }
+
+  public async getProjectUserRoleIds(userId: number) {
+    const [roles] = await dbConnection.query<RowDataPacket[]>(
+      `SELECT projectRoleId FROM projectuserrole WHERE projectUserId='${userId}'`,
+    );
+
+    return roles.map((p) => p.projectRoleId) as number[];
   }
 
   public async getProjectUsers(projectId: number) {

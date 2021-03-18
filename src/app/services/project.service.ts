@@ -14,6 +14,7 @@ import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { CreateTaskRequest } from 'back/src/models/requests/task.models';
 import { ProjectEditInfo } from 'back/src/models/responses/project-edit-info';
+import { UserShortView } from 'back/src/models/responses/user-short-view';
 
 @Injectable()
 export class ProjectService {
@@ -38,6 +39,10 @@ export class ProjectService {
 
   public addProjectUser(projectId: number, user: AddProjectUserRequest): Observable<string> {
     return this.http.post<string>(`${this.baseUrl}/${projectId}/add-user`, user);
+  }
+
+  public getProjectUsers(projectId: number): Observable<UserShortView[]> {
+    return this.http.get<UserShortView[]>(`${this.baseUrl}/${projectId}/users`);
   }
 
   public editProjectUser(projectId: number, user: EditProjectUserRequest): Observable<string> {
