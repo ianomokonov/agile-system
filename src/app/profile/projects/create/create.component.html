@@ -19,7 +19,7 @@
         <a class="nav-link" routerLink="roles" [routerLinkActive]="'active'">Роли</a>
       </li>
     </ul>
-    <ng-container *ngIf="false; else pages">
+    <ng-container *ngIf="!this.projectId; else pages">
       <app-edit-project-form></app-edit-project-form
     ></ng-container>
   </div>

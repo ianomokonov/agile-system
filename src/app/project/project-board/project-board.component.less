@@ -3,7 +3,7 @@
 @collumn-width: 250px;
 
 .scrollable {
-  padding-bottom: 1rem;
+  padding-bottom: 0.5rem;
   height: 100%;
   overflow: auto;
   .headers {
@@ -45,6 +45,13 @@
         background: #fff;
         margin-bottom: 0.5rem;
         padding: 0.5rem;
+
+        h6 {
+          cursor: pointer;
+          &:hover {
+            text-decoration: underline;
+          }
+        }
       }
     }
   }
