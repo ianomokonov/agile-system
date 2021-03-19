@@ -1,3 +1,4 @@
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { StatusResponse } from 'back/src/models/responses/status.response';
@@ -50,5 +51,23 @@ export class ProjectBoardComponent implements OnInit {
         });
       })
       .catch(() => {});
+  }
+
+  public changeStatus(event: CdkDragDrop<TaskShortView[]>) {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    } else {
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex,
+      );
+      this.taskService
+        .updateTaskStatus(+event.container.data[event.currentIndex].id, +event.container.id)
+        .subscribe(() => {
+          this.update.emit();
+        });
+    }
   }
 }
