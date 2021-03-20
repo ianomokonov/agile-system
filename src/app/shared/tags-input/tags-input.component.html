@@ -1,0 +1,30 @@
+<div #dropdown="ngbDropdown" ngbDropdown>
+  <div
+    class="form-control bg-white d-flex flex-wrap justify-content-start"
+    (click)="!disabled && setCursor(input, dropdown)"
+    #container
+    ngbDropdownToggle
+  >
+    <span class="tag" *ngFor="let tag of tags; let i = index"
+      >{{ tag.key }}
+      <i class="fas fa-times ml-1" (click)="remove(i)"></i>
+    </span>
+    <span
+      [contentEditable]="!!availableTags?.length"
+      class="placeholder"
+      #input
+      (keyup)="onKeyPress(input.innerText)"
+    ></span>
+  </div>
+  <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+    <ng-container *ngIf="availableTags?.length; else noData">
+      <button ngbDropdownItem *ngFor="let item of availableTags" (click)="addTag(item, input)">
+        {{ item.key }}
+      </button>
+    </ng-container>
+  </div>
+</div>
+
+<ng-template #noData>
+  <small class="text-muted w-100 text-center d-block">Данные не найдены</small>
+</ng-template>

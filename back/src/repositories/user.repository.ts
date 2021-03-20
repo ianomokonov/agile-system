@@ -1,6 +1,9 @@
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import * as sql from 'sql-query-generator';
-import { User } from '../models/user';
+import { CreateUserRequest } from '../models/requests/create-user.request';
+import { CheckUserResponse } from '../models/responses/check-user.response';
+import { UserShortView } from '../models/responses/user-short-view';
+import { GetProfileInfoResponse } from '../models/responses/get-profile-info.response';
 import { UserInfo } from '../models/user-info';
 import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
@@ -9,23 +12,19 @@ import projectRepository from './project.repository';
 sql.use('mysql');
 
 class UserRepository {
-  public async getUsers() {
-    const [result] = await dbConnection.query('SELECT * FROM `user`');
-    return result;
-  }
-
-  public async getUserByEmail(email: string) {
-    const query = sql.select('user', '*').where({ email });
+  public async getUserByEmail(email: string): Promise<CheckUserResponse> {
+    const query = sql.select('user', ['id', 'password']).where({ email });
     const [result] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
     );
-    return (result[0] as unknown) as User;
+
+    return result[0] as CheckUserResponse;
   }
 
-  public async getUserById(userId: number) {
+  public async getUserById(userId: number): Promise<GetProfileInfoResponse> {
     const query = sql
-      .select('user', ['name', 'surname', 'email', 'vk', 'github'])
+      .select('user', ['name', 'surname', 'email', 'vk', 'github', 'image'])
       .where({ id: userId });
     const [[user]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -36,7 +35,20 @@ class UserRepository {
     }
     user.projects = await projectRepository.getUserProjects(userId);
 
-    return (user as unknown) as UserInfo;
+    return (user as unknown) as GetProfileInfoResponse;
+  }
+
+  public async getUsers(searchString?: string): Promise<UserShortView[]> {
+    const query = sql
+      .select('user', ['id', 'name', 'surname', 'email', 'image'])
+      .where({ email: `${searchString}%` }, 'LIKE')
+      .limit(20, 0);
+    const [users] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    return users as UserShortView[];
   }
 
   public async isTokenActual(token: string) {
@@ -46,7 +58,7 @@ class UserRepository {
     return !!result?.length;
   }
 
-  public async addUser(user: User) {
+  public async addUser(user: CreateUserRequest): Promise<number> {
     const query = sql.insert('user', user);
     const result = await dbConnection.query(getQueryText(query.text), query.values);
     return (result[0] as ResultSetHeader).insertId;

@@ -19,10 +19,11 @@ export default (req, res, next): any => {
   // eslint-disable-next-line consistent-return
   jwt.verify(token, constants.JWT_ACCESS_SECRET, (err, userData) => {
     if (err) {
-      return res.sendStatus(StatusCodes.FORBIDDEN);
+      return res.sendStatus(StatusCodes.UNAUTHORIZED);
     }
 
-    res.locals.user = userData;
+    res.locals.userId = userData.userId;
+
     next();
   });
 };

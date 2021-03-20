@@ -1,12 +1,12 @@
 import bcrypt from 'bcrypt';
-import { User } from '../models/user';
+import { CreateUserRequest } from '../models/requests/create-user.request';
 import { UserInfo } from '../models/user-info';
 import userRepository from '../repositories/user.repository';
 
 const saltRounds = 10;
 
 class UserService {
-  public async add(user: User) {
+  public async add(user: CreateUserRequest) {
     const hash = await bcrypt.hash(user.password, saltRounds);
     return userRepository.addUser({ ...user, password: hash });
   }
@@ -23,8 +23,12 @@ class UserService {
     return userRepository.getUserById(userId);
   }
 
-  public async checkUser(user: User, password: string) {
-    const match = await bcrypt.compare(password, user.password);
+  public async getUsers(searchString?: string) {
+    return userRepository.getUsers(searchString);
+  }
+
+  public async checkUser(userPassword: string, password: string) {
+    const match = await bcrypt.compare(password, userPassword);
     return match;
   }
 }

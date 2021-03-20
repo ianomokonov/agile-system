@@ -1,22 +1,36 @@
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import * as sql from 'sql-query-generator';
-import { AddProjectUserRequest } from '../models/add-project-user-request';
-import { CreateProjectRequest } from '../models/create-project-request';
-import { EditProjectUserRequest } from '../models/edit-project-user-request';
+import { AddProjectUserRequest } from '../models/requests/add-project-user-request';
+import { CreateProjectRequest } from '../models/requests/create-project-request';
+import { EditProjectUserRequest } from '../models/requests/edit-project-user-request';
 import { Link } from '../models/link';
-import { Project } from '../models/project';
-import { CreateProjectRoleRequest, UpdateProjectRoleRequest } from '../models/project-role.models';
+import {
+  CreateProjectRoleRequest,
+  UpdateProjectRoleRequest,
+} from '../models/requests/project-role.models';
 import { getQueryText, Permissions } from '../utils';
 import dbConnection from './db-connection';
+import { ProjectResponse } from '../models/responses/project.response';
+import { ProjectShortView } from '../models/responses/project-short-view';
+import { TaskShortView } from '../models/responses/task-short-view';
+import { ProjectRoleResponse } from '../models/responses/project-role.response';
+import { ProjectPermissionResponse } from '../models/responses/permission.response';
+import { UserShortView } from '../models/responses/user-short-view';
+import { StatusResponse } from '../models/responses/status.response';
 
 sql.use('mysql');
 
 class ProjectRepository {
   public async getUserProjects(userId: number) {
-    const query = sql.select('project', '*').where({ ownerId: userId });
-    const [projects] = await dbConnection.query<RowDataPacket[]>(query.text, query.values);
+    const query = sql
+      .select('project', ['id', 'name', 'repository', 'lastEditDate'])
+      .where({ ownerId: userId });
+    const [projects] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
 
-    return (projects as unknown) as Project[];
+    return projects as ProjectShortView[];
   }
 
   public async create(userId: number, project: CreateProjectRequest) {
@@ -58,6 +72,23 @@ class ProjectRepository {
     await dbConnection.query(getQueryText(query.text), query.values);
   }
 
+  public async getFullProjectUsers(projectId: number) {
+    let [users] = await dbConnection.query<
+      RowDataPacket[]
+    >(`SELECT pu.id, u.name, u.surname, u.image, u.email 
+        FROM projectuser pu JOIN user u ON pu.userId = u.id 
+        WHERE pu.projectId=${projectId}`);
+
+    users = await Promise.all(
+      users.map(async (userTemp) => {
+        const user = userTemp;
+        user.roleIds = await this.getProjectUserRoleIds(user.id);
+        return user;
+      }),
+    );
+    return users as UserShortView[];
+  }
+
   public async addProjectRole(request: CreateProjectRoleRequest) {
     const query = sql.insert('projectroles', {
       projectId: request.projectId,
@@ -70,15 +101,6 @@ class ProjectRepository {
     return projectRoleId;
   }
 
-  public async getFullProjectUsers(projectId: number) {
-    const [users] = await dbConnection.query<
-      RowDataPacket[]
-    >(`SELECT pu.id, u.name, u.surname, u.image, u.email 
-        FROM projectuser pu JOIN user u ON pu.userId = u.id 
-        WHERE pu.projectId=${projectId}`);
-    return users;
-  }
-
   public async editProjectRole(request: UpdateProjectRoleRequest) {
     const query = sql
       .update('projectroles', { name: request.projectRoleName })
@@ -86,6 +108,20 @@ class ProjectRepository {
     dbConnection.query(getQueryText(query.text), query.values);
     await this.removeProjectRolePermissions(request.projectRoleId);
     this.addProjectRolePermissions(request.projectRoleId, request.permissionIds);
+  }
+
+  public async editProject(projectId, request: CreateProjectRequest) {
+    const query = sql
+      .update('project', {
+        name: request.name,
+        repository: request.repository,
+        description: request.description,
+      })
+      .where({ id: projectId });
+    dbConnection.query(getQueryText(query.text), query.values);
+    await Promise.all([this.removeProjectUsers(projectId), this.removeProjectLinks(projectId)]);
+    this.createProjectUsers(projectId, request.usersIds);
+    this.createProjectLinks(projectId, request.links);
   }
 
   public async removeProjectRole(projectRoleId: number) {
@@ -111,25 +147,67 @@ class ProjectRepository {
   }
 
   public async getProjectRoles(projectId: number) {
-    const [roles] = await dbConnection.query<RowDataPacket[]>(
-      `SELECT * FROM projectroles WHERE projectId='${projectId}'`,
+    let [roles] = await dbConnection.query<RowDataPacket[]>(
+      `SELECT id, name FROM projectroles WHERE projectId='${projectId}'`,
     );
-
-    return roles;
+    roles = await Promise.all(
+      roles.map(async (roleTemp) => {
+        const role = roleTemp;
+        role.permissionIds = await this.getRolePermissionIds(role.id);
+        return role;
+      }),
+    );
+    return roles as ProjectRoleResponse[];
   }
 
   public async getProjectPermissions() {
     const [permissions] = await dbConnection.query<RowDataPacket[]>(`SELECT * FROM permission`);
 
-    return permissions;
+    return permissions as ProjectPermissionResponse[];
+  }
+
+  public async getRolePermissionIds(roleId: number) {
+    const [permissions] = await dbConnection.query<RowDataPacket[]>(
+      `SELECT permissionId FROM projectrolepermission WHERE projectRoleId='${roleId}'`,
+    );
+
+    return permissions.map((p) => p.permissionId) as number[];
+  }
+
+  public async getProjectUserRoleIds(userId: number) {
+    const [roles] = await dbConnection.query<RowDataPacket[]>(
+      `SELECT projectRoleId FROM projectuserrole WHERE projectUserId='${userId}'`,
+    );
+
+    return roles.map((p) => p.projectRoleId) as number[];
   }
 
   public async getProjectUsers(projectId: number) {
     const [users] = await dbConnection.query<RowDataPacket[]>(
-      `SELECT * FROM projectuser WHERE projectId='${projectId}'`,
+      `SELECT u.id, u.name, u.email, u.surname, u.image FROM projectuser pu JOIN user u ON pu.userId = u.id WHERE projectId='${projectId}'`,
     );
 
-    return users;
+    return users as UserShortView[];
+  }
+
+  public async getProjectUser(userId: number) {
+    const [[user]] = await dbConnection.query<
+      RowDataPacket[]
+    >(`SELECT pu.id, u.name, u.surname, u.image, u.email 
+    FROM projectuser pu JOIN user u ON pu.userId = u.id 
+    WHERE pu.id=${userId}`);
+
+    return user;
+  }
+
+  public async getProjectUserByUserId(userId: number, projectId: number) {
+    const [[user]] = await dbConnection.query<
+      RowDataPacket[]
+    >(`SELECT pu.id, u.name, u.surname, u.image, u.email 
+    FROM projectuser pu JOIN user u ON pu.userId = u.id 
+    WHERE u.id=${userId} AND pu.projectId=${projectId}`);
+
+    return user;
   }
 
   private async addProjectUserRoles(projectUserId: number, roleIds: number[]) {
@@ -188,6 +266,28 @@ class ProjectRepository {
     await dbConnection.query(getQueryText(query.text), query.values);
   }
 
+  private async removeProjectUsers(projectId: number) {
+    if (!projectId) {
+      console.error('Укажите id проекта');
+      return;
+    }
+
+    const query = sql.deletes('projectuser').where({ projectId });
+
+    await dbConnection.query(getQueryText(query.text), query.values);
+  }
+
+  private async removeProjectLinks(projectId: number) {
+    if (!projectId) {
+      console.error('Укажите id проекта');
+      return;
+    }
+
+    const query = sql.deletes('projectlinks').where({ projectId });
+
+    await dbConnection.query(getQueryText(query.text), query.values);
+  }
+
   public async createProjectLinks(projectId: number, links: Link[]) {
     if (!links?.length) {
       return;
@@ -200,16 +300,51 @@ class ProjectRepository {
     await dbConnection.query(query);
   }
 
-  public async getUserProject(userId: number, projectId: number) {
-    if (!userId || !projectId) {
+  public async getProject(projectId: number): Promise<ProjectResponse> {
+    if (!projectId) {
+      console.error('Укажите id проекта');
       return null;
     }
 
-    const query = `SELECT * FROM project p WHERE p.Id=${projectId} AND p.ownerId=${userId} OR 0 < (SELECT COUNT(*) from projectuser pu where pu.userId=${userId} AND pu.projectId=p.id)`;
+    const query = sql
+      .select('project', ['id', 'name', 'repository', 'description'])
+      .where({ id: projectId });
 
-    const [projects] = await dbConnection.query(query);
+    const [[project]] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    return project as ProjectResponse;
+  }
 
-    return projects[0];
+  public async getProjectTasks(projectId: number) {
+    if (!projectId) {
+      console.error('Укажите id проекта');
+      return null;
+    }
+
+    const query = sql.select('projecttask', '*').where({ projectId });
+
+    let [tasks] = await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
+
+    tasks = await Promise.all(
+      tasks.map(async (taskTemp) => {
+        const task = taskTemp;
+        task.user = await this.getProjectUser(task.projectUserId);
+        return task;
+      }),
+    );
+    return tasks as TaskShortView[];
+  }
+
+  public async getProjectStatuses() {
+    const query = sql.select('projecttaskstatus', '*');
+
+    const [statuses] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    return statuses as StatusResponse[];
   }
 
   public async checkUserPermission(userId: number, projectId: number, permission: Permissions) {
@@ -217,6 +352,7 @@ class ProjectRepository {
       return false;
     }
     let query = `SELECT * FROM project p WHERE p.Id=${projectId} AND p.ownerId=${userId}`;
+
     const [projects] = await dbConnection.query(query);
     if (projects[0]) {
       return true;

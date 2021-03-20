@@ -1,5 +1,5 @@
 export interface CreateProjectRoleRequest {
-  projectId: number;
+  projectId?: number;
   roleName: string;
   permissionIds: number[];
 }

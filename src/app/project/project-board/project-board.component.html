@@ -1,0 +1,25 @@
+<div class="scrollable">
+  <div class="headers">
+    <div class="header mx-1" *ngFor="let status of statuses">{{ status.name }}</div>
+  </div>
+  <div class="board px-1" cdkDropListGroup>
+    <div
+      class="collumn mx-1 rounded"
+      cdkDropList
+      [cdkDropListData]="tasksStatus"
+      [id]="statuses[index].id.toString()"
+      *ngFor="let tasksStatus of tasks; let first = first; let index = index"
+      (cdkDropListDropped)="changeStatus($event)"
+    >
+      <div *ngIf="first" class="text-center create-task rounded" (click)="createTask()">
+        <i class="fas fa-plus mr-1"></i>
+        Создать задачу
+      </div>
+      <div class="task rounded" *ngFor="let task of tasksStatus" cdkDrag>
+        <small class="text-muted">#{{ task.id }}</small>
+        <h6 [routerLink]="['/task', task.id]">{{ task.name }}</h6>
+        <small class="text-muted">{{ task.user?.name }} {{ task.user?.surname }}</small>
+      </div>
+    </div>
+  </div>
+</div>

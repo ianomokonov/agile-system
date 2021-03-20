@@ -1,7 +1,12 @@
-import { AddProjectUserRequest } from '../models/add-project-user-request';
-import { CreateProjectRequest } from '../models/create-project-request';
-import { EditProjectUserRequest } from '../models/edit-project-user-request';
-import { CreateProjectRoleRequest, UpdateProjectRoleRequest } from '../models/project-role.models';
+import { AddProjectUserRequest } from '../models/requests/add-project-user-request';
+import { CreateProjectRequest } from '../models/requests/create-project-request';
+import { EditProjectUserRequest } from '../models/requests/edit-project-user-request';
+import {
+  CreateProjectRoleRequest,
+  UpdateProjectRoleRequest,
+} from '../models/requests/project-role.models';
+import { ProjectEditInfo } from '../models/responses/project-edit-info';
+import { ProjectResponse } from '../models/responses/project.response';
 import projectRepository from '../repositories/project.repository';
 import { Permissions } from '../utils';
 
@@ -9,7 +14,10 @@ class ProjectService {
   public async create(userId: number, project: CreateProjectRequest) {
     const projectId = await projectRepository.create(userId, project);
     await Promise.all([
-      projectRepository.createProjectUsers(projectId, project.usersIds),
+      projectRepository.createProjectUsers(
+        projectId,
+        project.usersIds.filter((id) => id !== userId),
+      ),
       projectRepository.createProjectLinks(projectId, project.links),
     ]);
     return projectId;
@@ -47,9 +55,27 @@ class ProjectService {
     return projectRepository.getFullProjectUsers(projectId);
   }
 
-  public async get(userId: number, projectId: number) {
-    const project = projectRepository.getUserProject(userId, projectId);
+  public async read(projectId: number): Promise<ProjectResponse> {
+    const [project, tasks, statuses] = await Promise.all([
+      projectRepository.getProject(projectId),
+      projectRepository.getProjectTasks(projectId),
+      projectRepository.getProjectStatuses(),
+    ]);
+    project.tasks = tasks;
+    project.statuses = statuses;
+    return project;
+  }
 
+  public async update(projectId: number, project: CreateProjectRequest) {
+    projectRepository.editProject(projectId, project);
+  }
+
+  public async getEditInfo(projectId: number): Promise<ProjectEditInfo> {
+    const [project, users] = await Promise.all([
+      projectRepository.getProject(projectId) as any,
+      projectRepository.getProjectUsers(projectId),
+    ]);
+    project.users = users;
     return project;
   }
 

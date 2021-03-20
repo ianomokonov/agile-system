@@ -1,4 +1,5 @@
-import chalk from "chalk";
+/* eslint-disable no-console */
+import chalk from 'chalk';
 
 export default {
   error: (...msg: any) => console.error(chalk.red(...msg)),

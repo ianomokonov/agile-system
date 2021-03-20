@@ -1,9 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
 @import './variables.less';
+@import "~@ng-select/ng-select/themes/default.theme.css";
+@import "./controls.less";
 
 body,
 html {
   height: 100%;
+  font-family: 'Roboto', sans-serif;
 }
 
 * {
@@ -48,8 +51,12 @@ html {
   border-color: @primary-color;
 }
 
-.form-control{
-  &.ng-touched.ng-invalid{
+.form-control {
+  &.ng-touched.ng-invalid {
     border-color: @border-danger;
   }
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }

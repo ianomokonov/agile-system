@@ -1,70 +1,55 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Project } from 'back/src/models/project';
+import { GetProfileInfoResponse } from 'back/src/models/responses/get-profile-info.response';
+import { ProfileService } from '../services/profile.service';
 import { EditUserComponent } from './create/edit-user.component';
-import { Project } from './models/project';
-import { User } from './models/user';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.less'],
 })
-export class ProfileComponent {
-  public userInfo: User = {
-    name: 'Ванька',
-    surname: 'Номоконов',
-    email: 'vanika.koma@yandex.ru',
-    vk: 'https://vk.com/vanikakoma',
-    gitHub: 'https://github.com/ianomokonov',
-  };
-  private projects: Project[] = [
-    {
-      name: 'Agile system',
-      roles: ['admin', 'developer'],
-      date: new Date(),
-      isClosed: false,
-    },
-    {
-      name: 'Agile system 1',
-      roles: ['admin', 'developer'],
-      date: new Date(),
-      isClosed: true,
-    },
-    {
-      name: 'Agile system 2',
-      roles: ['developer'],
-      date: new Date(),
-      isClosed: false,
-    },
-    {
-      name: 'Agile system 3',
-      roles: ['testing'],
-      date: new Date(),
-      isClosed: false,
-    },
-  ];
+export class ProfileComponent implements OnInit {
+  public userInfo!: GetProfileInfoResponse;
 
   private readonly ADMIN_ROLE = 'admin';
 
   public get myProjects(): Project[] {
-    return this.projects.filter((p) => !p.isClosed && p.roles.indexOf(this.ADMIN_ROLE) > -1);
+    return this.userInfo.projects;
   }
 
   public get othersProjects(): Project[] {
-    return this.projects.filter((p) => !p.isClosed && p.roles.indexOf(this.ADMIN_ROLE) < 0);
+    return this.userInfo.projects.filter((p) => !p.isClosed);
   }
 
   public get closedProjects(): Project[] {
-    return this.projects.filter((p) => p.isClosed);
+    return this.userInfo.projects.filter((p) => p.isClosed);
   }
 
-  constructor(private modalService: NgbModal) {}
+  constructor(
+    private modalService: NgbModal,
+    private profileService: ProfileService,
+    private router: Router,
+  ) {}
 
+  public ngOnInit(): void {
+    this.profileService.getUser().subscribe((info) => {
+      this.userInfo = info;
+    });
+  }
   public onEditUserClick() {
     const modal = this.modalService.open(EditUserComponent);
     modal.componentInstance.user = this.userInfo;
     modal.closed.subscribe((result) => {
-      this.userInfo = { ...result };
+      this.userInfo = { ...this.userInfo, ...result };
+    });
+  }
+
+  public onLogoutClick() {
+    this.profileService.logout().subscribe(() => {
+      this.router.navigate(['/sign-in']);
     });
   }
 }

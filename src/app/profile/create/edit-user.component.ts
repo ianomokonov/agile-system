@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { User } from '../models/user';
+import { GetProfileInfoResponse } from 'back/src/models/responses/get-profile-info.response';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-create',
@@ -10,14 +11,17 @@ import { User } from '../models/user';
 })
 export class EditUserComponent {
   public userForm: FormGroup;
-  public set user(user: User) {
+  public set user(user: GetProfileInfoResponse) {
     this.userForm?.patchValue(user);
   }
-  constructor(private fb: FormBuilder, private activeModal: NgbActiveModal) {
+  constructor(
+    private fb: FormBuilder,
+    private activeModal: NgbActiveModal,
+    private userService: UserService,
+  ) {
     this.userForm = fb.group({
       name: [null, Validators.required],
       surname: [null, Validators.required],
-      email: [null, [Validators.required, Validators.email]],
       vk: [null],
       gitHub: [null],
     });
@@ -29,7 +33,9 @@ export class EditUserComponent {
       return;
     }
     const formValue = this.userForm.getRawValue();
-    this.activeModal.close(formValue);
+    this.userService.editProfile(formValue).subscribe(() => {
+      this.activeModal.close(formValue);
+    });
   }
 
   public onCancelClick() {
