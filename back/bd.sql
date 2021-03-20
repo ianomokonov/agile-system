@@ -268,9 +268,12 @@ DROP TABLE IF EXISTS `projectSprint`;
 		
 CREATE TABLE `projectSprint` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `startDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  `endDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  `name` varchar(255),
+  `startDate` DATE NULL,
+  `endDate` DATE NULL,
+  `name` varchar(255) NOT NULL,
+  `goal` varchar(255),
+  `isActive` bit DEFAULT 0,
+  `isFinished` bit DEFAULT 0,
   `projectId` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) COMMENT 'спринты проекта';

@@ -1,6 +1,6 @@
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { StatusResponse } from 'back/src/models/responses/status.response';
 import { TaskShortView } from 'back/src/models/responses/task-short-view';
@@ -9,6 +9,7 @@ import { forkJoin } from 'rxjs';
 import { ProjectDataService } from 'src/app/services/project-data.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { TaskService } from 'src/app/services/task.service';
+import { CreateSprintComponent } from '../create-sprint/create-sprint.component';
 import { CreateTaskComponent } from './create-task/create-task.component';
 
 @Component({
@@ -26,6 +27,7 @@ export class ProjectBoardComponent implements OnInit {
     private projectService: ProjectService,
     private projectDataService: ProjectDataService,
     private activatedRoute: ActivatedRoute,
+    private router: Router,
   ) {}
   public ngOnInit() {
     this.activatedRoute.parent?.params.subscribe((params) => {
@@ -33,14 +35,21 @@ export class ProjectBoardComponent implements OnInit {
         this.projectDataService.getProject(params.id),
         this.projectService.getProjectUsers(params.id),
       ]).subscribe(([project, users]) => {
+        if (!project.sprint) {
+          this.router.navigate(['../backlog'], { relativeTo: this.activatedRoute });
+          return;
+        }
         this.statuses = project.statuses;
-        this.setTasks(project.tasks);
+        this.setTasks(project.sprint?.tasks);
         this.users = users;
       });
     });
   }
   private setTasks(tasks: TaskShortView[]) {
     this.tasks = [];
+    if (!tasks?.length) {
+      return;
+    }
     this.statuses?.forEach((status) => {
       this.tasks.push(tasks.filter((task) => task.statusId === status.id));
     });
@@ -79,7 +88,7 @@ export class ProjectBoardComponent implements OnInit {
   public refreshProjectInfo(id: number) {
     this.projectDataService.getProject(id).subscribe((info) => {
       this.statuses = info.statuses;
-      this.setTasks(info.tasks);
+      this.setTasks(info.sprint?.tasks);
     });
   }
 }

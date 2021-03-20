@@ -34,6 +34,7 @@ import { CreateTaskComponent } from './project/project-board/create-task/create-
 import { TaskComponent } from './project/project-board/task/task.component';
 import { ProjectDataService } from './services/project-data.service';
 import { ProjectBacklogComponent } from './project/project-backlog/project-backlog.component';
+import { CreateSprintComponent } from './project/create-sprint/create-sprint.component';
 
 @NgModule({
   declarations: [
@@ -54,6 +55,7 @@ import { ProjectBacklogComponent } from './project/project-backlog/project-backl
     CreateTaskComponent,
     TaskComponent,
     ProjectBacklogComponent,
+    CreateSprintComponent,
   ],
   imports: [
     BrowserModule,

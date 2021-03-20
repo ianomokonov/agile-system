@@ -1,5 +1,6 @@
+import { Sprint } from '../sprint';
 import { StatusResponse } from './status.response';
-import { TaskShortView } from './task-short-view';
+import { UserShortView } from './user-short-view';
 
 export interface ProjectResponse {
   id: number;
@@ -7,6 +8,7 @@ export interface ProjectResponse {
   repository: string;
   description: string;
   isClosed: boolean;
-  tasks: TaskShortView[];
+  sprint: Sprint;
   statuses: StatusResponse[];
+  users: UserShortView[];
 }

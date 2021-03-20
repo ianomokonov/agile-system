@@ -1,4 +1,4 @@
-<div class="scrollable">
+<div class="scrollable" *ngIf="tasks?.length">
   <div class="headers">
     <div class="header mx-1" *ngFor="let status of statuses">{{ status.name }}</div>
   </div>

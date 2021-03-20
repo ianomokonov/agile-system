@@ -14,6 +14,7 @@ import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { CreateTaskRequest } from 'back/src/models/requests/task.models';
 import { ProjectEditInfo } from 'back/src/models/responses/project-edit-info';
+import { Backlog } from 'back/src/models/responses/backlog';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
 
 @Injectable()
@@ -75,6 +76,10 @@ export class ProjectService {
 
   public getPermissions(): Observable<ProjectPermissionResponse[]> {
     return this.http.get<ProjectPermissionResponse[]>(`${this.baseUrl}/permissions`);
+  }
+
+  public getProjectBacklog(projectId: number): Observable<Backlog> {
+    return this.http.get<Backlog>(`${this.baseUrl}/${projectId}/backlog`);
   }
 
   public addTask(

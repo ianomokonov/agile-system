@@ -10,13 +10,14 @@ import {
 } from '../models/requests/project-role.models';
 import { getQueryText, Permissions } from '../utils';
 import dbConnection from './db-connection';
-import { ProjectResponse } from '../models/responses/project.response';
-import { ProjectShortView } from '../models/responses/project-short-view';
-import { TaskShortView } from '../models/responses/task-short-view';
+import { UserShortView } from '../models/responses/user-short-view';
 import { ProjectRoleResponse } from '../models/responses/project-role.response';
 import { ProjectPermissionResponse } from '../models/responses/permission.response';
-import { UserShortView } from '../models/responses/user-short-view';
+import { ProjectResponse } from '../models/responses/project.response';
 import { StatusResponse } from '../models/responses/status.response';
+import { TaskShortView } from '../models/responses/task-short-view';
+import { ProjectShortView } from '../models/responses/project-short-view';
+import { Sprint } from '../models/sprint';
 
 sql.use('mysql');
 
@@ -87,6 +88,27 @@ class ProjectRepository {
       }),
     );
     return users as UserShortView[];
+  }
+
+  public async getProjectSprints(projectId: number) {
+    const query = sql.select('projectsprint', '*').where({ projectId, isFinished: false });
+
+    let [sprints] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    if (!sprints?.length) {
+      return [];
+    }
+
+    sprints = await Promise.all(
+      sprints.map(async (sprintTemp) => {
+        const sprint = sprintTemp;
+        sprint.tasks = await this.getSprintTasks(projectId, sprint.id);
+        return sprint;
+      }),
+    );
+    return sprints as Sprint[];
   }
 
   public async addProjectRole(request: CreateProjectRoleRequest) {
@@ -317,16 +339,42 @@ class ProjectRepository {
     return project as ProjectResponse;
   }
 
-  public async getProjectTasks(projectId: number) {
+  public async getProjectActiveSprint(projectId: number) {
     if (!projectId) {
       console.error('Укажите id проекта');
       return null;
     }
 
-    const query = sql.select('projecttask', '*').where({ projectId });
+    const query = sql.select('projectsprint', '*').where({ projectId, isActive: true }).limit(1, 0);
+
+    const [[sprint]] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    if (!sprint) {
+      return null;
+    }
+    sprint.tasks = await this.getSprintTasks(projectId, sprint?.id);
+
+    return sprint as Sprint;
+  }
+
+  public async getSprintTasks(projectId?: number, projectSprintId?: number) {
+    let query = sql.select('projecttask', [
+      'id',
+      'name',
+      'statusId',
+      'createDate',
+      'projectUserId',
+    ]);
+
+    if (projectSprintId) {
+      query = query.where({ projectSprintId });
+    } else {
+      query = query.where({ projectSprintId: null }, 'IS').and({ projectId });
+    }
 
     let [tasks] = await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
-
     tasks = await Promise.all(
       tasks.map(async (taskTemp) => {
         const task = taskTemp;

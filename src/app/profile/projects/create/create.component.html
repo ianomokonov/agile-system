@@ -2,7 +2,7 @@
   <h4 [routerLink]="projectId ? ['/project', projectId] : ['/profile']">
     <i class="fas fa-long-arrow-alt-left mr-3"></i>{{ projectId ? 'К проекту' : 'Все проекты' }}
   </h4>
-  <div class="create-form">
+  <div class="shadow-form">
     <ul class="nav nav-pills mb-3" *ngIf="projectId">
       <li class="nav-item">
         <a

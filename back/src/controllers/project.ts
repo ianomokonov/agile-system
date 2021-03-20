@@ -5,6 +5,7 @@ import editProjectHandler from '../handlers/project/edit-project.handler';
 import getProjectEditInfoHandler from '../handlers/project/get-project-edit-info.handler';
 import getProjectPermissionsHandler from '../handlers/project/get-project-permissions.handler';
 import getProjectHandler from '../handlers/project/get-project.handler';
+import projectBacklogHandler from '../handlers/project/project-backlog.handler';
 import projectRolesHandler from '../handlers/project/project-roles.handler';
 import projectUsersHandler from '../handlers/project/project-users.handler';
 import tasksHandler from '../handlers/task/tasks.handler';
@@ -37,7 +38,8 @@ projectRouter.get(
       }
       res.status(StatusCodes.OK).json(project);
     } catch (error) {
-      res.status(error.statusCode).json(error.error);
+      logger.error(error);
+      res.status(error.statusCode || 500).json(error.error);
     }
   },
 );
@@ -234,6 +236,21 @@ projectRouter.get(
   },
 );
 
+projectRouter.get(
+  `/:id/backlog`,
+  authJWT,
+  checkPermissions(Permissions.CanReadProject),
+  async (req, res) => {
+    try {
+      const backlog = await projectBacklogHandler(+req.params.id);
+      res.status(StatusCodes.OK).json(backlog);
+    } catch (error) {
+      logger.error(error);
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
 projectRouter.post(
   `/:id/add-task`,
   authJWT,
@@ -248,7 +265,7 @@ projectRouter.post(
       });
       res.status(StatusCodes.OK).json(newTaskId);
     } catch (error) {
-      console.log(error);
+      logger.error(error);
 
       res.status(error.statusCode).json(error.error);
     }

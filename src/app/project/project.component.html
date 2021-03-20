@@ -15,10 +15,14 @@
   </div>
   <div class="board">
     <div class="board-menu border-right pr-2">
-      <div class="menu-item btn btn-outline-primary" routerLink="board" routerLinkActive="active"><i class="fas fa-running"></i></div>
-      <div class="menu-item btn btn-outline-primary" routerLink="backlog" routerLinkActive="active"><i class="fas fa-book"></i></div>
+      <div class="menu-item btn btn-outline-primary" routerLink="board" routerLinkActive="active" *ngIf="project?.sprint">
+        <i class="fas fa-running"></i>
+      </div>
+      <div class="menu-item btn btn-outline-primary" routerLink="backlog" routerLinkActive="active">
+        <i class="fas fa-book"></i>
+      </div>
     </div>
-    <div class="content">
+    <div class="content" *ngIf="project">
       <router-outlet></router-outlet>
     </div>
   </div>

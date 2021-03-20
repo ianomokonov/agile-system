@@ -5,6 +5,7 @@ import {
   CreateProjectRoleRequest,
   UpdateProjectRoleRequest,
 } from '../models/requests/project-role.models';
+import { Backlog } from '../models/responses/backlog';
 import { ProjectEditInfo } from '../models/responses/project-edit-info';
 import { ProjectResponse } from '../models/responses/project.response';
 import projectRepository from '../repositories/project.repository';
@@ -56,18 +57,29 @@ class ProjectService {
   }
 
   public async read(projectId: number): Promise<ProjectResponse> {
-    const [project, tasks, statuses] = await Promise.all([
+    const [project, sprint, statuses, users] = await Promise.all([
       projectRepository.getProject(projectId),
-      projectRepository.getProjectTasks(projectId),
+      projectRepository.getProjectActiveSprint(projectId),
       projectRepository.getProjectStatuses(),
+      projectRepository.getFullProjectUsers(projectId),
     ]);
-    project.tasks = tasks;
+    project.sprint = sprint;
     project.statuses = statuses;
+    project.users = users;
     return project;
   }
 
   public async update(projectId: number, project: CreateProjectRequest) {
     projectRepository.editProject(projectId, project);
+  }
+
+  public async getBacklog(projectId: number) {
+    const [sprints, tasks] = await Promise.all([
+      projectRepository.getProjectSprints(projectId),
+      projectRepository.getSprintTasks(projectId),
+    ]);
+
+    return { sprints, tasks } as Backlog;
   }
 
   public async getEditInfo(projectId: number): Promise<ProjectEditInfo> {
