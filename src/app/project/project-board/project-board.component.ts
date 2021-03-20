@@ -1,9 +1,11 @@
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { StatusResponse } from 'back/src/models/responses/status.response';
 import { TaskShortView } from 'back/src/models/responses/task-short-view';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
+import { forkJoin } from 'rxjs';
 import { ProjectDataService } from 'src/app/services/project-data.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { TaskService } from 'src/app/services/task.service';
@@ -23,13 +25,19 @@ export class ProjectBoardComponent implements OnInit {
     private modalService: NgbModal,
     private projectService: ProjectService,
     private projectDataService: ProjectDataService,
+    private activatedRoute: ActivatedRoute,
   ) {}
   public ngOnInit() {
-    this.projectService.getProjectUsers(this.projectDataService.project.id).subscribe((users) => {
-      this.users = users;
+    this.activatedRoute.parent?.params.subscribe((params) => {
+      forkJoin([
+        this.projectDataService.getProject(params.id),
+        this.projectService.getProjectUsers(params.id),
+      ]).subscribe(([project, users]) => {
+        this.statuses = project.statuses;
+        this.setTasks(project.tasks);
+        this.users = users;
+      });
     });
-    this.statuses = this.projectDataService.project.statuses;
-    this.setTasks(this.projectDataService.project.tasks);
   }
   private setTasks(tasks: TaskShortView[]) {
     this.tasks = [];
