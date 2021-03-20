@@ -5,6 +5,7 @@
 .scrollable {
   padding-bottom: 0.5rem;
   height: 100%;
+  max-width: 100%;
   overflow: auto;
   .headers {
     display: flex;
@@ -19,7 +20,7 @@
   }
 
   .board {
-    display: flex;
+    display: inline-flex;
     height: calc(100% - 40px);
     .collumn {
       overflow: hidden;

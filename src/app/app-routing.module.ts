@@ -5,6 +5,8 @@ import { CreateComponent } from './profile/projects/create/create.component';
 import { EditProjectFormComponent } from './project/edit-project-form/edit-project-form.component';
 import { EditRolesComponent } from './project/edit/edit-roles/edit-roles.component';
 import { EditUsersComponent } from './project/edit/edit-users/edit-users.component';
+import { ProjectBacklogComponent } from './project/project-backlog/project-backlog.component';
+import { ProjectBoardComponent } from './project/project-board/project-board.component';
 import { TaskComponent } from './project/project-board/task/task.component';
 import { ProjectComponent } from './project/project.component';
 import { ResetPasswordComponent } from './security/reset-password/reset-password.component';
@@ -40,6 +42,21 @@ const routes: Routes = [
   {
     path: 'project/:id',
     component: ProjectComponent,
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'board',
+      },
+      {
+        path: 'board',
+        component: ProjectBoardComponent,
+      },
+      {
+        path: 'backlog',
+        component: ProjectBacklogComponent,
+      },
+    ],
   },
   {
     path: 'project/:id/edit',
@@ -52,7 +69,6 @@ const routes: Routes = [
       },
       {
         path: 'info',
-        pathMatch: 'full',
         component: EditProjectFormComponent,
       },
       {

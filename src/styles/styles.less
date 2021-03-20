@@ -38,10 +38,10 @@ html {
   color: @primary-color;
   border-color: @primary-color;
 
-  &:hover {
+  &:hover, &:not(:disabled).active {
     color: #fff;
-    background-color: @primary-color;
-    border-color: @primary-color;
+    background-color: @primary-color !important;
+    border-color: @primary-color !important;
   }
 }
 

@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
+import { ProjectResponse } from 'back/src/models/responses/project.response';
 import { tap } from 'rxjs/operators';
 import { ProjectService } from './project.service';
 
 @Injectable()
 export class ProjectDataService {
-  public projectId: number;
+  public project: ProjectResponse;
   constructor(private projectService: ProjectService) {}
 
   public getProject(projectId: number) {
     return this.projectService.getProject(projectId).pipe(
-      tap(() => {
-        this.projectId = projectId;
+      tap((project) => {
+        this.project = project;
       }),
     );
   }
