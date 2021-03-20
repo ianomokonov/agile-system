@@ -1,1 +1,14 @@
-<p>project-backlog works!</p>
+<div class="px-2 pb-2">
+  <div class="header">Бэклог проекта</div>
+  <div class="content rounded p-2">
+    <div class="task rounded d-flex" *ngFor="let task of tasks">
+      <div class="col-8">
+        <small class="text-muted mr-3">#{{ task.id }}</small>
+        <h6 class="d-inline" [routerLink]="['/task', task.id]">{{ task.name }}</h6>
+      </div>
+      <div class="col-4 text-right">
+        <small class="text-muted">{{ task.user?.name }} {{ task.user?.surname }}</small>
+      </div>
+    </div>
+  </div>
+</div>
