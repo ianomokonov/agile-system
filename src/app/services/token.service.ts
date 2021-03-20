@@ -3,20 +3,20 @@ import { authTokenKey, refreshTokenKey } from '../utils/constants';
 
 export class TokenService {
   public getRefreshToken() {
-    return sessionStorage.getItem(refreshTokenKey);
+    return localStorage.getItem(refreshTokenKey);
   }
 
   public getAuthToken() {
-    return sessionStorage.getItem(authTokenKey);
+    return localStorage.getItem(authTokenKey);
   }
 
   public storeTokens(tokens: TokensResponse) {
-    sessionStorage.setItem(authTokenKey, tokens.accessToken);
-    sessionStorage.setItem(refreshTokenKey, tokens.refreshToken);
+    localStorage.setItem(authTokenKey, tokens.accessToken);
+    localStorage.setItem(refreshTokenKey, tokens.refreshToken);
   }
 
   public removeTokens() {
-    sessionStorage.removeItem(authTokenKey);
-    sessionStorage.removeItem(refreshTokenKey);
+    localStorage.removeItem(authTokenKey);
+    localStorage.removeItem(refreshTokenKey);
   }
 }
