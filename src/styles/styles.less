@@ -1,7 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @import './variables.less';
-@import "~@ng-select/ng-select/themes/default.theme.css";
-@import "./controls.less";
+@import '~@ng-select/ng-select/themes/default.theme.css';
+@import './controls.less';
 
 body,
 html {
@@ -38,10 +38,11 @@ html {
   color: @primary-color;
   border-color: @primary-color;
 
-  &:hover {
+  &:hover,
+  &:not(:disabled).active {
     color: #fff;
-    background-color: @primary-color;
-    border-color: @primary-color;
+    background-color: @primary-color !important;
+    border-color: @primary-color !important;
   }
 }
 
@@ -59,4 +60,28 @@ html {
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.header {
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.task {
+  display: block;
+  color: black;
+  text-decoration: none;
+  background: #fff;
+  padding: 0.5rem;
+
+  &:not(:last-child) {
+    margin-bottom: 0.5rem;
+  }
+
+  h6 {
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }

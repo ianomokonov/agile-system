@@ -4,6 +4,7 @@ import { TaskResponse } from 'back/src/models/responses/task.response';
 import { TaskService } from 'src/app/services/task.service';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { FormControl, Validators } from '@angular/forms';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-task',
@@ -17,7 +18,11 @@ export class TaskComponent {
   public editingName = false;
   public descriptionControl: FormControl = new FormControl();
   public nameControl: FormControl = new FormControl(null, Validators.required);
-  constructor(private activatedRoute: ActivatedRoute, private taskService: TaskService) {
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private taskService: TaskService,
+    private location: Location,
+  ) {
     this.activatedRoute.params.subscribe((params) => {
       this.getTaskInfo(params.id);
     });
@@ -66,6 +71,10 @@ export class TaskComponent {
       .subscribe(() => {
         this.getTaskInfo(this.task.id);
       });
+  }
+
+  public backClicked() {
+    this.location.back();
   }
 
   public cancelNameEditing() {

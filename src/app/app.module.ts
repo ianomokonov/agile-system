@@ -33,6 +33,7 @@ import { TaskService } from './services/task.service';
 import { CreateTaskComponent } from './project/project-board/create-task/create-task.component';
 import { TaskComponent } from './project/project-board/task/task.component';
 import { ProjectDataService } from './services/project-data.service';
+import { ProjectBacklogComponent } from './project/project-backlog/project-backlog.component';
 
 @NgModule({
   declarations: [
@@ -52,6 +53,7 @@ import { ProjectDataService } from './services/project-data.service';
     ProjectBoardComponent,
     CreateTaskComponent,
     TaskComponent,
+    ProjectBacklogComponent,
   ],
   imports: [
     BrowserModule,

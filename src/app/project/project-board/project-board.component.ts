@@ -1,9 +1,12 @@
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { StatusResponse } from 'back/src/models/responses/status.response';
 import { TaskShortView } from 'back/src/models/responses/task-short-view';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
+import { forkJoin } from 'rxjs';
+import { ProjectDataService } from 'src/app/services/project-data.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { TaskService } from 'src/app/services/task.service';
 import { CreateTaskComponent } from './create-task/create-task.component';
@@ -14,13 +17,6 @@ import { CreateTaskComponent } from './create-task/create-task.component';
   styleUrls: ['./project-board.component.less'],
 })
 export class ProjectBoardComponent implements OnInit {
-  @Input() public projectId: number;
-  @Input() public set info([tasks, statuses]: [TaskShortView[], StatusResponse[]]) {
-    this.statuses = statuses;
-    this.setTasks(tasks);
-  }
-  @Output() public update: EventEmitter<void> = new EventEmitter();
-
   public statuses: StatusResponse[];
   private users: UserShortView[];
   public tasks: TaskShortView[][] = [];
@@ -28,10 +24,19 @@ export class ProjectBoardComponent implements OnInit {
     private taskService: TaskService,
     private modalService: NgbModal,
     private projectService: ProjectService,
+    private projectDataService: ProjectDataService,
+    private activatedRoute: ActivatedRoute,
   ) {}
   public ngOnInit() {
-    this.projectService.getProjectUsers(this.projectId).subscribe((users) => {
-      this.users = users;
+    this.activatedRoute.parent?.params.subscribe((params) => {
+      forkJoin([
+        this.projectDataService.getProject(params.id),
+        this.projectService.getProjectUsers(params.id),
+      ]).subscribe(([project, users]) => {
+        this.statuses = project.statuses;
+        this.setTasks(project.tasks);
+        this.users = users;
+      });
     });
   }
   private setTasks(tasks: TaskShortView[]) {
@@ -46,8 +51,8 @@ export class ProjectBoardComponent implements OnInit {
     modal.componentInstance.users = this.users;
     modal.result
       .then((task) => {
-        this.projectService.addTask(this.projectId, task).subscribe(() => {
-          this.update.emit();
+        this.projectService.addTask(this.projectDataService.project.id, task).subscribe(() => {
+          this.refreshProjectInfo(this.projectDataService.project.id);
         });
       })
       .catch(() => {});
@@ -66,8 +71,15 @@ export class ProjectBoardComponent implements OnInit {
       this.taskService
         .updateTaskStatus(+event.container.data[event.currentIndex].id, +event.container.id)
         .subscribe(() => {
-          this.update.emit();
+          this.refreshProjectInfo(this.projectDataService.project.id);
         });
     }
+  }
+
+  public refreshProjectInfo(id: number) {
+    this.projectDataService.getProject(id).subscribe((info) => {
+      this.statuses = info.statuses;
+      this.setTasks(info.tasks);
+    });
   }
 }
