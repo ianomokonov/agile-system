@@ -1,5 +1,6 @@
 import { AddProjectUserRequest } from '../models/requests/add-project-user-request';
 import { CreateProjectRequest } from '../models/requests/create-project-request';
+import { CreateSprintRequest } from '../models/requests/create-sprint.request';
 import { EditProjectUserRequest } from '../models/requests/edit-project-user-request';
 import {
   CreateProjectRoleRequest,
@@ -97,6 +98,22 @@ class ProjectService {
 
   public async checkPermission(userId: number, projectId: number, permission: Permissions) {
     return projectRepository.checkUserPermission(userId, projectId, permission);
+  }
+
+  public async createSprint(request: CreateSprintRequest, projectId: number) {
+    return projectRepository.createSprint(request, projectId);
+  }
+
+  public async getProjectSprintNames(projectId: number) {
+    return projectRepository.getProjectSprintNames(projectId);
+  }
+
+  public async startSprint(sprintId: number) {
+    return projectRepository.startSprint(sprintId);
+  }
+
+  public async finishSprint(sprintId: number) {
+    return projectRepository.finishSprint(sprintId);
   }
 }
 

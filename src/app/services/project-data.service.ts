@@ -9,8 +9,8 @@ export class ProjectDataService {
   public project: ProjectResponse;
   constructor(private projectService: ProjectService) {}
 
-  public getProject(projectId: number) {
-    if (this.project?.id === +projectId) {
+  public getProject(projectId: number, forceUpdate: boolean = false) {
+    if (!forceUpdate && this.project?.id === +projectId) {
       return of(this.project);
     }
     return this.projectService.getProject(projectId).pipe(

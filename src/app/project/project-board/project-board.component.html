@@ -1,3 +1,16 @@
+<div class="info mx-2 border-bottom pb-3 mb-3" *ngIf="sprint">
+  <div>
+    <h3 class="mb-0">{{ sprint.name }}</h3>
+    <small class="text-muted">{{ sprint.goal }}</small>
+  </div>
+  <div class="dates" *ngIf="sprint.startDate">
+    <div class="d-flex">
+      {{ sprint.startDate | date: 'dd.MM.yyyy' }}
+      <span class="px-1">—</span>
+      {{ getFinishDate(sprint.startDate) | date: 'dd.MM.yyyy' }}
+    </div>
+  </div>
+</div>
 <div class="scrollable" *ngIf="tasks?.length">
   <div class="headers">
     <div class="header mx-1" *ngFor="let status of statuses">{{ status.name }}</div>

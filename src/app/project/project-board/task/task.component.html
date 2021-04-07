@@ -18,10 +18,10 @@
         ></span>
       </div>
     </div>
-    <!-- <div class="col text-right pt-4">
-      <button class="btn btn-outline-primary mb-1">Изменить</button>
-      <button class="btn btn-primary ml-1 mb-1">Начать оценку</button>
-    </div> -->
+    <div class="col text-right pt-4">
+      <button class="btn btn-outline-primary mb-1" (click)="editTaskInfo()">Изменить</button>
+      <!-- <button class="btn btn-primary ml-1 mb-1">Начать оценку</button> -->
+    </div>
   </div>
 
   <div class="row">
@@ -31,7 +31,7 @@
           <div class="row">
             <div class="col-6">
               <small class="text-muted">Тип</small>
-              <h6>{{ task.typeId || 'Feature' }}</h6>
+              <h6>{{ task.typeId | taskType }}</h6>
             </div>
             <div class="col-6">
               <small class="text-muted">Статус</small>
@@ -39,11 +39,11 @@
             </div>
             <div class="col-6">
               <small class="text-muted">Приоритет</small>
-              <h6>Низкий</h6>
+              <h6>{{ task.priorityId | priority }}</h6>
             </div>
             <div class="col-6">
               <small class="text-muted">Спринт</small>
-              <h6>SCRUM 13/12/2000</h6>
+              <h6>{{ task.sprint?.name || '—' }}</h6>
             </div>
           </div>
         </div>
@@ -77,11 +77,23 @@
       </section>
     </div>
     <div class="col border-left">
-      <div>
+      <div class="form-group">
         <small class="text-muted">Исполнитель</small>
-        <h6 *ngIf="task.projectUser; else setTaskUser">
-          {{ task.projectUser.name }} {{ task.projectUser.surname }}
-        </h6>
+        <ng-select
+          *ngIf="project"
+          [items]="project.users"
+          bindValue="id"
+          [formControl]="userControl"
+          [closeOnSelect]="true"
+        >
+          <ng-template ng-label-tmp let-item="item">
+            {{ item.name }} {{ item.surname }}
+          </ng-template>
+          <ng-template ng-option-tmp let-item="item">
+            <p class="m-0">{{ item.name }} {{ item.surname }}</p>
+            <small class="text-muted">{{ item.email }}</small>
+          </ng-template>
+        </ng-select>
       </div>
       <div class="form-group">
         <small class="text-muted">Создатель</small>
@@ -100,7 +112,3 @@
     </div>
   </div>
 </div>
-
-<ng-template #setTaskUser>
-  <button class="btn btn-link p-0 d-block" (click)="setDeveloper()">Стать исполнителем</button>
-</ng-template>

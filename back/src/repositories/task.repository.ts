@@ -1,5 +1,6 @@
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import * as sql from 'sql-query-generator';
+import logger from '../logger';
 import { CRUD } from '../models/crud.interface';
 import { CreateTaskRequest, UpdateTaskRequest } from '../models/requests/task.models';
 import { StatusResponse } from '../models/responses/status.response';
@@ -37,15 +38,17 @@ class TaskRepository implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
     const [[task]] = await dbConnection.query<RowDataPacket[]>(`SELECT *
         FROM projecttask 
         WHERE id=${taskId}`);
-    const [status, user, creator] = await Promise.all([
+    const [status, user, creator, sprints] = await Promise.all([
       await this.getStatus(task.statusId),
       projectRepository.getProjectUser(task.projectUserId),
       projectRepository.getProjectUser(task.creatorId),
+      projectRepository.getProjectSprintNames(task.projectId, task.projectSprintId),
     ]);
 
     task.status = status;
     task.projectUser = user;
     task.creator = creator;
+    task.sprint = task.projectSprintId ? sprints[0] : null;
     return task as TaskResponse;
   }
 
@@ -65,27 +68,21 @@ class TaskRepository implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
   }
 
   public async update(request: UpdateTaskRequest) {
-    const model = {} as any;
-    if ('name' in request) {
-      model.name = request.name;
-    }
-    if ('description' in request) {
-      model.description = request.description;
-    }
-    if ('projectUserId' in request) {
-      if (+request.projectUserId < 0) {
-        const { id } = await projectRepository.getProjectUserByUserId(
-          request.userId,
-          request.projectId,
-        );
+    try {
+      const model = {} as any;
+      const specialKeys = ['id'];
+      Object.keys(request)
+        .filter((key) => specialKeys.indexOf(key) < 0)
+        .forEach((key) => {
+          model[key] = request[key];
+        });
 
-        request.projectUserId = id;
-      }
-      model.projectUserId = request.projectUserId;
-    }
-    const query = sql.update('projecttask', model).where({ id: request.id });
+      const query = sql.update('projecttask', model).where({ id: request.id });
 
-    dbConnection.query(getQueryText(query.text), query.values);
+      dbConnection.query(getQueryText(query.text), query.values);
+    } catch (error) {
+      logger.error(error);
+    }
   }
 
   public async updateTaskStatus(taskId: number, statusId: number) {

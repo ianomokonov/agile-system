@@ -7,6 +7,7 @@ import getProjectPermissionsHandler from '../handlers/project/get-project-permis
 import getProjectHandler from '../handlers/project/get-project.handler';
 import projectBacklogHandler from '../handlers/project/project-backlog.handler';
 import projectRolesHandler from '../handlers/project/project-roles.handler';
+import projectSprintHandler from '../handlers/project/project-sprint.handler';
 import projectUsersHandler from '../handlers/project/project-users.handler';
 import tasksHandler from '../handlers/task/tasks.handler';
 import logger from '../logger';
@@ -251,6 +252,21 @@ projectRouter.get(
   },
 );
 
+projectRouter.get(
+  `/:id/sprints`,
+  authJWT,
+  checkPermissions(Permissions.CanReadProject),
+  async (req, res) => {
+    try {
+      const sprints = await projectSprintHandler.getProjectSprints(+req.params.id);
+      res.status(StatusCodes.OK).json(sprints);
+    } catch (error) {
+      logger.error(error);
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
 projectRouter.post(
   `/:id/add-task`,
   authJWT,
@@ -264,6 +280,54 @@ projectRouter.post(
         creatorId: userId,
       });
       res.status(StatusCodes.OK).json(newTaskId);
+    } catch (error) {
+      logger.error(error);
+
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
+projectRouter.post(
+  `/:id/add-sprint`,
+  authJWT,
+  checkPermissions(Permissions.CanEditProject),
+  async (req, res) => {
+    try {
+      const newPrintId = await projectSprintHandler.create(req.body, +req.params.id);
+      res.status(StatusCodes.OK).json(newPrintId);
+    } catch (error) {
+      logger.error(error);
+
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
+projectRouter.post(
+  `/:id/start-sprint`,
+  authJWT,
+  checkPermissions(Permissions.CanEditProject),
+  async (req, res) => {
+    try {
+      await projectSprintHandler.start(req.body.id);
+      res.status(StatusCodes.OK).json('Спринт стартовал');
+    } catch (error) {
+      logger.error(error);
+
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
+projectRouter.post(
+  `/:id/finish-sprint`,
+  authJWT,
+  checkPermissions(Permissions.CanEditProject),
+  async (req, res) => {
+    try {
+      await projectSprintHandler.finish(req.body.id);
+      res.status(StatusCodes.OK).json('Спринт завершен');
     } catch (error) {
       logger.error(error);
 

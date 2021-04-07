@@ -18,6 +18,8 @@ import { StatusResponse } from '../models/responses/status.response';
 import { TaskShortView } from '../models/responses/task-short-view';
 import { ProjectShortView } from '../models/responses/project-short-view';
 import { Sprint } from '../models/sprint';
+import { CreateSprintRequest } from '../models/requests/create-sprint.request';
+import { IdNameResponse } from '../models/responses/id-name.response';
 
 sql.use('mysql');
 
@@ -91,7 +93,7 @@ class ProjectRepository {
   }
 
   public async getProjectSprints(projectId: number) {
-    const query = sql.select('projectsprint', '*').where({ projectId, isFinished: false });
+    const query = sql.select('projectsprint', '*').where({ projectId }).orderby('isFinished');
 
     let [sprints] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -364,6 +366,8 @@ class ProjectRepository {
       'id',
       'name',
       'statusId',
+      'typeId',
+      'priorityId',
       'createDate',
       'projectUserId',
     ]);
@@ -416,6 +420,63 @@ class ProjectRepository {
     const [users] = await dbConnection.query(query);
 
     return !!users[0];
+  }
+
+  public async createSprint(request: CreateSprintRequest, projectId: number) {
+    const query = sql.insert('projectsprint', {
+      projectId,
+      name: request.name,
+      goal: request.goal,
+    });
+    const result = await dbConnection.query(getQueryText(query.text), query.values);
+    const sprintId = (result[0] as ResultSetHeader).insertId;
+    return sprintId;
+  }
+
+  public async getProjectSprintNames(projectId: number, sprintId?: number) {
+    const query = sql.select('projectsprint', ['id', 'name']);
+    if (sprintId) {
+      query.where({ projectId, isFinished: false, id: sprintId });
+    } else {
+      query.where({ projectId, isFinished: false });
+    }
+
+    const [sprints] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    return sprints as IdNameResponse[];
+  }
+
+  public async startSprint(sprintId: number) {
+    let query = sql
+      .update('projectsprint', {
+        endDate: new Date(),
+        isActive: false,
+        isFinished: true,
+      })
+      .where({ isActive: true });
+    await dbConnection.query(getQueryText(query.text), query.values);
+
+    query = sql
+      .update('projectsprint', {
+        startDate: new Date(),
+        isActive: true,
+        isFinished: false,
+      })
+      .where({ id: sprintId });
+    await dbConnection.query(getQueryText(query.text), query.values);
+  }
+
+  public async finishSprint(sprintId: number) {
+    const query = sql
+      .update('projectsprint', {
+        endDate: new Date(),
+        isActive: false,
+        isFinished: true,
+      })
+      .where({ id: sprintId });
+    await dbConnection.query(getQueryText(query.text), query.values);
   }
 }
 

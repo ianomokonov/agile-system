@@ -5,11 +5,11 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { StatusResponse } from 'back/src/models/responses/status.response';
 import { TaskShortView } from 'back/src/models/responses/task-short-view';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
+import { Sprint } from 'back/src/models/sprint';
 import { forkJoin } from 'rxjs';
 import { ProjectDataService } from 'src/app/services/project-data.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { TaskService } from 'src/app/services/task.service';
-import { CreateSprintComponent } from '../create-sprint/create-sprint.component';
 import { CreateTaskComponent } from './create-task/create-task.component';
 
 @Component({
@@ -21,6 +21,7 @@ export class ProjectBoardComponent implements OnInit {
   public statuses: StatusResponse[];
   private users: UserShortView[];
   public tasks: TaskShortView[][] = [];
+  public sprint: Sprint;
   constructor(
     private taskService: TaskService,
     private modalService: NgbModal,
@@ -39,17 +40,23 @@ export class ProjectBoardComponent implements OnInit {
           this.router.navigate(['../backlog'], { relativeTo: this.activatedRoute });
           return;
         }
+        this.sprint = project.sprint;
         this.statuses = project.statuses;
         this.setTasks(project.sprint?.tasks);
         this.users = users;
       });
     });
   }
+  public getFinishDate(startDate?: Date) {
+    if (!startDate) {
+      return null;
+    }
+    const finishDate = new Date(startDate);
+    finishDate.setDate(finishDate.getDate() + 14);
+    return finishDate;
+  }
   private setTasks(tasks: TaskShortView[]) {
     this.tasks = [];
-    if (!tasks?.length) {
-      return;
-    }
     this.statuses?.forEach((status) => {
       this.tasks.push(tasks.filter((task) => task.statusId === status.id));
     });
@@ -86,7 +93,7 @@ export class ProjectBoardComponent implements OnInit {
   }
 
   public refreshProjectInfo(id: number) {
-    this.projectDataService.getProject(id).subscribe((info) => {
+    this.projectDataService.getProject(id, true).subscribe((info) => {
       this.statuses = info.statuses;
       this.setTasks(info.sprint?.tasks);
     });

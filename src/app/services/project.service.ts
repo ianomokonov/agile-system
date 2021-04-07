@@ -16,6 +16,8 @@ import { CreateTaskRequest } from 'back/src/models/requests/task.models';
 import { ProjectEditInfo } from 'back/src/models/responses/project-edit-info';
 import { Backlog } from 'back/src/models/responses/backlog';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
+import { CreateSprintRequest } from 'back/src/models/requests/create-sprint.request';
+import { IdNameResponse } from 'back/src/models/responses/id-name.response';
 
 @Injectable()
 export class ProjectService {
@@ -82,13 +84,23 @@ export class ProjectService {
     return this.http.get<Backlog>(`${this.baseUrl}/${projectId}/backlog`);
   }
 
-  public addTask(
-    projectId: number,
-    task: CreateTaskRequest,
-  ): Observable<ProjectPermissionResponse[]> {
-    return this.http.post<ProjectPermissionResponse[]>(
-      `${this.baseUrl}/${projectId}/add-task`,
-      task,
-    );
+  public addTask(projectId: number, task: CreateTaskRequest): Observable<number> {
+    return this.http.post<number>(`${this.baseUrl}/${projectId}/add-task`, task);
+  }
+
+  public addSprint(projectId: number, sprint: CreateSprintRequest): Observable<number> {
+    return this.http.post<number>(`${this.baseUrl}/${projectId}/add-sprint`, sprint);
+  }
+
+  public getProjectSprints(projectId: number): Observable<IdNameResponse[]> {
+    return this.http.get<IdNameResponse[]>(`${this.baseUrl}/${projectId}/sprints`);
+  }
+
+  public finishSprint(projectId: number, sprintId: number): Observable<number> {
+    return this.http.post<number>(`${this.baseUrl}/${projectId}/finish-sprint`, { id: sprintId });
+  }
+
+  public startSprint(projectId: number, sprintId: number): Observable<number> {
+    return this.http.post<number>(`${this.baseUrl}/${projectId}/start-sprint`, { id: sprintId });
   }
 }

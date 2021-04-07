@@ -5,9 +5,11 @@ export interface Sprint {
   name: string;
   goal?: string;
   isActive: boolean;
+  isFinished: boolean;
   projectId: number;
-  dateStart?: Date;
-  dateEnd?: Date;
+  startDate?: Date;
+  endDate?: Date;
+  isOpened?: boolean;
 
   tasks: TaskShortView[];
 }

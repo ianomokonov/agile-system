@@ -6,28 +6,76 @@
       <div class="btn btn-primary ml-2" (click)="onCreateSprint()">Создать спринт</div>
     </div>
   </div>
-  <div class="content rounded p-2" *ngFor="let sprint of backlog.sprints">
-    <div class="header mb-3">{{ sprint.name }}</div>
-    <div class="task rounded d-flex" *ngFor="let task of sprint.tasks">
-      <div class="col-8">
-        <small class="text-muted mr-3">#{{ task.id }}</small>
-        <h6 class="d-inline" [routerLink]="['/task', task.id]">{{ task.name }}</h6>
+  <div class="content rounded p-2 mb-2" *ngFor="let sprint of backlog.sprints">
+    <div
+      [ngClass]="{ 'mb-3': sprint.isOpened }"
+      class="header d-flex justify-content-between align-items-center"
+    >
+      <div class="name" (click)="toggleSprint(sprint)">
+        <span class="d-block"
+          ><i class="fas fa-chevron-right mr-2" [ngClass]="{ opened: sprint.isOpened }"></i
+          >{{ sprint.name }}</span
+        >
       </div>
-      <div class="col-4 text-right">
-        <small class="text-muted">{{ task.user?.name }} {{ task.user?.surname }}</small>
-      </div>
+
+      <ng-container *ngIf="!sprint.isFinished">
+        <button
+          class="btn btn-success"
+          *ngIf="!sprint.isActive; else finish"
+          (click)="onStartSprint(sprint.id)"
+        >
+          Начать спринт
+        </button>
+        <ng-template #finish>
+          <button class="btn btn-danger" (click)="onFinishSprint(sprint.id)">
+            Завершить спринт
+          </button>
+        </ng-template>
+      </ng-container>
     </div>
+    <ng-container *ngIf="sprint.isOpened"
+      ><ng-container *ngIf="sprint.tasks?.length; else noData">
+        <ng-container *ngFor="let task of sprint.tasks">
+          <ng-container
+            *ngTemplateOutlet="taskTemp; context: { $implicit: task, showBtn: !sprint.isActive }"
+          ></ng-container>
+        </ng-container> </ng-container
+    ></ng-container>
   </div>
-  <div class="content rounded p-2">
+  <div class="content rounded p-2" *ngIf="backlog.tasks?.length">
     <div class="header mb-3">Задачи без спринта</div>
-    <div class="task rounded d-flex" *ngFor="let task of backlog.tasks">
-      <div class="col-8">
-        <small class="text-muted mr-3">#{{ task.id }}</small>
-        <h6 class="d-inline" [routerLink]="['/task', task.id]">{{ task.name }}</h6>
-      </div>
-      <div class="col-4 text-right">
-        <small class="text-muted">{{ task.user?.name }} {{ task.user?.surname }}</small>
-      </div>
-    </div>
+    <ng-container *ngIf="backlog.tasks?.length; else noData">
+      <ng-container *ngFor="let task of backlog.tasks">
+        <ng-container
+          *ngTemplateOutlet="taskTemp; context: { $implicit: task, showBtn: true }"
+        ></ng-container>
+      </ng-container>
+    </ng-container>
   </div>
 </div>
+
+<ng-template #noData>
+  <div class="d-flex justify-content-center align-items-center text-muted p-4">
+    Задачи отсутствуют
+  </div>
+</ng-template>
+
+<ng-template #taskTemp let-task let-show="showBtn">
+  <div class="task rounded d-flex">
+    <div class="col-8 d-flex align-items-center">
+      <small class="text-muted mr-3">#{{ task.id }}</small>
+      <h6 class="d-inline mb-0" [routerLink]="['/task', task.id]">{{ task.name }}</h6>
+    </div>
+    <div class="col-4 pr-0 d-flex align-items-center justify-content-end">
+      <small class="text-muted">{{ task.user?.name }} {{ task.user?.surname }}</small>
+      <button
+        *ngIf="show"
+        class="btn icon-btn ml-3"
+        title="Добавить в текущий спринт"
+        (click)="onAddToActiveSprint(task.id)"
+      >
+        <i class="far fa-plus-square"></i>
+      </button>
+    </div>
+  </div>
+</ng-template>

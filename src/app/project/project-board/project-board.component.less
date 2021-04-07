@@ -1,10 +1,13 @@
 @import '../../../styles/variables.less';
 
 @collumn-width: 250px;
-
+.info{
+  display: flex;
+  justify-content: space-between;
+}
 .scrollable {
   padding-bottom: 0.5rem;
-  height: 100%;
+  height: calc(100% - 90px);
   max-width: 100%;
   overflow: auto;
   .headers {

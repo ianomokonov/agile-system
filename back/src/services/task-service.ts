@@ -7,10 +7,13 @@ import taskRepository from '../repositories/task.repository';
 
 class TaskService implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
   public async create(request: CreateTaskRequest) {
-    const user = await projectRepository.getProjectUser(request.projectUserId);
-    if (!user) {
-      throw new WebError(StatusCodes.BAD_REQUEST, 'Неверно указан исполнитель');
+    if (request.projectUserId) {
+      const user = await projectRepository.getProjectUser(request.projectUserId);
+      if (!user) {
+        throw new WebError(StatusCodes.BAD_REQUEST, 'Неверно указан исполнитель');
+      }
     }
+
     return taskRepository.create(request);
   }
   public async update(request: UpdateTaskRequest) {

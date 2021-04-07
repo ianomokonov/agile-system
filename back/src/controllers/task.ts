@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import tasksHandler from '../handlers/task/tasks.handler';
 import updateTaskStatusHandler from '../handlers/task/update-task-status.handler';
+import logger from '../logger';
 import authJWT from '../middleware/authJWT';
 import checkTaskPermissions from '../middleware/check-task-permissions';
 import { Permissions } from '../utils';
@@ -16,6 +17,7 @@ taskRouter.get(
       const result = await tasksHandler.read(+req.params.id);
       res.status(StatusCodes.OK).json(result);
     } catch (error) {
+      logger.error(error);
       res.status(error.statusCode).json(error.error);
     }
   },
@@ -27,10 +29,6 @@ taskRouter.put(
   checkTaskPermissions(Permissions.CanEditProject),
   async (req, res) => {
     try {
-      const { userId } = res.locals;
-      if (+req.body.projectUserId < 0) {
-        req.body.userId = userId;
-      }
       await tasksHandler.update({ id: +req.params.id, ...req.body });
       res.status(StatusCodes.OK).json('Задача обновлена');
     } catch (error) {

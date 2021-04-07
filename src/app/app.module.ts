@@ -35,6 +35,9 @@ import { TaskComponent } from './project/project-board/task/task.component';
 import { ProjectDataService } from './services/project-data.service';
 import { ProjectBacklogComponent } from './project/project-backlog/project-backlog.component';
 import { CreateSprintComponent } from './project/create-sprint/create-sprint.component';
+import { EditTaskComponent } from './project/project-board/task/edit-task/edit-task.component';
+import { PriorityPipe } from './shared/pipes/priority.pipe';
+import { TaskTypePipe } from './shared/pipes/task-type.pipe';
 
 @NgModule({
   declarations: [
@@ -56,6 +59,9 @@ import { CreateSprintComponent } from './project/create-sprint/create-sprint.com
     TaskComponent,
     ProjectBacklogComponent,
     CreateSprintComponent,
+    EditTaskComponent,
+    PriorityPipe,
+    TaskTypePipe,
   ],
   imports: [
     BrowserModule,

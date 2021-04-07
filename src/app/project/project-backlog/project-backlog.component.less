@@ -1,4 +1,22 @@
 @import '../../../styles/variables.less';
-.content{
-    background-color: @bg-light;
+.content {
+  background-color: @bg-light;
+}
+
+.header {
+  .name {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    line-height: 38px;
+    cursor: pointer;
+
+    i {
+      transition: 0.3s;
+
+      &.opened {
+        transform: rotate(90deg);
+      }
+    }
+  }
 }
