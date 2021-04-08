@@ -40,6 +40,7 @@ import { PriorityPipe } from './shared/pipes/priority.pipe';
 import { TaskTypePipe } from './shared/pipes/task-type.pipe';
 import { PlanningComponent } from './project/planning-list/planning/planning.component';
 import { PlanningListComponent } from './project/planning-list/planning-list.component';
+import { DiscussNewTasksComponent } from './project/planning-list/planning/discuss-new-tasks/discuss-new-tasks.component';
 
 @NgModule({
   declarations: [
@@ -66,6 +67,7 @@ import { PlanningListComponent } from './project/planning-list/planning-list.com
     TaskTypePipe,
     PlanningComponent,
     PlanningListComponent,
+    DiscussNewTasksComponent,
   ],
   imports: [
     BrowserModule,

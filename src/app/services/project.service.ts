@@ -122,4 +122,10 @@ export class ProjectService {
   public getPlanning(projectId: number, planningId: number): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/${projectId}/planning/${planningId}`);
   }
+
+  public setPlanningStep(projectId: number, planningId: number, stepId: number): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/${projectId}/planning/${planningId}/set-step`, {
+      stepId,
+    });
+  }
 }

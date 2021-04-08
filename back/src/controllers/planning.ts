@@ -23,4 +23,9 @@ planningRouter.get(`/:planningId`, async (req, res) => {
   res.status(StatusCodes.OK).json(planning);
 });
 
+planningRouter.get(`/:planningId/set-step`, async (req, res) => {
+  await planningHandler.setStep(+req.params.planningId, req.body.stepId);
+  res.status(StatusCodes.OK).json('Планировани обновлено');
+});
+
 export default planningRouter;

@@ -14,6 +14,10 @@ export class PlanningHandler {
     return planningService.read(planningId);
   }
 
+  public async setStep(planningStepId: number, stepId: number) {
+    return planningService.setStep(planningStepId, stepId);
+  }
+
   public async finish(sprintId: number) {
     return projectService.finishSprint(sprintId);
   }

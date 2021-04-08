@@ -22,6 +22,16 @@ class PlanningRepository {
     return result?.insertId;
   }
 
+  public async setStep(planningId: number, stepId: number) {
+    const query = sql
+      .update('projectplanning', {
+        stepId,
+      })
+      .where({ id: planningId });
+
+    await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
+  }
+
   public async getList(projectId: number) {
     const query = sql
       .select('projectplanning', [

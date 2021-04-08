@@ -294,6 +294,8 @@ CREATE TABLE `projectPlanning` (
   `isActive` bit DEFAULT 0,
   `isFinished` bit DEFAULT 0,
   `projectId` int(11) NOT NULL,
+  `activeStep` int(1) NOT NULL DEFAULT 1,
+
   PRIMARY KEY (`id`)
 ) COMMENT 'планирования проекта';
 
@@ -342,6 +344,9 @@ BEGIN
     VALUES(new.id, new.ownerId);
 END$$
 DELIMITER ;
+
+
+alter table projectplanning ADD `activeStep` int(1) NOT NULL DEFAULT 1;
 
 -- ---
 -- Table Properties

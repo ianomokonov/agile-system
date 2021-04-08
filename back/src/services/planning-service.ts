@@ -20,6 +20,10 @@ class PlanningService {
     planning.notMarkedTasks = notMarkedTasks;
     return planning;
   }
+
+  public async setStep(planningId: number, stepId: number) {
+    return planningRepository.setStep(planningId, stepId);
+  }
 }
 
 export default new PlanningService();
