@@ -382,7 +382,7 @@ class ProjectRepository {
     tasks = await Promise.all(
       tasks.map(async (taskTemp) => {
         const task = taskTemp;
-        task.user = await this.getProjectUser(task.projectUserId);
+        task.projectUser = await this.getProjectUser(task.projectUserId);
         return task;
       }),
     );

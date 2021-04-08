@@ -18,6 +18,8 @@ import { Backlog } from 'back/src/models/responses/backlog';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
 import { CreateSprintRequest } from 'back/src/models/requests/create-sprint.request';
 import { IdNameResponse } from 'back/src/models/responses/id-name.response';
+import { Planning, PlanningFullView } from 'back/src/models/responses/planning';
+import { PlanningUpdateRequest } from 'back/src/models/requests/planning-update.request';
 
 @Injectable()
 export class ProjectService {
@@ -115,17 +117,22 @@ export class ProjectService {
     });
   }
 
-  public getPlanningList(projectId: number): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/${projectId}/planning/list`);
+  public getPlanningList(projectId: number): Observable<Planning[]> {
+    return this.http.get<Planning[]>(`${this.baseUrl}/${projectId}/planning/list`);
   }
 
-  public getPlanning(projectId: number, planningId: number): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/${projectId}/planning/${planningId}`);
+  public getPlanning(projectId: number, planningId: number): Observable<PlanningFullView> {
+    return this.http.get<PlanningFullView>(`${this.baseUrl}/${projectId}/planning/${planningId}`);
   }
 
-  public setPlanningStep(projectId: number, planningId: number, stepId: number): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/${projectId}/planning/${planningId}/set-step`, {
-      stepId,
-    });
+  public updatePlanning(
+    projectId: number,
+    planningId: number,
+    request: PlanningUpdateRequest,
+  ): Observable<any> {
+    return this.http.put<any>(
+      `${this.baseUrl}/${projectId}/planning/${planningId}/update`,
+      request,
+    );
   }
 }

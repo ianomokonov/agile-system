@@ -1,3 +1,6 @@
+import { StatusCodes } from 'http-status-codes';
+import { WebError } from '../models/error';
+import { PlanningUpdateRequest } from '../models/requests/planning-update.request';
 import planningRepository from '../repositories/planning.repository';
 import taskService from './task-service';
 
@@ -11,9 +14,12 @@ class PlanningService {
 
   public async read(planningId: number) {
     const planning = await planningRepository.read(planningId);
+    if (!planning) {
+      throw new WebError(StatusCodes.NOT_FOUND, 'Планирование не найдено');
+    }
     const [newTasks, notMarkedTasks] = await Promise.all([
-      taskService.getNewSprintTasks(planning.activeSprintId),
-      taskService.getNotMarkedSprintTasks(planning.sprintId),
+      taskService.getNewSprintTasks(planning?.activeSprintId),
+      taskService.getNotMarkedSprintTasks(planning?.sprintId),
     ]);
 
     planning.newTasks = newTasks;
@@ -21,8 +27,8 @@ class PlanningService {
     return planning;
   }
 
-  public async setStep(planningId: number, stepId: number) {
-    return planningRepository.setStep(planningId, stepId);
+  public async update(planningId: number, request: PlanningUpdateRequest) {
+    return planningRepository.update(planningId, request);
   }
 }
 

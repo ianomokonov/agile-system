@@ -2,6 +2,8 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import * as sql from 'sql-query-generator';
 import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
+import { PlanningStep } from '../models/responses/planning';
+import { PlanningUpdateRequest } from '../models/requests/planning-update.request';
 
 sql.use('mysql');
 
@@ -12,6 +14,7 @@ class PlanningRepository {
       sprintId,
       activeSprintId,
       isActive: true,
+      activeStep: activeSprintId ? PlanningStep.NewTasks : PlanningStep.MarkTasks,
     });
 
     const [result] = await dbConnection.query<ResultSetHeader>(
@@ -22,12 +25,8 @@ class PlanningRepository {
     return result?.insertId;
   }
 
-  public async setStep(planningId: number, stepId: number) {
-    const query = sql
-      .update('projectplanning', {
-        stepId,
-      })
-      .where({ id: planningId });
+  public async update(planningId: number, request: PlanningUpdateRequest) {
+    const query = sql.update('projectplanning', request).where({ id: planningId });
 
     await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
   }
@@ -57,6 +56,8 @@ class PlanningRepository {
       .select('projectplanning', [
         'projectplanning.id',
         'projectplanning.isActive',
+        'projectplanning.activeStep',
+        'projectplanning.activeTaskId',
         'projectplanning.createDate',
         'projectplanning.sprintId',
         'projectplanning.activeSprintId',

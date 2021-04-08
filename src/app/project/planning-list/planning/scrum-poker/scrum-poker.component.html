@@ -1,0 +1,54 @@
+<div class="d-flex align-items-stretch">
+  <div class="w-50 task border-right mr-4 pr-3 mb-0">
+    <h4>Lorem ipsum dolor sit amet.</h4>
+    <div class="form-group">
+      <small class="text-muted">Описание</small>
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio veritatis quia nobis
+        atque sunt quae sequi ut animi consequuntur corrupti eos doloribus repudiandae dolore
+        placeat, earum perspiciatis nostrum reiciendis odio!
+      </p>
+    </div>
+    <div class="row">
+      <div class="col-4">
+        <div class="form-group">
+          <small class="text-muted">Приоритет</small>
+          <h6>Высокий</h6>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="form-group">
+          <small class="text-muted">Тип задачи</small>
+          <h6>Feature</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="poker">
+    <div class="form-group">
+      <small class="text-muted">Оценки</small>
+      <div class="d-flex cards">
+        <div
+          class="card"
+          (click)="activeMark = card"
+          [ngClass]="{ active: activeMark === card }"
+          *ngFor="let card of marks"
+        >
+          {{ card }}
+        </div>
+      </div>
+    </div>
+    <div class="poker-marks mb-4">
+      <div class="poker-mark d-flex align-items-center">
+        <div class="card active card-sm mr-3" [ngClass]="{ hidden: !showCards }">
+          {{ showCards ? activeMark : '?' }}
+        </div>
+        <h5>Иван Номоконов</h5>
+      </div>
+    </div>
+    <div class="d-flex">
+      <button class="btn btn-outline-primary mr-1">Сбросить</button>
+      <button class="btn btn-primary" (click)="showCards = !showCards">Показать</button>
+    </div>
+  </div>
+</div>

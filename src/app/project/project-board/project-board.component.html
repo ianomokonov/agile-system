@@ -31,7 +31,9 @@
       <div class="task rounded" *ngFor="let task of tasksStatus" cdkDrag>
         <small class="text-muted">#{{ task.id }}</small>
         <h6 [routerLink]="['/task', task.id]">{{ task.name }}</h6>
-        <small class="text-muted">{{ task.user?.name }} {{ task.user?.surname }}</small>
+        <small class="text-muted"
+          >{{ task.projectUser?.name }} {{ task.projectUser?.surname }}</small
+        >
       </div>
     </div>
   </div>

@@ -347,6 +347,8 @@ DELIMITER ;
 
 
 alter table projectplanning ADD `activeStep` int(1) NOT NULL DEFAULT 1;
+alter table projectplanning ADD `activeTaskId` int(11) NULL;
+ALTER TABLE `projectplanning` ADD FOREIGN KEY (activeTaskId) REFERENCES `projectTask` (`id`) ON DELETE NO ACTION;
 
 -- ---
 -- Table Properties

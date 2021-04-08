@@ -41,6 +41,10 @@ import { TaskTypePipe } from './shared/pipes/task-type.pipe';
 import { PlanningComponent } from './project/planning-list/planning/planning.component';
 import { PlanningListComponent } from './project/planning-list/planning-list.component';
 import { DiscussNewTasksComponent } from './project/planning-list/planning/discuss-new-tasks/discuss-new-tasks.component';
+import { TaskListComponent } from './project/planning-list/planning/task-list/task-list.component';
+import { ScrumPokerComponent } from './project/planning-list/planning/scrum-poker/scrum-poker.component';
+import { MarkTasksComponent } from './project/planning-list/planning/mark-tasks/mark-tasks.component';
+import { PlanningDataService } from './services/planning-data.service';
 
 @NgModule({
   declarations: [
@@ -68,6 +72,9 @@ import { DiscussNewTasksComponent } from './project/planning-list/planning/discu
     PlanningComponent,
     PlanningListComponent,
     DiscussNewTasksComponent,
+    TaskListComponent,
+    ScrumPokerComponent,
+    MarkTasksComponent,
   ],
   imports: [
     BrowserModule,
@@ -89,6 +96,7 @@ import { DiscussNewTasksComponent } from './project/planning-list/planning/discu
     ProfileService,
     ProjectDataService,
     TaskService,
+    PlanningDataService,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ContentTypeInterceptor, multi: true },
   ],

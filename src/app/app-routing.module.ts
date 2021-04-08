@@ -6,7 +6,9 @@ import { EditProjectFormComponent } from './project/edit-project-form/edit-proje
 import { EditRolesComponent } from './project/edit/edit-roles/edit-roles.component';
 import { EditUsersComponent } from './project/edit/edit-users/edit-users.component';
 import { PlanningListComponent } from './project/planning-list/planning-list.component';
+import { MarkTasksComponent } from './project/planning-list/planning/mark-tasks/mark-tasks.component';
 import { PlanningComponent } from './project/planning-list/planning/planning.component';
+import { ScrumPokerComponent } from './project/planning-list/planning/scrum-poker/scrum-poker.component';
 import { ProjectBacklogComponent } from './project/project-backlog/project-backlog.component';
 import { ProjectBoardComponent } from './project/project-board/project-board.component';
 import { TaskComponent } from './project/project-board/task/task.component';
@@ -65,6 +67,16 @@ const routes: Routes = [
       {
         path: 'planning/:planningId',
         component: PlanningComponent,
+        children: [
+          {
+            path: '',
+            component: MarkTasksComponent,
+          },
+          {
+            path: 'task/:taskId',
+            component: ScrumPokerComponent,
+          },
+        ],
       },
     ],
   },

@@ -19,13 +19,17 @@ planningRouter.get(`/list`, async (req, res) => {
 });
 
 planningRouter.get(`/:planningId`, async (req, res) => {
-  const planning = await planningHandler.read(+req.params.planningId);
-  res.status(StatusCodes.OK).json(planning);
+  try {
+    const planning = await planningHandler.read(+req.params.planningId);
+    res.status(StatusCodes.OK).json(planning);
+  } catch (error) {
+    res.status(error.statusCode).json(error.error);
+  }
 });
 
-planningRouter.get(`/:planningId/set-step`, async (req, res) => {
-  await planningHandler.setStep(+req.params.planningId, req.body.stepId);
-  res.status(StatusCodes.OK).json('Планировани обновлено');
+planningRouter.put(`/:planningId/update`, async (req, res) => {
+  await planningHandler.update(+req.params.planningId, req.body);
+  res.status(StatusCodes.OK).json('Планирование обновлено');
 });
 
 export default planningRouter;

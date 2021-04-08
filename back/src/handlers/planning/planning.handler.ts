@@ -1,3 +1,4 @@
+import { PlanningUpdateRequest } from '../../models/requests/planning-update.request';
 import planningService from '../../services/planning-service';
 import projectService from '../../services/project-service';
 
@@ -14,8 +15,8 @@ export class PlanningHandler {
     return planningService.read(planningId);
   }
 
-  public async setStep(planningStepId: number, stepId: number) {
-    return planningService.setStep(planningStepId, stepId);
+  public async update(planningId: number, request: PlanningUpdateRequest) {
+    return planningService.update(planningId, request);
   }
 
   public async finish(sprintId: number) {
