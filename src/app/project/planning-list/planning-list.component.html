@@ -1,0 +1,15 @@
+<h4 class="mb-3">Планирования проекта</h4>
+<div class="content rounded p-2 mb-2">
+  <div class="task rounded d-flex" *ngFor="let planning of plannings">
+    <div class="col-8 d-flex align-items-center">
+      <small class="text-muted mr-3">#{{ planning.id }}</small>
+      <a [routerLink]="[planning.id]"
+        ><h6 class="d-inline text-dark mb-0">{{ planning.sprintName }}</h6></a
+      >
+    </div>
+    <div class="col-4 d-flex align-items-center justify-content-end">
+      <small class="text-muted">{{ planning.createDate | date: 'dd.MM.yyyy HH.mm' }}</small>
+      <span class="badge bg-success ml-2" *ngIf="planning.isActive">Активно</span>
+    </div>
+  </div>
+</div>

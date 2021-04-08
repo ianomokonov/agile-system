@@ -1,4 +1,4 @@
-<div class="px-2 pb-2" *ngIf="backlog">
+<div class="pb-2" *ngIf="backlog">
   <div class="d-flex justify-content-between mb-3">
     <h4 class="mb-0">Бэклог</h4>
     <div class="text-right">
@@ -21,10 +21,10 @@
       <ng-container *ngIf="!sprint.isFinished">
         <button
           class="btn btn-success"
-          *ngIf="!sprint.isActive; else finish"
-          (click)="onStartSprint(sprint.id)"
+          *ngIf="!sprint.isActive && sprint.tasks?.length"
+          (click)="onStartPlanning(sprint.id)"
         >
-          Начать спринт
+          Оценить задачи
         </button>
         <ng-template #finish>
           <button class="btn btn-danger" (click)="onFinishSprint(sprint.id)">
@@ -37,7 +37,13 @@
       ><ng-container *ngIf="sprint.tasks?.length; else noData">
         <ng-container *ngFor="let task of sprint.tasks">
           <ng-container
-            *ngTemplateOutlet="taskTemp; context: { $implicit: task, showBtn: !sprint.isActive }"
+            *ngTemplateOutlet="
+              taskTemp;
+              context: {
+                $implicit: task,
+                showBtn: !sprint.isActive && !!projectDataService.project?.sprint
+              }
+            "
           ></ng-container>
         </ng-container> </ng-container
     ></ng-container>
@@ -47,7 +53,10 @@
     <ng-container *ngIf="backlog.tasks?.length; else noData">
       <ng-container *ngFor="let task of backlog.tasks">
         <ng-container
-          *ngTemplateOutlet="taskTemp; context: { $implicit: task, showBtn: true }"
+          *ngTemplateOutlet="
+            taskTemp;
+            context: { $implicit: task, showBtn: !!projectDataService.project?.sprint }
+          "
         ></ng-container>
       </ng-container>
     </ng-container>
@@ -64,7 +73,9 @@
   <div class="task rounded d-flex">
     <div class="col-8 d-flex align-items-center">
       <small class="text-muted mr-3">#{{ task.id }}</small>
-      <h6 class="d-inline mb-0" [routerLink]="['/task', task.id]">{{ task.name }}</h6>
+      <a [routerLink]="['/task', task.id]"
+        ><h6 class="d-inline text-dark mb-0">{{ task.name }}</h6></a
+      >
     </div>
     <div class="col-4 pr-0 d-flex align-items-center justify-content-end">
       <small class="text-muted">{{ task.user?.name }} {{ task.user?.surname }}</small>

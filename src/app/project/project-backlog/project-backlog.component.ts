@@ -21,7 +21,7 @@ export class ProjectBacklogComponent implements OnInit {
   public showTasks = false;
   constructor(
     private projectService: ProjectService,
-    private projectDataService: ProjectDataService,
+    public projectDataService: ProjectDataService,
     private activatedRoute: ActivatedRoute,
     private taskService: TaskService,
     private modalService: NgbModal,
@@ -84,14 +84,16 @@ export class ProjectBacklogComponent implements OnInit {
       .catch(() => {});
   }
 
-  public onStartSprint(sprintId) {
-    this.projectService.startSprint(this.projectDataService.project.id, sprintId).subscribe(() => {
-      this.projectDataService
-        .getProject(this.projectDataService.project?.id, true)
-        .subscribe(() =>
-          this.router.navigate(['board'], { relativeTo: this.activatedRoute.parent }),
-        );
-    });
+  public onStartPlanning(sprintId) {
+    this.projectService
+      .startPlanning(
+        this.projectDataService.project?.id,
+        sprintId,
+        this.projectDataService.project?.sprint?.id,
+      )
+      .subscribe((planningId: number) => {
+        this.router.navigate(['planning', planningId], { relativeTo: this.activatedRoute.parent });
+      });
   }
 
   public onFinishSprint(sprintId) {

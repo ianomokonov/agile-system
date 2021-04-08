@@ -8,8 +8,8 @@ export class ProjectSprintHandler {
   public async create(request: CreateSprintRequest, projectId: number) {
     return projectService.createSprint(request, projectId);
   }
-  public async start(sprintId: number) {
-    return projectService.startSprint(sprintId);
+  public async start(sprintId: number, projectId: number) {
+    return projectService.startSprint(sprintId, projectId);
   }
   public async finish(sprintId: number) {
     return projectService.finishSprint(sprintId);

@@ -403,6 +403,7 @@ class ProjectRepository {
     if (!userId || !projectId || !permission) {
       return false;
     }
+
     let query = `SELECT * FROM project p WHERE p.Id=${projectId} AND p.ownerId=${userId}`;
 
     const [projects] = await dbConnection.query(query);
@@ -448,14 +449,14 @@ class ProjectRepository {
     return sprints as IdNameResponse[];
   }
 
-  public async startSprint(sprintId: number) {
+  public async startSprint(sprintId: number, projectId: number) {
     let query = sql
       .update('projectsprint', {
         endDate: new Date(),
         isActive: false,
         isFinished: true,
       })
-      .where({ isActive: true });
+      .where({ isActive: true, projectId });
     await dbConnection.query(getQueryText(query.text), query.values);
 
     query = sql

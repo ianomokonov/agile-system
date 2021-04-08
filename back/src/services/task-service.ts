@@ -35,6 +35,14 @@ class TaskService implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
   public async getTaskProjectId(taskId: number): Promise<number> {
     return taskRepository.getProjectId(taskId);
   }
+
+  public async getNotMarkedSprintTasks(sprintId: number) {
+    return taskRepository.getNotMarkedSprintTasks(sprintId);
+  }
+
+  public async getNewSprintTasks(sprintId: number) {
+    return taskRepository.getNewSprintTasks(sprintId);
+  }
 }
 
 export default new TaskService();

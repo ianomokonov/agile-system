@@ -280,6 +280,24 @@ CREATE TABLE `projectSprint` (
 ) COMMENT 'спринты проекта';
 
 -- ---
+-- Table 'projectPlanning'
+-- спринты проекта
+-- ---
+
+DROP TABLE IF EXISTS `projectPlanning`;
+		
+CREATE TABLE `projectPlanning` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `createDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `sprintId` int(11) NOT NULL,
+  `activeSprintId` int(11) NULL,
+  `isActive` bit DEFAULT 0,
+  `isFinished` bit DEFAULT 0,
+  `projectId` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) COMMENT 'планирования проекта';
+
+-- ---
 -- Foreign Keys 
 -- ---
 
@@ -307,6 +325,9 @@ ALTER TABLE `comment` ADD FOREIGN KEY (projectTaskId) REFERENCES `projectTask` (
 ALTER TABLE `taskHistoryOperations` ADD FOREIGN KEY (projectUserId) REFERENCES `projectUser` (`id`) ON DELETE CASCADE;
 ALTER TABLE `taskHistoryOperations` ADD FOREIGN KEY (projectTaskId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
 ALTER TABLE `projectSprint` ADD FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
+ALTER TABLE `projectPlanning` ADD FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
+ALTER TABLE `projectPlanning` ADD FOREIGN KEY (sprintId) REFERENCES `projectSprint` (`id`) ON DELETE CASCADE;
+ALTER TABLE `projectPlanning` ADD FOREIGN KEY (activeSprintId) REFERENCES `projectSprint` (`id`) ON DELETE NO ACTION;
 
 
 INSERT INTO `projectTaskStatus` (`name`) VALUES

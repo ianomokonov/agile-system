@@ -89,7 +89,7 @@ export class ProjectService {
   }
 
   public addSprint(projectId: number, sprint: CreateSprintRequest): Observable<number> {
-    return this.http.post<number>(`${this.baseUrl}/${projectId}/add-sprint`, sprint);
+    return this.http.post<number>(`${this.baseUrl}/${projectId}/sprint/create`, sprint);
   }
 
   public getProjectSprints(projectId: number): Observable<IdNameResponse[]> {
@@ -97,10 +97,29 @@ export class ProjectService {
   }
 
   public finishSprint(projectId: number, sprintId: number): Observable<number> {
-    return this.http.post<number>(`${this.baseUrl}/${projectId}/finish-sprint`, { id: sprintId });
+    return this.http.post<number>(`${this.baseUrl}/${projectId}/sprint/finish`, { id: sprintId });
   }
 
   public startSprint(projectId: number, sprintId: number): Observable<number> {
-    return this.http.post<number>(`${this.baseUrl}/${projectId}/start-sprint`, { id: sprintId });
+    return this.http.post<number>(`${this.baseUrl}/${projectId}/sprint/start`, { id: sprintId });
+  }
+
+  public startPlanning(
+    projectId: number,
+    sprintId: number,
+    activeSprintId: number,
+  ): Observable<number> {
+    return this.http.post<number>(`${this.baseUrl}/${projectId}/planning/start`, {
+      sprintId,
+      activeSprintId,
+    });
+  }
+
+  public getPlanningList(projectId: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/${projectId}/planning/list`);
+  }
+
+  public getPlanning(projectId: number, planningId: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/${projectId}/planning/${planningId}`);
   }
 }

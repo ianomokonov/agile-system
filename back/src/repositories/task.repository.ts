@@ -52,6 +52,37 @@ class TaskRepository implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
     return task as TaskResponse;
   }
 
+  public async getNewSprintTasks(sprintId?: number) {
+    if (!sprintId) {
+      return [];
+    }
+    const query = sql
+      .select('projecttask', ['id', 'name', 'description', 'typeId', 'priorityId'])
+      .where({ projectSprintId: sprintId, statusId: 1 });
+    const [tasks] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    return tasks as TaskResponse[];
+  }
+
+  public async getNotMarkedSprintTasks(sprintId?: number) {
+    if (!sprintId) {
+      return [];
+    }
+    const query = sql
+      .select('projecttask', ['id', 'name', 'description', 'typeId', 'priorityId'])
+      .where({ projectSprintId: sprintId })
+      .and({ points: null }, 'IS');
+    const [tasks] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    return tasks as TaskResponse[];
+  }
+
   public async create(request: CreateTaskRequest) {
     const { id: creatorId } = await projectRepository.getProjectUserByUserId(
       request.creatorId,

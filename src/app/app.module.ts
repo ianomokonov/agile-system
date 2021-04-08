@@ -38,6 +38,8 @@ import { CreateSprintComponent } from './project/create-sprint/create-sprint.com
 import { EditTaskComponent } from './project/project-board/task/edit-task/edit-task.component';
 import { PriorityPipe } from './shared/pipes/priority.pipe';
 import { TaskTypePipe } from './shared/pipes/task-type.pipe';
+import { PlanningComponent } from './project/planning-list/planning/planning.component';
+import { PlanningListComponent } from './project/planning-list/planning-list.component';
 
 @NgModule({
   declarations: [
@@ -62,6 +64,8 @@ import { TaskTypePipe } from './shared/pipes/task-type.pipe';
     EditTaskComponent,
     PriorityPipe,
     TaskTypePipe,
+    PlanningComponent,
+    PlanningListComponent,
   ],
   imports: [
     BrowserModule,

@@ -10,330 +10,183 @@ import projectRolesHandler from '../handlers/project/project-roles.handler';
 import projectSprintHandler from '../handlers/project/project-sprint.handler';
 import projectUsersHandler from '../handlers/project/project-users.handler';
 import tasksHandler from '../handlers/task/tasks.handler';
-import logger from '../logger';
 import authJWT from '../middleware/authJWT';
 import checkPermissions from '../middleware/check-project-permissions';
 import { Permissions } from '../utils';
+import planningRouter from './planning';
+import sprintRouter from './sprint';
 
 const projectRouter = Router();
+projectRouter.use(authJWT);
 
-projectRouter.get(`/permissions`, authJWT, async (req, res) => {
-  try {
-    const permissions = await getProjectPermissionsHandler();
-    res.status(StatusCodes.OK).json(permissions);
-  } catch (error) {
-    res.status(error.statusCode).json(error.error);
-  }
+projectRouter.get(`/permissions`, async (req, res) => {
+  const permissions = await getProjectPermissionsHandler();
+  res.status(StatusCodes.OK).json(permissions);
 });
-projectRouter.get(
-  `/:id`,
-  authJWT,
-  checkPermissions(Permissions.CanReadProject),
-  async (req, res) => {
-    try {
-      const project = await getProjectHandler(Number.parseInt(req.params.id, 10));
+projectRouter.get(`/:projectId`, checkPermissions(Permissions.CanReadProject), async (req, res) => {
+  const project = await getProjectHandler(res.locals.projectId);
 
-      if (!project) {
-        res.status(StatusCodes.NOT_FOUND).json('Проект не найден');
-        return;
-      }
-      res.status(StatusCodes.OK).json(project);
-    } catch (error) {
-      logger.error(error);
-      res.status(error.statusCode || 500).json(error.error);
-    }
-  },
-);
+  if (!project) {
+    res.status(StatusCodes.NOT_FOUND).json('Проект не найден');
+    return;
+  }
+  res.status(StatusCodes.OK).json(project);
+});
 
-projectRouter.put(
-  `/:id`,
-  authJWT,
-  checkPermissions(Permissions.CanEditProject),
-  async (req, res) => {
-    try {
-      await editProjectHandler(Number.parseInt(req.params.id, 10), req.body);
-      res.status(StatusCodes.OK).json('Проект изменен');
-    } catch (error) {
-      res.status(error.statusCode).json(error.error);
-    }
-  },
-);
+projectRouter.put(`/:projectId`, checkPermissions(Permissions.CanEditProject), async (req, res) => {
+  await editProjectHandler(res.locals.projectId, req.body);
+  res.status(StatusCodes.OK).json('Проект изменен');
+});
 
 projectRouter.get(
-  `/:id/get-edit-info`,
-  authJWT,
+  `/:projectId/get-edit-info`,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    try {
-      const project = await getProjectEditInfoHandler(Number.parseInt(req.params.id, 10));
+    const project = await getProjectEditInfoHandler(res.locals.projectId);
 
-      if (!project) {
-        res.status(StatusCodes.NOT_FOUND).json('Проект не найден');
-        return;
-      }
-      res.status(StatusCodes.OK).json(project);
-    } catch (error) {
-      logger.error(error);
-
-      res.status(error.statusCode).json(error.error);
+    if (!project) {
+      res.status(StatusCodes.NOT_FOUND).json('Проект не найден');
+      return;
     }
+    res.status(StatusCodes.OK).json(project);
   },
 );
 
-projectRouter.post(`/create`, authJWT, async (req, res) => {
+projectRouter.post(`/create`, async (req, res) => {
   const { userId } = res.locals;
   const projectId = await createProjectHandler(userId, req.body);
   res.status(StatusCodes.CREATED).json(projectId);
 });
 
 projectRouter.post(
-  `/:id/add-link`,
-  authJWT,
+  `/:projectId/add-link`,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    try {
-      res.json({ message: 'заглушка' });
-    } catch (error) {
-      res.status(error.statusCode).json(error.error);
-    }
+    res.json({ message: 'заглушка' });
   },
 );
 
 projectRouter.put(
-  `/:id/edit-link`,
-  authJWT,
+  `/:projectId/edit-link`,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    try {
-      res.json({ message: 'заглушка' });
-    } catch (error) {
-      res.status(error.statusCode).json(error.error);
-    }
+    res.json({ message: 'заглушка' });
   },
 );
 
 projectRouter.delete(
-  `/:id/remove-link`,
-  authJWT,
+  `/:projectId/remove-link`,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    try {
-      res.json({ message: 'заглушка' });
-    } catch (error) {
-      res.status(error.statusCode).json(error.error);
-    }
+    res.json({ message: 'заглушка' });
   },
 );
 
 projectRouter.post(
-  `/:id/add-user`,
-  authJWT,
+  `/:projectId/add-user`,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    try {
-      await projectUsersHandler.create(req.body);
-      res.status(StatusCodes.CREATED).json('Пользователь добавлен');
-    } catch (error) {
-      res.status(error.statusCode).json(error.error);
-    }
+    await projectUsersHandler.create(req.body);
+    res.status(StatusCodes.CREATED).json('Пользователь добавлен');
   },
 );
 
 projectRouter.put(
-  `/:id/edit-user`,
-  authJWT,
+  `/:projectId/edit-user`,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    try {
-      await projectUsersHandler.update(req.body);
-      res.status(StatusCodes.OK).json('Пользователь обновлен');
-    } catch (error) {
-      res.status(error.statusCode).json(error.error);
-    }
+    await projectUsersHandler.update(req.body);
+    res.status(StatusCodes.OK).json('Пользователь обновлен');
   },
 );
 
 projectRouter.delete(
-  `/:id/remove-user`,
-  authJWT,
+  `/:projectId/remove-user`,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    try {
-      await projectUsersHandler.delete(+req.query.projectUserId);
-      res.status(StatusCodes.OK).json('Пользователь удален');
-    } catch (error) {
-      res.status(error.statusCode).json(error.error);
-    }
+    await projectUsersHandler.delete(+req.query.projectUserId);
+    res.status(StatusCodes.OK).json('Пользователь удален');
   },
 );
 
 projectRouter.get(
-  `/:id/users`,
-  authJWT,
+  `/:projectId/users`,
   checkPermissions(Permissions.CanReadProject),
   async (req, res) => {
-    try {
-      const users = await projectUsersHandler.read(+req.params.id);
-      res.status(StatusCodes.OK).json(users);
-    } catch (error) {
-      res.status(error.statusCode).json(error.error);
-    }
+    const users = await projectUsersHandler.read(res.locals.projectId);
+    res.status(StatusCodes.OK).json(users);
   },
 );
 
 projectRouter.post(
-  `/:id/add-role`,
-  authJWT,
+  `/:projectId/add-role`,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    try {
-      await projectRolesHandler.create({ projectId: req.params.id, ...req.body });
-      res.status(StatusCodes.OK).json('Роль добавлена');
-    } catch (error) {
-      res.status(error.statusCode).json(error.error);
-    }
+    await projectRolesHandler.create({ projectId: req.params.id, ...req.body });
+    res.status(StatusCodes.OK).json('Роль добавлена');
   },
 );
 
 projectRouter.put(
-  `/:id/edit-role`,
-  authJWT,
+  `/:projectId/edit-role`,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    try {
-      await projectRolesHandler.update(req.body);
-      res.status(StatusCodes.OK).json('Роль обновлена');
-    } catch (error) {
-      res.status(error.statusCode).json(error.error);
-    }
+    await projectRolesHandler.update(req.body);
+    res.status(StatusCodes.OK).json('Роль обновлена');
   },
 );
 
 projectRouter.delete(
-  `/:id/remove-role`,
-  authJWT,
+  `/:projectId/remove-role`,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    try {
-      await projectRolesHandler.delete(+req.query.projectRoleId);
-      res.status(StatusCodes.OK).json('Роль удалена');
-    } catch (error) {
-      res.status(error.statusCode).json(error.error);
-    }
+    await projectRolesHandler.delete(+req.query.projectRoleId);
+    res.status(StatusCodes.OK).json('Роль удалена');
   },
 );
 
 projectRouter.get(
-  `/:id/roles`,
-  authJWT,
+  `/:projectId/roles`,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    try {
-      const roles = await projectRolesHandler.read(+req.params.id);
-      res.status(StatusCodes.OK).json(roles);
-    } catch (error) {
-      res.status(error.statusCode).json(error.error);
-    }
+    const roles = await projectRolesHandler.read(res.locals.projectId);
+    res.status(StatusCodes.OK).json(roles);
   },
 );
 
 projectRouter.get(
-  `/:id/backlog`,
-  authJWT,
+  `/:projectId/backlog`,
   checkPermissions(Permissions.CanReadProject),
   async (req, res) => {
-    try {
-      const backlog = await projectBacklogHandler(+req.params.id);
-      res.status(StatusCodes.OK).json(backlog);
-    } catch (error) {
-      logger.error(error);
-      res.status(error.statusCode).json(error.error);
-    }
+    const backlog = await projectBacklogHandler(res.locals.projectId);
+    res.status(StatusCodes.OK).json(backlog);
   },
 );
 
 projectRouter.get(
-  `/:id/sprints`,
-  authJWT,
+  `/:projectId/sprints`,
   checkPermissions(Permissions.CanReadProject),
   async (req, res) => {
-    try {
-      const sprints = await projectSprintHandler.getProjectSprints(+req.params.id);
-      res.status(StatusCodes.OK).json(sprints);
-    } catch (error) {
-      logger.error(error);
-      res.status(error.statusCode).json(error.error);
-    }
+    const sprints = await projectSprintHandler.getProjectSprints(res.locals.projectId);
+    res.status(StatusCodes.OK).json(sprints);
   },
 );
 
 projectRouter.post(
-  `/:id/add-task`,
-  authJWT,
+  `/:projectId/add-task`,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    try {
-      const { userId } = res.locals;
-      const newTaskId = await tasksHandler.create({
-        projectId: +req.params.id,
-        ...req.body,
-        creatorId: userId,
-      });
-      res.status(StatusCodes.OK).json(newTaskId);
-    } catch (error) {
-      logger.error(error);
-
-      res.status(error.statusCode).json(error.error);
-    }
+    const { userId } = res.locals;
+    const newTaskId = await tasksHandler.create({
+      projectId: res.locals.projectId,
+      ...req.body,
+      creatorId: userId,
+    });
+    res.status(StatusCodes.OK).json(newTaskId);
   },
 );
 
-projectRouter.post(
-  `/:id/add-sprint`,
-  authJWT,
-  checkPermissions(Permissions.CanEditProject),
-  async (req, res) => {
-    try {
-      const newPrintId = await projectSprintHandler.create(req.body, +req.params.id);
-      res.status(StatusCodes.OK).json(newPrintId);
-    } catch (error) {
-      logger.error(error);
-
-      res.status(error.statusCode).json(error.error);
-    }
-  },
-);
-
-projectRouter.post(
-  `/:id/start-sprint`,
-  authJWT,
-  checkPermissions(Permissions.CanEditProject),
-  async (req, res) => {
-    try {
-      await projectSprintHandler.start(req.body.id);
-      res.status(StatusCodes.OK).json('Спринт стартовал');
-    } catch (error) {
-      logger.error(error);
-
-      res.status(error.statusCode).json(error.error);
-    }
-  },
-);
-
-projectRouter.post(
-  `/:id/finish-sprint`,
-  authJWT,
-  checkPermissions(Permissions.CanEditProject),
-  async (req, res) => {
-    try {
-      await projectSprintHandler.finish(req.body.id);
-      res.status(StatusCodes.OK).json('Спринт завершен');
-    } catch (error) {
-      logger.error(error);
-
-      res.status(error.statusCode).json(error.error);
-    }
-  },
-);
+projectRouter.use('/:projectId/sprint', sprintRouter);
+projectRouter.use('/:projectId/planning', planningRouter);
 
 export default projectRouter;
