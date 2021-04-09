@@ -1,25 +1,21 @@
-<div class="d-flex align-items-stretch">
+<div class="d-flex align-items-stretch" *ngIf="session?.task">
   <div class="w-50 task border-right mr-4 pr-3 mb-0">
-    <h4>Lorem ipsum dolor sit amet.</h4>
+    <h4>{{ session.task.name }}</h4>
     <div class="form-group">
       <small class="text-muted">Описание</small>
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio veritatis quia nobis
-        atque sunt quae sequi ut animi consequuntur corrupti eos doloribus repudiandae dolore
-        placeat, earum perspiciatis nostrum reiciendis odio!
-      </p>
+      <p [innerHTML]="session.task.description"></p>
     </div>
     <div class="row">
       <div class="col-4">
         <div class="form-group">
           <small class="text-muted">Приоритет</small>
-          <h6>Высокий</h6>
+          <h6>{{ session.task.priorityId | priority }}</h6>
         </div>
       </div>
       <div class="col-4">
         <div class="form-group">
           <small class="text-muted">Тип задачи</small>
-          <h6>Feature</h6>
+          <h6>{{ session.task.typeId | taskType }}</h6>
         </div>
       </div>
     </div>
@@ -30,7 +26,7 @@
       <div class="d-flex cards">
         <div
           class="card"
-          (click)="activeMark = card"
+          (click)="setCard(card)"
           [ngClass]="{ active: activeMark === card }"
           *ngFor="let card of marks"
         >
@@ -39,14 +35,14 @@
       </div>
     </div>
     <div class="poker-marks mb-4">
-      <div class="poker-mark d-flex align-items-center">
+      <div class="poker-mark d-flex align-items-center" *ngFor="let card of session.cards">
         <div class="card active card-sm mr-3" [ngClass]="{ hidden: !showCards }">
-          {{ showCards ? activeMark : '?' }}
+          {{ showCards ? card.value : '?' }}
         </div>
-        <h5>Иван Номоконов</h5>
+        <h5>{{ card.userName }} {{ card.userSurname }}</h5>
       </div>
     </div>
-    <div class="d-flex">
+    <div class="d-flex" *ngIf="session.cards?.length">
       <button class="btn btn-outline-primary mr-1">Сбросить</button>
       <button class="btn btn-primary" (click)="showCards = !showCards">Показать</button>
     </div>

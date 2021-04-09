@@ -122,7 +122,7 @@ projectRouter.post(
   `/:projectId/add-role`,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    await projectRolesHandler.create({ projectId: req.params.id, ...req.body });
+    await projectRolesHandler.create({ projectId: res.locals.projectId, ...req.body });
     res.status(StatusCodes.OK).json('Роль добавлена');
   },
 );

@@ -1,17 +1,14 @@
 -- ---
 -- Globals
 -- ---
-
 -- SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- SET FOREIGN_KEY_CHECKS=0;
-
 -- ---
 -- Table 'user'
 -- Таблица пользователей
 -- ---
-
 DROP TABLE IF EXISTS `user`;
-		
+
 CREATE TABLE `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -30,9 +27,8 @@ CREATE TABLE `user` (
 -- Table 'project'
 -- Проекты пользователей
 -- ---
-
 DROP TABLE IF EXISTS `project`;
-		
+
 CREATE TABLE `project` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -47,9 +43,8 @@ CREATE TABLE `project` (
 -- Table 'projectUser'
 -- Пользователи в команде проекта
 -- ---
-
 DROP TABLE IF EXISTS `projectUser`;
-		
+
 CREATE TABLE `projectUser` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `projectId` int(11) NOT NULL,
@@ -62,9 +57,8 @@ CREATE TABLE `projectUser` (
 -- Table 'projectRoles'
 -- Роли участников проекта, открывающие им функционал в сисетме
 -- ---
-
 DROP TABLE IF EXISTS `projectRoles`;
-		
+
 CREATE TABLE `projectRoles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -76,9 +70,8 @@ CREATE TABLE `projectRoles` (
 -- Table 'projectUserRole'
 -- Роли пользователя проетка
 -- ---
-
 DROP TABLE IF EXISTS `projectUserRole`;
-		
+
 CREATE TABLE `projectUserRole` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `projectRoleId` int(11) NOT NULL,
@@ -91,9 +84,8 @@ CREATE TABLE `projectUserRole` (
 -- Table 'projectRolePermission'
 -- Разрешения для ролей проекта
 -- ---
-
 DROP TABLE IF EXISTS `permission`;
-		
+
 CREATE TABLE `permission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -104,9 +96,8 @@ CREATE TABLE `permission` (
 -- Table 'projectRolePermission'
 -- Разрешения для ролей проекта
 -- ---
-
 DROP TABLE IF EXISTS `projectRolePermission`;
-		
+
 CREATE TABLE `projectRolePermission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `projectRoleId` int(11) NOT NULL,
@@ -118,9 +109,8 @@ CREATE TABLE `projectRolePermission` (
 -- Table 'projectLinks'
 -- Важные ссылки проекта
 -- ---
-
 DROP TABLE IF EXISTS `projectLinks`;
-		
+
 CREATE TABLE `projectLinks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -133,9 +123,8 @@ CREATE TABLE `projectLinks` (
 -- Table 'projectTask'
 -- Задачи
 -- ---
-
 DROP TABLE IF EXISTS `projectTask`;
-		
+
 CREATE TABLE `projectTask` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -159,9 +148,8 @@ CREATE TABLE `projectTask` (
 -- Table 'epics'
 -- Таблица для эпиков
 -- ---
-
 DROP TABLE IF EXISTS `epics`;
-		
+
 CREATE TABLE `epics` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -176,9 +164,8 @@ CREATE TABLE `epics` (
 -- Table 'projectTaskStatus'
 -- возможные статусы задач проекта
 -- ---
-
 DROP TABLE IF EXISTS `projectTaskStatus`;
-		
+
 CREATE TABLE `projectTaskStatus` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -189,9 +176,8 @@ CREATE TABLE `projectTaskStatus` (
 -- Table 'projectTaskLink'
 -- Связи между задачами проекта
 -- ---
-
 DROP TABLE IF EXISTS `projectTaskLink`;
-		
+
 CREATE TABLE `projectTaskLink` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `linkTypeId` int(11) NOT NULL,
@@ -204,9 +190,8 @@ CREATE TABLE `projectTaskLink` (
 -- Table 'linkType'
 -- типы связей между задачами
 -- ---
-
 DROP TABLE IF EXISTS `linkType`;
-		
+
 CREATE TABLE `linkType` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -217,9 +202,8 @@ CREATE TABLE `linkType` (
 -- Table 'comment'
 -- комментарии к задаче
 -- ---
-
 DROP TABLE IF EXISTS `comment`;
-		
+
 CREATE TABLE `comment` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `userId` int(11) NOT NULL,
@@ -234,9 +218,8 @@ CREATE TABLE `comment` (
 -- Table 'taskHistoryOperations'
 -- история изменений задачи
 -- ---
-
 DROP TABLE IF EXISTS `taskHistoryOperations`;
-		
+
 CREATE TABLE `taskHistoryOperations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `operationName` varchar(255) NOT NULL,
@@ -250,9 +233,8 @@ CREATE TABLE `taskHistoryOperations` (
 -- Table 'refreshTokens'
 -- токены для обновления доступа
 -- ---
-
 DROP TABLE IF EXISTS `refreshTokens`;
-		
+
 CREATE TABLE `refreshTokens` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `token` varchar(255) NOT NULL,
@@ -264,9 +246,8 @@ CREATE TABLE `refreshTokens` (
 -- Table 'projectSprint'
 -- спринты проекта
 -- ---
-
 DROP TABLE IF EXISTS `projectSprint`;
-		
+
 CREATE TABLE `projectSprint` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `startDate` DATE NULL,
@@ -283,9 +264,8 @@ CREATE TABLE `projectSprint` (
 -- Table 'projectPlanning'
 -- спринты проекта
 -- ---
-
 DROP TABLE IF EXISTS `projectPlanning`;
-		
+
 CREATE TABLE `projectPlanning` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `createDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -295,65 +275,229 @@ CREATE TABLE `projectPlanning` (
   `isFinished` bit DEFAULT 0,
   `projectId` int(11) NOT NULL,
   `activeStep` int(1) NOT NULL DEFAULT 1,
-
   PRIMARY KEY (`id`)
 ) COMMENT 'планирования проекта';
 
 -- ---
+-- Table 'projectPlanningTaskSession'
+-- сессии оценки задач
+-- ---
+DROP TABLE IF EXISTS `projectPlanningTaskSession`;
+
+CREATE TABLE `projectPlanningTaskSession` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `createDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `taskId` int(11) NOT NULL,
+  `planningId` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) COMMENT 'оценка задач';
+
+-- ---
+-- Table 'planningTaskSessionCard'
+-- оценки задачи
+-- ---
+DROP TABLE IF EXISTS `planningTaskSessionCard`;
+
+CREATE TABLE `planningTaskSessionCard` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sessionId` int(11) NOT NULL,
+  `userId` int(11) NOT NULL,
+  `value` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) COMMENT 'оценки задачи';
+
+-- ---
 -- Foreign Keys 
 -- ---
+ALTER TABLE
+  `project`
+ADD
+  FOREIGN KEY (ownerId) REFERENCES `user` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `project` ADD FOREIGN KEY (ownerId) REFERENCES `user` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectUser` ADD FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectRoles` ADD FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectUser` ADD FOREIGN KEY (userId) REFERENCES `user` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectUserRole` ADD FOREIGN KEY (projectRoleId) REFERENCES `projectRoles` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectUserRole` ADD FOREIGN KEY (projectUserId) REFERENCES `projectUser` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectRolePermission` ADD FOREIGN KEY (projectRoleId) REFERENCES `projectRoles` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectRolePermission` ADD FOREIGN KEY (permissionId) REFERENCES `permission` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectLinks` ADD FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectTask` ADD FOREIGN KEY (statusId) REFERENCES `projectTaskStatus` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectTask` ADD FOREIGN KEY (epicId) REFERENCES `epics` (`id`) ON DELETE NO ACTION;
-ALTER TABLE `projectTask` ADD FOREIGN KEY (parentId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectTask` ADD FOREIGN KEY (projectUserId) REFERENCES `projectUser` (`id`) ON DELETE NO ACTION;
-ALTER TABLE `projectTask` ADD FOREIGN KEY (creatorId) REFERENCES `projectUser` (`id`) ON DELETE NO ACTION;
-ALTER TABLE `projectTask` ADD FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectTask` ADD FOREIGN KEY (projectSprintId) REFERENCES `projectSprint` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectTaskLink` ADD FOREIGN KEY (linkTypeId) REFERENCES `linkType` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectTaskLink` ADD FOREIGN KEY (fromTaskId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectTaskLink` ADD FOREIGN KEY (toTaskId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
-ALTER TABLE `comment` ADD FOREIGN KEY (userId) REFERENCES `projectUser` (`id`) ON DELETE CASCADE;
-ALTER TABLE `comment` ADD FOREIGN KEY (projectTaskId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
-ALTER TABLE `taskHistoryOperations` ADD FOREIGN KEY (projectUserId) REFERENCES `projectUser` (`id`) ON DELETE CASCADE;
-ALTER TABLE `taskHistoryOperations` ADD FOREIGN KEY (projectTaskId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectSprint` ADD FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectPlanning` ADD FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectPlanning` ADD FOREIGN KEY (sprintId) REFERENCES `projectSprint` (`id`) ON DELETE CASCADE;
-ALTER TABLE `projectPlanning` ADD FOREIGN KEY (activeSprintId) REFERENCES `projectSprint` (`id`) ON DELETE NO ACTION;
+ALTER TABLE
+  `projectUser`
+ADD
+  FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
 
+ALTER TABLE
+  `projectRoles`
+ADD
+  FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
 
-INSERT INTO `projectTaskStatus` (`name`) VALUES
-('to do'), ('dev in progress'), ('under review'), ('dev completed'), ('testing'), ('test completed');
+ALTER TABLE
+  `projectUser`
+ADD
+  FOREIGN KEY (userId) REFERENCES `user` (`id`) ON DELETE CASCADE;
 
-DELIMITER $$
-CREATE TRIGGER create_project_user
-AFTER INSERT
-ON project FOR EACH ROW
-BEGIN
-    INSERT INTO projectUser(projectId, userId)
-    VALUES(new.id, new.ownerId);
-END$$
-DELIMITER ;
+ALTER TABLE
+  `projectUserRole`
+ADD
+  FOREIGN KEY (projectRoleId) REFERENCES `projectRoles` (`id`) ON DELETE CASCADE;
 
+ALTER TABLE
+  `projectUserRole`
+ADD
+  FOREIGN KEY (projectUserId) REFERENCES `projectUser` (`id`) ON DELETE CASCADE;
 
-alter table projectplanning ADD `activeStep` int(1) NOT NULL DEFAULT 1;
-alter table projectplanning ADD `activeTaskId` int(11) NULL;
-ALTER TABLE `projectplanning` ADD FOREIGN KEY (activeTaskId) REFERENCES `projectTask` (`id`) ON DELETE NO ACTION;
+ALTER TABLE
+  `projectRolePermission`
+ADD
+  FOREIGN KEY (projectRoleId) REFERENCES `projectRoles` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectRolePermission`
+ADD
+  FOREIGN KEY (permissionId) REFERENCES `permission` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectLinks`
+ADD
+  FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectTask`
+ADD
+  FOREIGN KEY (statusId) REFERENCES `projectTaskStatus` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectTask`
+ADD
+  FOREIGN KEY (epicId) REFERENCES `epics` (`id`) ON DELETE NO ACTION;
+
+ALTER TABLE
+  `projectTask`
+ADD
+  FOREIGN KEY (parentId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectTask`
+ADD
+  FOREIGN KEY (projectUserId) REFERENCES `projectUser` (`id`) ON DELETE NO ACTION;
+
+ALTER TABLE
+  `projectTask`
+ADD
+  FOREIGN KEY (creatorId) REFERENCES `projectUser` (`id`) ON DELETE NO ACTION;
+
+ALTER TABLE
+  `projectTask`
+ADD
+  FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectTask`
+ADD
+  FOREIGN KEY (projectSprintId) REFERENCES `projectSprint` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectTaskLink`
+ADD
+  FOREIGN KEY (linkTypeId) REFERENCES `linkType` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectTaskLink`
+ADD
+  FOREIGN KEY (fromTaskId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectTaskLink`
+ADD
+  FOREIGN KEY (toTaskId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `comment`
+ADD
+  FOREIGN KEY (userId) REFERENCES `projectUser` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `comment`
+ADD
+  FOREIGN KEY (projectTaskId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `taskHistoryOperations`
+ADD
+  FOREIGN KEY (projectUserId) REFERENCES `projectUser` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `taskHistoryOperations`
+ADD
+  FOREIGN KEY (projectTaskId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectSprint`
+ADD
+  FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectPlanning`
+ADD
+  FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectPlanning`
+ADD
+  FOREIGN KEY (sprintId) REFERENCES `projectSprint` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectPlanningTaskSession`
+ADD
+  FOREIGN KEY (taskId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectPlanningTaskSession`
+ADD
+  FOREIGN KEY (planningId) REFERENCES `projectPlanning` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `planningTaskSessionCard`
+ADD
+  FOREIGN KEY (userId) REFERENCES `user` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `planningTaskSessionCard`
+ADD
+  FOREIGN KEY (sessionId) REFERENCES `projectPlanningTaskSession` (`id`) ON DELETE CASCADE;
+
+INSERT INTO
+  `projectTaskStatus` (`name`)
+VALUES
+  ('to do'),
+  ('dev in progress'),
+  ('under review'),
+  ('dev completed'),
+  ('testing'),
+  ('test completed');
+
+DELIMITER $ $ CREATE TRIGGER create_project_user
+AFTER
+INSERT
+  ON project FOR EACH ROW BEGIN
+INSERT INTO
+  projectUser(projectId, userId)
+VALUES
+  (new.id, new.ownerId);
+
+END $ $ DELIMITER;
+
+alter table
+  projectplanning
+ADD
+  `activeStep` int(1) NOT NULL DEFAULT 1;
+
+alter table
+  projectplanning
+ADD
+  `activeTaskId` int(11) NULL;
+
+ALTER TABLE
+  `projectplanning`
+ADD
+  FOREIGN KEY (activeTaskId) REFERENCES `projectTask` (`id`) ON DELETE NO ACTION;
 
 -- ---
 -- Table Properties
 -- ---
-
 -- ALTER TABLE `user` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 -- ALTER TABLE `project` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 -- ALTER TABLE `projectUser` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -368,11 +512,9 @@ ALTER TABLE `projectplanning` ADD FOREIGN KEY (activeTaskId) REFERENCES `project
 -- ALTER TABLE `comment` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 -- ALTER TABLE `taskHistoryOperations` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 -- ALTER TABLE `projectSprint` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
 -- ---
 -- Test Data
 -- ---
-
 -- INSERT INTO `user` (`id`,`name`,`surname`,`vkId`,`gitHubId`,`vk`,`gitHub`,`image`) VALUES
 -- ('','','','','','','','');
 -- INSERT INTO `project` (`id`,`name`,`repository`,`description`,`ownerId`,`lastEditDate`) VALUES

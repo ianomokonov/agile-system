@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import { WebError } from '../models/error';
 import { PlanningUpdateRequest } from '../models/requests/planning-update.request';
 import planningRepository from '../repositories/planning.repository';
+import taskRepository from '../repositories/task.repository';
 import taskService from './task-service';
 
 class PlanningService {
@@ -28,7 +29,32 @@ class PlanningService {
   }
 
   public async update(planningId: number, request: PlanningUpdateRequest) {
+    if (request.activeTaskId) {
+      planningRepository.createSession(planningId, request.activeTaskId);
+    }
     return planningRepository.update(planningId, request);
+  }
+
+  public async getSession(planningId: number, taskId: number, userId: number) {
+    const session = await planningRepository.getSession(planningId, taskId, userId);
+    if (!session) {
+      throw new WebError(StatusCodes.NOT_FOUND, 'Сессия не найдена');
+    }
+
+    session.task = await taskRepository.read(taskId);
+    return session;
+  }
+
+  public async setCard(sessionId: number, userId: number, value: number) {
+    const card = await planningRepository.getSessionCard(sessionId, userId);
+    return planningRepository.setSessionCard(sessionId, userId, value, card?.id);
+  }
+
+  public async closeSession(sessionId: number, value: number, taskId: number) {
+    await Promise.all([
+      planningRepository.closeSession(sessionId),
+      taskRepository.update({ id: taskId, points: value }),
+    ]);
   }
 }
 

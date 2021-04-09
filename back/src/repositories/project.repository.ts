@@ -26,8 +26,18 @@ sql.use('mysql');
 class ProjectRepository {
   public async getUserProjects(userId: number) {
     const query = sql
-      .select('project', ['id', 'name', 'repository', 'lastEditDate'])
-      .where({ ownerId: userId });
+      .select('project', [
+        'project.id',
+        'project.name',
+        'project.repository',
+        'project.lastEditDate',
+      ])
+      .join('projectUser', { projectId: 'project.id' }, 'RIGHT OUTER')
+      .where({ ownerId: userId })
+      .or({ 'projectUser.userId': userId })
+      .groupby('project.id');
+    console.log(query);
+
     const [projects] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,

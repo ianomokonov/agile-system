@@ -98,7 +98,7 @@ class TaskRepository implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
     return insertId;
   }
 
-  public async update(request: UpdateTaskRequest) {
+  public async update(request: Partial<UpdateTaskRequest>) {
     try {
       const model = {} as any;
       const specialKeys = ['id'];

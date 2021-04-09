@@ -125,6 +125,32 @@ export class ProjectService {
     return this.http.get<PlanningFullView>(`${this.baseUrl}/${projectId}/planning/${planningId}`);
   }
 
+  public getPlanningSession(
+    projectId: number,
+    planningId: number,
+    taskId: number,
+  ): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/${projectId}/planning/${planningId}/task/${taskId}`);
+  }
+
+  public setSessionCard(projectId: number, sessionId: number, value: number): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/${projectId}/planning/${sessionId}/set-card`, {
+      value,
+    });
+  }
+
+  public closeSession(
+    projectId: number,
+    sessionId: number,
+    value: number,
+    taskId: number,
+  ): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/${projectId}/planning/${sessionId}/close`, {
+      value,
+      taskId,
+    });
+  }
+
   public updatePlanning(
     projectId: number,
     planningId: number,

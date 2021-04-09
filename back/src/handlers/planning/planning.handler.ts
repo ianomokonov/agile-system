@@ -15,12 +15,24 @@ export class PlanningHandler {
     return planningService.read(planningId);
   }
 
+  public async getPlanningTaskSession(planningId: number, taskId: number, userId: number) {
+    return planningService.getSession(planningId, taskId, userId);
+  }
+
   public async update(planningId: number, request: PlanningUpdateRequest) {
     return planningService.update(planningId, request);
   }
 
   public async finish(sprintId: number) {
     return projectService.finishSprint(sprintId);
+  }
+
+  public async setCard(sessionId: number, userId: number, value: number) {
+    return planningService.setCard(sessionId, userId, value);
+  }
+
+  public async closeSession(sessionId: number, value: number, taskId: number) {
+    return planningService.closeSession(sessionId, value, taskId);
   }
 }
 
