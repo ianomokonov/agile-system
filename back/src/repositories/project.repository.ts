@@ -36,7 +36,6 @@ class ProjectRepository {
       .where({ ownerId: userId })
       .or({ 'projectUser.userId': userId })
       .groupby('project.id');
-    console.log(query);
 
     const [projects] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),

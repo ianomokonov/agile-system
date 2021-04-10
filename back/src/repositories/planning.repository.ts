@@ -2,8 +2,9 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import * as sql from 'sql-query-generator';
 import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
-import { PlanningStep } from '../models/responses/planning';
+import { PlanningFullView, PlanningStep } from '../models/responses/planning';
 import { PlanningUpdateRequest } from '../models/requests/planning-update.request';
+import taskRepository from './task.repository';
 
 sql.use('mysql');
 
@@ -69,8 +70,9 @@ class PlanningRepository {
       getQueryText(query.text),
       query.values,
     );
-
-    return planning;
+    planning.activeSessions = await this.getPlanningSessions(planningId, true);
+    planning.completedSessions = await this.getPlanningSessions(planningId, false);
+    return planning as PlanningFullView;
   }
 
   public async getSession(planningId: number, taskId: number, userId: number) {
@@ -79,10 +81,37 @@ class PlanningRepository {
       getQueryText(query.text),
       query.values,
     );
-
+    if (!session) {
+      return null;
+    }
     session.cards = await this.getSessionCards(session.id, userId);
 
     return session;
+  }
+
+  public async getPlanningSessions(planningId: number, active) {
+    let query = sql.select('projectPlanningTaskSession', '*').where({ planningId });
+
+    if (active) {
+      query = query.and({ resultValue: null }, 'IS');
+    }
+    if (!active && active !== undefined) {
+      query = query.and({ resultValue: null }, 'IS NOT');
+    }
+    let [sessions] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    sessions = await Promise.all(
+      sessions.map(async (sessionTemp) => {
+        const session = sessionTemp;
+        session.task = await taskRepository.getShortTaskView(session.taskId);
+        return session;
+      }),
+    );
+
+    return sessions;
   }
 
   public async getSessionCards(sessionId: number, userId: number) {
@@ -109,6 +138,16 @@ class PlanningRepository {
 
       return { ...card, isMy };
     });
+  }
+
+  public async resetSessionCards(sessionId: number) {
+    const query = sql.deletes('planningTaskSessionCard').where({ sessionId });
+    await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
+  }
+
+  public async setShowCards(sessionId: number, showCards: boolean) {
+    const query = sql.update('projectPlanningTaskSession', { showCards }).where({ id: sessionId });
+    await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
   }
 
   public async getSessionCard(sessionId: number, userId: number) {
@@ -153,8 +192,10 @@ class PlanningRepository {
     return result?.insertId;
   }
 
-  public async closeSession(sessionId: number) {
-    const query = sql.deletes('projectPlanningTaskSession').where({ sessionId });
+  public async closeSession(sessionId: number, value: number) {
+    const query = sql
+      .update('projectPlanningTaskSession', { resultValue: value })
+      .where({ id: sessionId });
 
     await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
   }

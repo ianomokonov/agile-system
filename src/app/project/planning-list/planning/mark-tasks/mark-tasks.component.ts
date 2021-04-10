@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PlanningFullView } from 'back/src/models/responses/planning';
+import { TaskResponse } from 'back/src/models/responses/task.response';
 import { PlanningDataService } from 'src/app/services/planning-data.service';
 import { ProjectService } from 'src/app/services/project.service';
 
@@ -28,23 +29,23 @@ export class MarkTasksComponent implements OnInit {
   }
 
   public getPlanning(projectId: number, id: number) {
-    this.planningDataService.getPlanning(projectId, id, true).subscribe((planning) => {
+    this.planningDataService.getPlanning(projectId, id).subscribe((planning) => {
       this.planning = planning;
     });
   }
 
-  public onStartPokerClick(taskId: number) {
+  public onStartPokerClick(task: TaskResponse) {
     if (!this.planning) {
       return;
     }
-    if (this.planning.activeTaskId === taskId) {
-      this.router.navigate(['task', taskId], { relativeTo: this.activatedRoute });
+    if (task.activeSessionId) {
+      this.router.navigate(['task', task.id], { relativeTo: this.activatedRoute });
       return;
     }
     this.projectService
-      .updatePlanning(this.projectId, this.planning.id, { activeTaskId: taskId })
+      .updatePlanning(this.projectId, this.planning.id, { activeTaskId: task.id })
       .subscribe(() => {
-        this.router.navigate(['task', taskId], { relativeTo: this.activatedRoute });
+        this.router.navigate(['task', task.id], { relativeTo: this.activatedRoute });
       });
   }
 }

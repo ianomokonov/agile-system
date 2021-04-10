@@ -8,12 +8,13 @@ export interface Planning {
   activeSprintId: number;
   sprintName: string;
   activeStep: PlanningStep;
-  activeTaskId: number;
+  activeSessions: any[];
 }
 
 export interface PlanningFullView extends Planning {
   newTasks: TaskResponse[];
   notMarkedTasks: TaskResponse[];
+  completedSessions: any[];
 }
 
 export enum PlanningStep {

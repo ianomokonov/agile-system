@@ -289,6 +289,8 @@ CREATE TABLE `projectPlanningTaskSession` (
   `createDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `taskId` int(11) NOT NULL,
   `planningId` int(11) NOT NULL,
+  `showCards` bit DEFAULT 0,
+  `resultValue` int(11) NULL,
   PRIMARY KEY (`id`)
 ) COMMENT 'оценка задач';
 

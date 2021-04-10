@@ -16,6 +16,10 @@ export class PlanningDataService {
     return this.projectService.getPlanning(projectId, planningId).pipe(
       tap((planning) => {
         this.planning = planning;
+        planning.notMarkedTasks.forEach((taskTemp) => {
+          const task = taskTemp;
+          task.activeSessionId = planning.activeSessions.find((as) => as.taskId === task.id)?.id;
+        });
       }),
     );
   }

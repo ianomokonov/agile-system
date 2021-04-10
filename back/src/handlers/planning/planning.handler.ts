@@ -23,6 +23,14 @@ export class PlanningHandler {
     return planningService.update(planningId, request);
   }
 
+  public async reset(sessionId: number) {
+    return planningService.reset(sessionId);
+  }
+
+  public async setShowCards(sessionId: number, showCards: boolean) {
+    return planningService.setShowCards(sessionId, showCards);
+  }
+
   public async finish(sprintId: number) {
     return projectService.finishSprint(sprintId);
   }

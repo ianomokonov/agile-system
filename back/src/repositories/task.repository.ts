@@ -4,6 +4,7 @@ import logger from '../logger';
 import { CRUD } from '../models/crud.interface';
 import { CreateTaskRequest, UpdateTaskRequest } from '../models/requests/task.models';
 import { StatusResponse } from '../models/responses/status.response';
+import { TaskShortView } from '../models/responses/task-short-view';
 import { TaskResponse } from '../models/responses/task.response';
 import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
@@ -50,6 +51,26 @@ class TaskRepository implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
     task.creator = creator;
     task.sprint = task.projectSprintId ? sprints[0] : null;
     return task as TaskResponse;
+  }
+
+  public async getShortTaskView(taskId: number) {
+    const query = sql
+      .select('projecttask', [
+        'id',
+        'name',
+        'statusId',
+        'typeId',
+        'priorityId',
+        'createDate',
+        'projectUserId',
+      ])
+      .where({ id: taskId });
+    const [[task]] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    return task as TaskShortView;
   }
 
   public async getNewSprintTasks(sprintId?: number) {

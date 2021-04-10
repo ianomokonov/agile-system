@@ -1,23 +1,39 @@
-<div class="tasks-list content p-2 rounded" *ngIf="planning">
+<div class="tasks-list content p-2 rounded mb-2" *ngIf="planning">
+  <div class="header mb-3">Задачи для оценки</div>
   <div
     class="task rounded d-flex justify-content-between align-items-center"
     *ngFor="let task of planning.notMarkedTasks"
   >
     <div class="d-flex align-items-center">
       <small class="text-muted mr-3">#{{ task.id }}</small>
-      <a [routerLink]="task.id === planning.activeTaskId ? ['task', task.id] : ['/task', task.id]"
+      <a [routerLink]="task.activeSessionId ? ['task', task.id] : ['/task', task.id]"
         ><h6 class="d-inline text-dark mb-0">{{ task.name }}</h6></a
       >
     </div>
     <div
       class="badge"
       [ngClass]="{
-        'btn-outline-primary': task.id !== planning.activeTaskId,
-        'badge-success': task.id === planning.activeTaskId
+        'btn-outline-primary': !task.activeSessionId,
+        'badge-success': task.activeSessionId
       }"
-      (click)="onStartPokerClick(task.id)"
+      (click)="onStartPokerClick(task)"
     >
-      {{ task.id === planning.activeTaskId ? 'Оценивается' : 'Начать оценку' }}
+      {{ task.activeSessionId ? 'Оценивается' : 'Начать оценку' }}
+    </div>
+  </div>
+</div>
+
+<div class="tasks-list content p-2 rounded" *ngIf="planning?.completedSessions">
+  <div class="header mb-3">Оцененные задачи</div>
+  <div
+    class="task rounded d-flex justify-content-between align-items-center"
+    *ngFor="let session of planning?.completedSessions"
+  >
+    <div class="d-flex align-items-center">
+      <small class="text-muted mr-3">#{{ session.task.id }}</small>
+      <a [routerLink]="['task', session.task.id]"
+        ><h6 class="d-inline text-dark mb-0">{{ session.task.name }}</h6></a
+      >
     </div>
   </div>
 </div>

@@ -20,31 +20,58 @@
       </div>
     </div>
   </div>
-  <div class="poker">
-    <div class="form-group">
-      <small class="text-muted">Оценки</small>
-      <div class="d-flex cards">
-        <div
-          class="card"
-          (click)="setCard(card)"
-          [ngClass]="{ active: activeMark === card }"
-          *ngFor="let card of marks"
+  <div class="poker w-50">
+    <ng-container *ngIf="!showResultValue">
+      <div class="form-group">
+        <small class="text-muted">Оценки</small>
+        <div class="d-flex cards">
+          <ng-container *ngIf="!session.showCards; else selectResult"
+            ><div
+              class="card"
+              (click)="setCard(card)"
+              [ngClass]="{ active: activeMark === card }"
+              *ngFor="let card of marks"
+            >
+              <span>{{ card }}</span>
+            </div></ng-container
+          >
+        </div>
+      </div>
+      <div class="poker-marks mb-4">
+        <div class="poker-mark d-flex align-items-center" *ngFor="let card of session.cards">
+          <div class="card active card-sm mr-3" [ngClass]="{ hidden: !session.showCards }">
+            {{ session.showCards ? card.value : '?' }}
+          </div>
+          <h5>{{ card.userName }} {{ card.userSurname }}</h5>
+        </div>
+      </div>
+      <div class="d-flex" *ngIf="session.cards?.length">
+        <button
+          *ngIf="session.showCards"
+          class="btn btn-outline-primary mr-1"
+          (click)="resetCards()"
         >
-          {{ card }}
-        </div>
+          Сбросить
+        </button>
+        <button *ngIf="!session.showCards" class="btn btn-primary" (click)="openCards()">
+          Показать
+        </button>
       </div>
-    </div>
-    <div class="poker-marks mb-4">
-      <div class="poker-mark d-flex align-items-center" *ngFor="let card of session.cards">
-        <div class="card active card-sm mr-3" [ngClass]="{ hidden: !showCards }">
-          {{ showCards ? card.value : '?' }}
-        </div>
-        <h5>{{ card.userName }} {{ card.userSurname }}</h5>
+    </ng-container>
+    <div
+      class="w-100 h-100 d-flex justify-content-center align-items-center"
+      *ngIf="showResultValue"
+    >
+      <div class="card main">
+        {{ session.resultValue }}
       </div>
-    </div>
-    <div class="d-flex" *ngIf="session.cards?.length">
-      <button class="btn btn-outline-primary mr-1">Сбросить</button>
-      <button class="btn btn-primary" (click)="showCards = !showCards">Показать</button>
     </div>
   </div>
 </div>
+
+<ng-template #selectResult>
+  <div class="card main" (click)="closeSession(card.value)" *ngFor="let card of mantionedCards">
+    <span class="d-block">{{ card.value }}</span>
+    <small class="text-wigth">({{ card.count }})</small>
+  </div>
+</ng-template>

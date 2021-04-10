@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import planningHandler from '../handlers/planning/planning.handler';
+import logger from '../logger';
 import checkProjectPermissions from '../middleware/check-project-permissions';
 import { Permissions } from '../utils';
 
@@ -23,6 +24,7 @@ planningRouter.get(`/:planningId`, async (req, res) => {
     const planning = await planningHandler.read(+req.params.planningId);
     res.status(StatusCodes.OK).json(planning);
   } catch (error) {
+    logger.error(error);
     res.status(error.statusCode).json(error.error);
   }
 });
@@ -53,6 +55,16 @@ planningRouter.put(`/:sessionId/set-card`, async (req, res) => {
 planningRouter.post(`/:sessionId/close`, async (req, res) => {
   await planningHandler.closeSession(+req.params.sessionId, req.body.value, req.body.taskId);
   res.status(StatusCodes.OK).json('Сессия закрыта');
+});
+
+planningRouter.post(`/:sessionId/set-show-cards`, async (req, res) => {
+  await planningHandler.setShowCards(+req.params.sessionId, req.body.showCards);
+  res.status(StatusCodes.OK).json('Карточки открыты');
+});
+
+planningRouter.delete(`/:sessionId/reset`, async (req, res) => {
+  await planningHandler.reset(+req.params.sessionId);
+  res.status(StatusCodes.OK).json('Оценки сюрошены');
 });
 
 export default planningRouter;

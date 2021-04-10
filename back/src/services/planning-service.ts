@@ -50,9 +50,18 @@ class PlanningService {
     return planningRepository.setSessionCard(sessionId, userId, value, card?.id);
   }
 
+  public async reset(sessionId: number) {
+    planningRepository.setShowCards(sessionId, false);
+    return planningRepository.resetSessionCards(sessionId);
+  }
+
+  public async setShowCards(sessionId: number, showCards: boolean) {
+    return planningRepository.setShowCards(sessionId, showCards);
+  }
+
   public async closeSession(sessionId: number, value: number, taskId: number) {
     await Promise.all([
-      planningRepository.closeSession(sessionId),
+      planningRepository.closeSession(sessionId, value),
       taskRepository.update({ id: taskId, points: value }),
     ]);
   }

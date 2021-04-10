@@ -14,4 +14,5 @@ export interface TaskResponse extends TaskShortView {
   projectId: number;
   lastEditDate: Date;
   projectSprintId: number;
+  activeSessionId?: number;
 }

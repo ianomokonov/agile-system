@@ -145,7 +145,7 @@ export class ProjectService {
     value: number,
     taskId: number,
   ): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}/${projectId}/planning/${sessionId}/close`, {
+    return this.http.post<any>(`${this.baseUrl}/${projectId}/planning/${sessionId}/close`, {
       value,
       taskId,
     });
@@ -159,6 +159,19 @@ export class ProjectService {
     return this.http.put<any>(
       `${this.baseUrl}/${projectId}/planning/${planningId}/update`,
       request,
+    );
+  }
+
+  public resetCards(projectId: number, sessionId: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/${projectId}/planning/${sessionId}/reset`);
+  }
+
+  public setShowCards(projectId: number, sessionId: number, showCards: boolean): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/${projectId}/planning/${sessionId}/set-show-cards`,
+      {
+        showCards,
+      },
     );
   }
 }
