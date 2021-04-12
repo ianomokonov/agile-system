@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PlanningFullView } from 'back/src/models/responses/planning';
 import { TaskResponse } from 'back/src/models/responses/task.response';
-import { PlanningDataService } from 'src/app/services/planning-data.service';
 import { ProjectService } from 'src/app/services/project.service';
+import { TaskService } from 'src/app/services/task.service';
 
 @Component({
   selector: 'app-mark-tasks',
@@ -15,8 +15,8 @@ export class MarkTasksComponent implements OnInit {
   private projectId: number;
   constructor(
     private activatedRoute: ActivatedRoute,
-    private planningDataService: PlanningDataService,
     private projectService: ProjectService,
+    private taskService: TaskService,
     private router: Router,
   ) {}
   public ngOnInit(): void {
@@ -28,9 +28,26 @@ export class MarkTasksComponent implements OnInit {
     });
   }
 
+  public onRemoveFromSprintClick(taskId: number) {
+    this.taskService.editTask(taskId, { projectSprintId: null }).subscribe(() => {
+      if (this.planning) {
+        this.planning.notMarkedTasks = this.planning?.notMarkedTasks.filter((t) => t.id !== taskId);
+      }
+    });
+  }
+
   public getPlanning(projectId: number, id: number) {
-    this.planningDataService.getPlanning(projectId, id).subscribe((planning) => {
+    this.projectService.getPlanning(projectId, id).subscribe((planning) => {
       this.planning = planning;
+    });
+  }
+
+  public onStartSprintClick() {
+    if (!this.planning) {
+      return;
+    }
+    this.projectService.startSprint(this.projectId, this.planning?.sprintId).subscribe(() => {
+      this.router.navigate(['../../board'], { relativeTo: this.activatedRoute });
     });
   }
 

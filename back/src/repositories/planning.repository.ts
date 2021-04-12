@@ -93,10 +93,10 @@ class PlanningRepository {
     let query = sql.select('projectPlanningTaskSession', '*').where({ planningId });
 
     if (active) {
-      query = query.and({ resultValue: null }, 'IS');
+      query = query.and({ resultValue: null }, 'IS').and({ isCanceled: false });
     }
     if (!active && active !== undefined) {
-      query = query.and({ resultValue: null }, 'IS NOT');
+      query = query.and({ resultValue: null }, 'IS NOT').or({ isCanceled: true });
     }
     let [sessions] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),

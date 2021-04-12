@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PlanningFullView, PlanningStep } from 'back/src/models/responses/planning';
-import { PlanningDataService } from 'src/app/services/planning-data.service';
+import { ProjectService } from 'src/app/services/project.service';
 
 @Component({
   selector: 'app-planning',
@@ -14,8 +14,8 @@ export class PlanningComponent implements OnInit {
   private projectId: number;
   constructor(
     private activatedRoute: ActivatedRoute,
-    private planningDataService: PlanningDataService,
     private router: Router,
+    private projectService: ProjectService,
   ) {}
   public ngOnInit(): void {
     this.activatedRoute.params.subscribe((params) => {
@@ -27,7 +27,7 @@ export class PlanningComponent implements OnInit {
   }
 
   public getPlanning(projectId: number, id: number) {
-    this.planningDataService.getPlanning(projectId, id).subscribe((planning) => {
+    this.projectService.getPlanning(projectId, id).subscribe((planning) => {
       this.planning = planning;
     });
   }

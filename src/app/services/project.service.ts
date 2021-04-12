@@ -11,6 +11,7 @@ import { ProjectResponse } from 'back/src/models/responses/project.response';
 import { ProjectRoleResponse } from 'back/src/models/responses/project-role.response';
 import { ProjectPermissionResponse } from 'back/src/models/responses/permission.response';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { CreateTaskRequest } from 'back/src/models/requests/task.models';
 import { ProjectEditInfo } from 'back/src/models/responses/project-edit-info';
@@ -122,7 +123,16 @@ export class ProjectService {
   }
 
   public getPlanning(projectId: number, planningId: number): Observable<PlanningFullView> {
-    return this.http.get<PlanningFullView>(`${this.baseUrl}/${projectId}/planning/${planningId}`);
+    return this.http
+      .get<PlanningFullView>(`${this.baseUrl}/${projectId}/planning/${planningId}`)
+      .pipe(
+        tap((planning) => {
+          planning.notMarkedTasks.forEach((taskTemp) => {
+            const task = taskTemp;
+            task.activeSessionId = planning.activeSessions.find((as) => as.taskId === task.id)?.id;
+          });
+        }),
+      );
   }
 
   public getPlanningSession(

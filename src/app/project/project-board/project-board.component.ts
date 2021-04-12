@@ -33,7 +33,7 @@ export class ProjectBoardComponent implements OnInit {
   public ngOnInit() {
     this.activatedRoute.parent?.params.subscribe((params) => {
       forkJoin([
-        this.projectDataService.getProject(params.id),
+        this.projectDataService.getProject(params.id, true),
         this.projectService.getProjectUsers(params.id),
       ]).subscribe(([project, users]) => {
         if (!project.sprint) {

@@ -15,7 +15,7 @@ export interface UpdateTaskRequest {
   projectId?: number;
   statusId: number;
   typeId: number;
-  projectSprintId: number;
+  projectSprintId?: number | null;
   priorityId: number;
   points: number;
 }

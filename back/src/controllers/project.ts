@@ -10,6 +10,7 @@ import projectRolesHandler from '../handlers/project/project-roles.handler';
 import projectSprintHandler from '../handlers/project/project-sprint.handler';
 import projectUsersHandler from '../handlers/project/project-users.handler';
 import tasksHandler from '../handlers/task/tasks.handler';
+import logger from '../logger';
 import authJWT from '../middleware/authJWT';
 import checkPermissions from '../middleware/check-project-permissions';
 import { Permissions } from '../utils';
@@ -158,8 +159,12 @@ projectRouter.get(
   `/:projectId/backlog`,
   checkPermissions(Permissions.CanReadProject),
   async (req, res) => {
-    const backlog = await projectBacklogHandler(res.locals.projectId);
-    res.status(StatusCodes.OK).json(backlog);
+    try {
+      const backlog = await projectBacklogHandler(res.locals.projectId);
+      res.status(StatusCodes.OK).json(backlog);
+    } catch (error) {
+      console.error(error);
+    }
   },
 );
 

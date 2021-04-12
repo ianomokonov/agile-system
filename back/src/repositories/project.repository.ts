@@ -102,7 +102,21 @@ class ProjectRepository {
   }
 
   public async getProjectSprints(projectId: number) {
-    const query = sql.select('projectsprint', '*').where({ projectId }).orderby('isFinished');
+    const query = sql
+      .select('projectsprint', [
+        'projectsprint.id',
+        'projectsprint.startDate',
+        'projectsprint.endDate',
+        'projectsprint.name',
+        'projectsprint.goal',
+        'projectsprint.isActive',
+        'projectsprint.isFinished',
+        'projectsprint.projectId',
+        'projectplanning.id as planningId',
+      ])
+      .join('projectplanning', { 'projectsprint.id': 'sprintId' }, 'LEFT')
+      .where({ 'projectsprint.projectId': projectId })
+      .orderby('isFinished');
 
     let [sprints] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),

@@ -9,5 +9,6 @@ export interface TaskShortView {
   createDate: Date;
   priorityId: Priority;
   typeId: TaskType;
+  points: number;
   projectUser: UserShortView;
 }

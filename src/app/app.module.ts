@@ -44,7 +44,6 @@ import { DiscussNewTasksComponent } from './project/planning-list/planning/discu
 import { TaskListComponent } from './project/planning-list/planning/task-list/task-list.component';
 import { ScrumPokerComponent } from './project/planning-list/planning/scrum-poker/scrum-poker.component';
 import { MarkTasksComponent } from './project/planning-list/planning/mark-tasks/mark-tasks.component';
-import { PlanningDataService } from './services/planning-data.service';
 
 @NgModule({
   declarations: [
@@ -96,7 +95,6 @@ import { PlanningDataService } from './services/planning-data.service';
     ProfileService,
     ProjectDataService,
     TaskService,
-    PlanningDataService,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ContentTypeInterceptor, multi: true },
   ],

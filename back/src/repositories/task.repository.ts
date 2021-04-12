@@ -63,6 +63,7 @@ class TaskRepository implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
         'priorityId',
         'createDate',
         'projectUserId',
+        'points',
       ])
       .where({ id: taskId });
     const [[task]] = await dbConnection.query<RowDataPacket[]>(
@@ -129,9 +130,17 @@ class TaskRepository implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
           model[key] = request[key];
         });
 
-      const query = sql.update('projecttask', model).where({ id: request.id });
+      let query = sql.update('projecttask', model).where({ id: request.id });
 
       dbConnection.query(getQueryText(query.text), query.values);
+
+      if ('projectSprintId' in request) {
+        query = sql
+          .update('projectPlanningTaskSession', { isCanceled: true })
+          .where({ taskId: request.id })
+          .and({ resultValue: null }, 'IS');
+        dbConnection.query(getQueryText(query.text), query.values);
+      }
     } catch (error) {
       logger.error(error);
     }

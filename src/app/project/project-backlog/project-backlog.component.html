@@ -21,16 +21,18 @@
       <ng-container *ngIf="!sprint.isFinished">
         <button
           class="btn btn-success"
-          *ngIf="!sprint.isActive && sprint.tasks?.length"
+          *ngIf="!sprint.planningId && !sprint.isActive && sprint.tasks?.length"
           (click)="onStartPlanning(sprint.id)"
         >
           Оценить задачи
         </button>
-        <ng-template #finish>
-          <button class="btn btn-danger" (click)="onFinishSprint(sprint.id)">
-            Завершить спринт
-          </button>
-        </ng-template>
+        <button
+          class="btn btn-outline-success"
+          *ngIf="sprint.planningId"
+          [routerLink]="['../planning', sprint.planningId]"
+        >
+          Перейти к планированию
+        </button>
       </ng-container>
     </div>
     <ng-container *ngIf="sprint.isOpened"

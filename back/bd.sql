@@ -290,6 +290,7 @@ CREATE TABLE `projectPlanningTaskSession` (
   `taskId` int(11) NOT NULL,
   `planningId` int(11) NOT NULL,
   `showCards` bit DEFAULT 0,
+  `isCanceled` bit DEFAULT 0,
   `resultValue` int(11) NULL,
   PRIMARY KEY (`id`)
 ) COMMENT 'оценка задач';
