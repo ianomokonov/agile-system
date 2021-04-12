@@ -15,14 +15,37 @@
   </div>
   <div class="board">
     <div class="board-menu border-right pr-2">
-      <div class="menu-item btn btn-outline-primary" routerLink="board" routerLinkActive="active" *ngIf="project?.sprint">
+      <div
+        class="menu-item btn btn-outline-primary"
+        routerLink="board"
+        routerLinkActive="active"
+        *ngIf="project?.sprint"
+      >
         <i class="fas fa-running"></i>
       </div>
       <div class="menu-item btn btn-outline-primary" routerLink="backlog" routerLinkActive="active">
         <i class="fas fa-book"></i>
       </div>
-      <div class="menu-item btn btn-outline-primary p-1" routerLink="planning" routerLinkActive="active">
+      <div
+        class="menu-item btn btn-outline-primary p-1"
+        routerLink="planning"
+        routerLinkActive="active"
+      >
         <i class="fas fa-balance-scale-left"></i>
+      </div>
+      <div
+        class="menu-item btn btn-outline-primary p-1"
+        routerLink="demo"
+        routerLinkActive="active"
+      >
+        <i class="fas fa-magic"></i>
+      </div>
+      <div
+        class="menu-item btn btn-outline-primary p-1"
+        routerLink="retro"
+        routerLinkActive="active"
+      >
+        <i class="far fa-comments"></i>
       </div>
     </div>
     <div class="content px-2" *ngIf="project">
