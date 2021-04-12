@@ -11,10 +11,12 @@ import { ProjectDataService } from '../services/project-data.service';
   styleUrls: ['./project.component.less'],
 })
 export class ProjectComponent implements OnInit {
-  public project: ProjectResponse;
+  public get project(): ProjectResponse {
+    return this.projectDataService.project;
+  }
   public user: GetProfileInfoResponse;
   constructor(
-    private projectDataService: ProjectDataService,
+    public projectDataService: ProjectDataService,
     private activatedRoute: ActivatedRoute,
     private profileService: ProfileService,
   ) {}
@@ -29,8 +31,6 @@ export class ProjectComponent implements OnInit {
   }
 
   public getProjectInfo(id: number) {
-    this.projectDataService.getProject(id).subscribe((info) => {
-      this.project = info;
-    });
+    this.projectDataService.getProject(id).subscribe();
   }
 }

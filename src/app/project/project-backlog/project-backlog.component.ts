@@ -109,6 +109,7 @@ export class ProjectBacklogComponent implements OnInit {
   public getBackLog(projectId: number) {
     this.projectService.getProjectBacklog(projectId).subscribe((backlog) => {
       this.backlog = backlog;
+      this.toggleSprint(this.backlog.sprints?.find((s) => s.isActive));
     });
   }
 }

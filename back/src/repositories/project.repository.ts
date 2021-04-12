@@ -116,7 +116,7 @@ class ProjectRepository {
       ])
       .join('projectplanning', { 'projectsprint.id': 'sprintId' }, 'LEFT')
       .where({ 'projectsprint.projectId': projectId })
-      .orderby('isFinished');
+      .orderby(['isFinished', 'isActive DESC']);
 
     let [sprints] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -473,7 +473,20 @@ class ProjectRepository {
   }
 
   public async startSprint(sprintId: number, projectId: number) {
-    let query = sql
+    let query = sql.select('projectsprint', ['id']).where({ isActive: true });
+    const [[sprint]] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    query = sql
+      .update('projectplanning', {
+        isActive: false,
+        isFinished: true,
+      })
+      .where({ sprintId, projectId });
+    await dbConnection.query(getQueryText(query.text), query.values);
+
+    query = sql
       .update('projectsprint', {
         endDate: new Date(),
         isActive: false,
@@ -490,6 +503,14 @@ class ProjectRepository {
       })
       .where({ id: sprintId });
     await dbConnection.query(getQueryText(query.text), query.values);
+
+    if (sprint) {
+      query = sql
+        .update('projectTask', { projectSprintId: sprintId })
+        .where({ projectSprintId: sprint.id })
+        .and({ statusId: 7 }, '!=');
+      await dbConnection.query(getQueryText(query.text), query.values);
+    }
   }
 
   public async finishSprint(sprintId: number) {

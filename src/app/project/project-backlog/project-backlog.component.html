@@ -12,10 +12,10 @@
       class="header d-flex justify-content-between align-items-center"
     >
       <div class="name" (click)="toggleSprint(sprint)">
-        <span class="d-block"
+        <span class="d-block mr-2"
           ><i class="fas fa-chevron-right mr-2" [ngClass]="{ opened: sprint.isOpened }"></i
           >{{ sprint.name }}</span
-        >
+        ><span class="badge badge-success" *ngIf="sprint.isActive">Активный</span>
       </div>
 
       <ng-container *ngIf="!sprint.isFinished">
@@ -28,10 +28,17 @@
         </button>
         <button
           class="btn btn-outline-success"
-          *ngIf="sprint.planningId"
+          *ngIf="!sprint.isActive && !sprint.isFinished && sprint.planningId"
           [routerLink]="['../planning', sprint.planningId]"
         >
           Перейти к планированию
+        </button>
+        <button
+          class="btn btn-outline-info"
+          *ngIf="sprint.isActive"
+          [routerLink]="['../planning', sprint.planningId]"
+        >
+          Начать демо спринта
         </button>
       </ng-container>
     </div>
@@ -80,7 +87,7 @@
       >
     </div>
     <div class="col-4 pr-0 d-flex align-items-center justify-content-end">
-      <small class="text-muted">{{ task.user?.name }} {{ task.user?.surname }}</small>
+      <small class="text-muted">{{ task.projectUser?.name }} {{ task.projectUser?.surname }}</small>
       <button
         *ngIf="show"
         class="btn icon-btn ml-3"

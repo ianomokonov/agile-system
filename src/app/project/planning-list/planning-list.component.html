@@ -8,8 +8,11 @@
       >
     </div>
     <div class="col-4 d-flex align-items-center justify-content-end">
-      <small class="text-muted">{{ planning.createDate | date: 'dd.MM.yyyy HH.mm' }}</small>
-      <span class="badge bg-success ml-2" *ngIf="planning.isActive">Активно</span>
+      <small class="text-muted mr-2">{{ planning.createDate | date: 'dd.MM.yyyy HH.mm' }}</small>
+      <ng-container [ngSwitch]="planning.isActive">
+        <span class="badge bg-success" *ngSwitchCase="true">Активно</span>
+        <span class="badge bg-secondary" *ngSwitchCase="false">Завершено</span>
+      </ng-container>
     </div>
   </div>
 </div>
