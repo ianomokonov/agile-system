@@ -43,6 +43,8 @@ import { DiscussNewTasksComponent } from './project/planning/discuss-new-tasks/d
 import { TaskListComponent } from './project/planning/task-list/task-list.component';
 import { ScrumPokerComponent } from './project/planning/scrum-poker/scrum-poker.component';
 import { MarkTasksComponent } from './project/planning/mark-tasks/mark-tasks.component';
+import { DemoComponent } from './project/demo/demo.component';
+import { RetroComponent } from './project/retro/retro.component';
 
 @NgModule({
   declarations: [
@@ -72,6 +74,8 @@ import { MarkTasksComponent } from './project/planning/mark-tasks/mark-tasks.com
     TaskListComponent,
     ScrumPokerComponent,
     MarkTasksComponent,
+    DemoComponent,
+    RetroComponent,
   ],
   imports: [
     BrowserModule,
