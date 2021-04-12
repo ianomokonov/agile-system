@@ -10,7 +10,6 @@ import projectRolesHandler from '../handlers/project/project-roles.handler';
 import projectSprintHandler from '../handlers/project/project-sprint.handler';
 import projectUsersHandler from '../handlers/project/project-users.handler';
 import tasksHandler from '../handlers/task/tasks.handler';
-import logger from '../logger';
 import authJWT from '../middleware/authJWT';
 import checkPermissions from '../middleware/check-project-permissions';
 import { Permissions } from '../utils';

@@ -38,12 +38,11 @@ import { CreateSprintComponent } from './project/create-sprint/create-sprint.com
 import { EditTaskComponent } from './project/project-board/task/edit-task/edit-task.component';
 import { PriorityPipe } from './shared/pipes/priority.pipe';
 import { TaskTypePipe } from './shared/pipes/task-type.pipe';
-import { PlanningComponent } from './project/planning-list/planning/planning.component';
-import { PlanningListComponent } from './project/planning-list/planning-list.component';
-import { DiscussNewTasksComponent } from './project/planning-list/planning/discuss-new-tasks/discuss-new-tasks.component';
-import { TaskListComponent } from './project/planning-list/planning/task-list/task-list.component';
-import { ScrumPokerComponent } from './project/planning-list/planning/scrum-poker/scrum-poker.component';
-import { MarkTasksComponent } from './project/planning-list/planning/mark-tasks/mark-tasks.component';
+import { PlanningComponent } from './project/planning/planning.component';
+import { DiscussNewTasksComponent } from './project/planning/discuss-new-tasks/discuss-new-tasks.component';
+import { TaskListComponent } from './project/planning/task-list/task-list.component';
+import { ScrumPokerComponent } from './project/planning/scrum-poker/scrum-poker.component';
+import { MarkTasksComponent } from './project/planning/mark-tasks/mark-tasks.component';
 
 @NgModule({
   declarations: [
@@ -69,7 +68,6 @@ import { MarkTasksComponent } from './project/planning-list/planning/mark-tasks/
     PriorityPipe,
     TaskTypePipe,
     PlanningComponent,
-    PlanningListComponent,
     DiscussNewTasksComponent,
     TaskListComponent,
     ScrumPokerComponent,

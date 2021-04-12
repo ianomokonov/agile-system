@@ -9,6 +9,9 @@ export interface ProjectResponse {
   description: string;
   isClosed: boolean;
   sprint: Sprint;
+  activePlanningId?: number;
+  activeRetroId?: number;
+  activeDemoId?: number;
   statuses: StatusResponse[];
   users: UserShortView[];
 }

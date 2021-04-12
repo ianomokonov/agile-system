@@ -92,7 +92,13 @@ export class ProjectBacklogComponent implements OnInit {
         this.projectDataService.project?.sprint?.id,
       )
       .subscribe((planningId: number) => {
-        this.router.navigate(['planning', planningId], { relativeTo: this.activatedRoute.parent });
+        this.projectDataService
+          .getProject(this.projectDataService.project?.id, true)
+          .subscribe(() => {
+            this.router.navigate(['planning', planningId], {
+              relativeTo: this.activatedRoute.parent,
+            });
+          });
       });
   }
 

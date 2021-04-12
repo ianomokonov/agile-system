@@ -32,27 +32,7 @@ class PlanningRepository {
     await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
   }
 
-  public async getList(projectId: number) {
-    const query = sql
-      .select('projectplanning', [
-        'projectplanning.id',
-        'projectplanning.isActive',
-        'projectplanning.createDate',
-        'projectplanning.sprintId',
-        'projectplanning.activeSprintId',
-        'projectSprint.name as sprintName',
-      ])
-      .join('projectSprint', { sprintId: 'projectSprint.id' }, 'LEFT')
-      .where({ 'projectplanning.projectId': projectId });
-    const [plannings] = await dbConnection.query<RowDataPacket[]>(
-      getQueryText(query.text),
-      query.values,
-    );
-
-    return plannings;
-  }
-
-  public async read(planningId: number) {
+  public async read(projectId: number) {
     const query = sql
       .select('projectplanning', [
         'projectplanning.id',
@@ -65,13 +45,16 @@ class PlanningRepository {
         'projectSprint.name as sprintName',
       ])
       .join('projectSprint', { sprintId: 'projectSprint.id' }, 'LEFT')
-      .where({ 'projectplanning.id': planningId });
+      .where({ 'projectplanning.projectId': projectId, 'projectplanning.isActive': true });
     const [[planning]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
     );
-    planning.activeSessions = await this.getPlanningSessions(planningId, true);
-    planning.completedSessions = await this.getPlanningSessions(planningId, false);
+    if (!planning) {
+      return null;
+    }
+    planning.activeSessions = await this.getPlanningSessions(planning.id, true);
+    planning.completedSessions = await this.getPlanningSessions(planning.id, false);
     return planning as PlanningFullView;
   }
 

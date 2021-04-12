@@ -33,13 +33,14 @@
         >
           Перейти к планированию
         </button>
-        <button
-          class="btn btn-outline-info"
-          *ngIf="sprint.isActive"
-          [routerLink]="['../planning', sprint.planningId]"
+        <ng-container *ngIf="sprint.isActive">
+          <button class="btn btn-outline-info" [routerLink]="['../planning', sprint.planningId]">
+            Начать демо
+          </button>
+          <button class="btn btn-outline-primary ml-2" [routerLink]="['../planning', sprint.planningId]">
+            Начать ретроспективу
+          </button></ng-container
         >
-          Начать демо спринта
-        </button>
       </ng-container>
     </div>
     <ng-container *ngIf="sprint.isOpened"

@@ -257,6 +257,7 @@ CREATE TABLE `projectSprint` (
   `isActive` bit DEFAULT 0,
   `isFinished` bit DEFAULT 0,
   `projectId` int(11) NOT NULL,
+  `createDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) COMMENT 'спринты проекта';
 

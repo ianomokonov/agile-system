@@ -14,14 +14,9 @@ planningRouter.post(`/start`, async (req, res) => {
   res.status(StatusCodes.OK).json(planningId);
 });
 
-planningRouter.get(`/list`, async (req, res) => {
-  const plannings = await planningHandler.getList(res.locals.projectId);
-  res.status(StatusCodes.OK).json(plannings);
-});
-
 planningRouter.get(`/:planningId`, async (req, res) => {
   try {
-    const planning = await planningHandler.read(+req.params.planningId);
+    const planning = await planningHandler.read(res.locals.projectId);
     res.status(StatusCodes.OK).json(planning);
   } catch (error) {
     logger.error(error);

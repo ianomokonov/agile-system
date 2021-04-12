@@ -28,22 +28,25 @@
       </div>
       <div
         class="menu-item btn btn-outline-primary p-1"
-        routerLink="planning"
+        [routerLink]="['planning', project?.activePlanningId]"
         routerLinkActive="active"
+        *ngIf="project?.activePlanningId"
       >
         <i class="fas fa-balance-scale-left"></i>
       </div>
       <div
         class="menu-item btn btn-outline-primary p-1"
-        routerLink="demo"
+        [routerLink]="['demo', project?.activeDemoId]"
         routerLinkActive="active"
+        *ngIf="project?.activeDemoId"
       >
         <i class="fas fa-magic"></i>
       </div>
       <div
         class="menu-item btn btn-outline-primary p-1"
-        routerLink="retro"
+        [routerLink]="['retro', project?.activeRetroId]"
         routerLinkActive="active"
+        *ngIf="project?.activeRetroId"
       >
         <i class="far fa-comments"></i>
       </div>

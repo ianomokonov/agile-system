@@ -19,7 +19,7 @@ import { Backlog } from 'back/src/models/responses/backlog';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
 import { CreateSprintRequest } from 'back/src/models/requests/create-sprint.request';
 import { IdNameResponse } from 'back/src/models/responses/id-name.response';
-import { Planning, PlanningFullView } from 'back/src/models/responses/planning';
+import { PlanningFullView } from 'back/src/models/responses/planning';
 import { PlanningUpdateRequest } from 'back/src/models/requests/planning-update.request';
 
 @Injectable()
@@ -116,10 +116,6 @@ export class ProjectService {
       sprintId,
       activeSprintId,
     });
-  }
-
-  public getPlanningList(projectId: number): Observable<Planning[]> {
-    return this.http.get<Planning[]>(`${this.baseUrl}/${projectId}/planning/list`);
   }
 
   public getPlanning(projectId: number, planningId: number): Observable<PlanningFullView> {

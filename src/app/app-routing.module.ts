@@ -5,10 +5,9 @@ import { CreateComponent } from './profile/projects/create/create.component';
 import { EditProjectFormComponent } from './project/edit-project-form/edit-project-form.component';
 import { EditRolesComponent } from './project/edit/edit-roles/edit-roles.component';
 import { EditUsersComponent } from './project/edit/edit-users/edit-users.component';
-import { PlanningListComponent } from './project/planning-list/planning-list.component';
-import { MarkTasksComponent } from './project/planning-list/planning/mark-tasks/mark-tasks.component';
-import { PlanningComponent } from './project/planning-list/planning/planning.component';
-import { ScrumPokerComponent } from './project/planning-list/planning/scrum-poker/scrum-poker.component';
+import { MarkTasksComponent } from './project/planning/mark-tasks/mark-tasks.component';
+import { PlanningComponent } from './project/planning/planning.component';
+import { ScrumPokerComponent } from './project/planning/scrum-poker/scrum-poker.component';
 import { ProjectBacklogComponent } from './project/project-backlog/project-backlog.component';
 import { ProjectBoardComponent } from './project/project-board/project-board.component';
 import { TaskComponent } from './project/project-board/task/task.component';
@@ -59,10 +58,6 @@ const routes: Routes = [
       {
         path: 'backlog',
         component: ProjectBacklogComponent,
-      },
-      {
-        path: 'planning',
-        component: PlanningListComponent,
       },
       {
         path: 'planning/:planningId',

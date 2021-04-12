@@ -9,22 +9,22 @@ class PlanningService {
   public async start(projectId: number, sprintId: number, activeSprintId: number) {
     return planningRepository.start(projectId, sprintId, activeSprintId);
   }
-  public async getList(projectId: number) {
-    return planningRepository.getList(projectId);
-  }
 
-  public async read(planningId: number) {
-    const planning = await planningRepository.read(planningId);
+  public async read(projectId: number, shortView = false) {
+    const planning = await planningRepository.read(projectId);
     if (!planning) {
-      throw new WebError(StatusCodes.NOT_FOUND, 'Планирование не найдено');
+      return null;
     }
-    const [newTasks, notMarkedTasks] = await Promise.all([
-      taskService.getNewSprintTasks(planning?.activeSprintId),
-      taskService.getNotMarkedSprintTasks(planning?.sprintId),
-    ]);
+    if (!shortView) {
+      const [newTasks, notMarkedTasks] = await Promise.all([
+        taskService.getNewSprintTasks(planning?.activeSprintId),
+        taskService.getNotMarkedSprintTasks(planning?.sprintId),
+      ]);
 
-    planning.newTasks = newTasks;
-    planning.notMarkedTasks = notMarkedTasks;
+      planning.newTasks = newTasks;
+      planning.notMarkedTasks = notMarkedTasks;
+    }
+
     return planning;
   }
 
