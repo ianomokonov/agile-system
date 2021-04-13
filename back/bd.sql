@@ -262,6 +262,35 @@ CREATE TABLE `projectSprint` (
 ) COMMENT 'спринты проекта';
 
 -- ---
+-- Table 'projectDemo'
+-- демо проекта
+-- ---
+DROP TABLE IF EXISTS `projectDemo`;
+
+CREATE TABLE `projectDemo` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `createDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `sprintId` int(11) NOT NULL,
+  `isFinished` bit DEFAULT 0,
+  `projectId` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) COMMENT 'демо проекта';
+
+-- ---
+-- Table 'projectDemoTask'
+-- задачи демо проекта
+-- ---
+DROP TABLE IF EXISTS `projectDemoTask`;
+
+CREATE TABLE `projectDemoTask` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `demoId` int(11) NOT NULL,
+  `isFinished` bit DEFAULT 0,
+  `taskId` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) COMMENT 'задачи демо проекта';
+
+-- ---
 -- Table 'projectPlanning'
 -- спринты проекта
 -- ---

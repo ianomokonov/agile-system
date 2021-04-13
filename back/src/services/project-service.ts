@@ -11,6 +11,7 @@ import { ProjectEditInfo } from '../models/responses/project-edit-info';
 import { ProjectResponse } from '../models/responses/project.response';
 import projectRepository from '../repositories/project.repository';
 import { Permissions } from '../utils';
+import demoService from './demo-service';
 import planningService from './planning-service';
 
 class ProjectService {
@@ -59,17 +60,19 @@ class ProjectService {
   }
 
   public async read(projectId: number): Promise<ProjectResponse> {
-    const [project, sprint, statuses, users, planning] = await Promise.all([
+    const [project, sprint, statuses, users, planning, demo] = await Promise.all([
       projectRepository.getProject(projectId),
       projectRepository.getProjectActiveSprint(projectId),
       projectRepository.getProjectStatuses(),
       projectRepository.getFullProjectUsers(projectId),
       planningService.read(projectId, true),
+      demoService.read(projectId, true),
     ]);
     project.sprint = sprint;
     project.statuses = statuses;
     project.users = users;
     project.activePlanningId = planning?.id;
+    project.activeDemoId = demo?.id;
     return project;
   }
 

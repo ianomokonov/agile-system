@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import planningHandler from '../handlers/planning/planning.handler';
+import planningHandler from '../handlers/planning.handler';
 import logger from '../logger';
 import checkProjectPermissions from '../middleware/check-project-permissions';
 import { Permissions } from '../utils';
 
 const planningRouter = Router({ mergeParams: true });
-planningRouter.use(checkProjectPermissions(Permissions.CanEditProject));
+planningRouter.use(checkProjectPermissions(Permissions.CanReadProject));
 
 planningRouter.post(`/start`, async (req, res) => {
   const { sprintId, activeSprintId } = req.body;

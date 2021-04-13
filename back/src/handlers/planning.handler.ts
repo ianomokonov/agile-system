@@ -1,6 +1,6 @@
-import { PlanningUpdateRequest } from '../../models/requests/planning-update.request';
-import planningService from '../../services/planning-service';
-import projectService from '../../services/project-service';
+import { PlanningUpdateRequest } from '../models/requests/planning-update.request';
+import planningService from '../services/planning-service';
+import projectService from '../services/project-service';
 
 export class PlanningHandler {
   public async start(projectId: number, sprintId: number, activeSprintId: number) {

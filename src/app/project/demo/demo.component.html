@@ -1,1 +1,117 @@
-<p>demo works!</p>
+<ng-container *ngIf="demo">
+  <div class="d-flex justify-content-between mb-3">
+    <h4 class="mb-0">Демо спринта "{{ demo.sprintName }}"</h4>
+    <div class="text-right">
+      <div class="btn btn-outline-primary">Завершить демо</div>
+    </div>
+  </div>
+  <div class="d-flex">
+    <div class="tasks w-25">
+      <div class="content rounded p-2 mb-2 w-100" *ngIf="demo.taskToShow?.length">
+        <div
+          [ngClass]="{ 'mb-2': true }"
+          class="header d-flex justify-content-between align-items-center"
+        >
+          <div class="name">
+            <span class="d-block mr-2">
+              <i class="fas fa-chevron-right mr-2" [ngClass]="{ opened: true }"></i>
+              Задачи для показа
+            </span>
+          </div>
+        </div>
+
+        <ng-container *ngFor="let task of demo.taskToShow">
+          <ng-container
+            *ngTemplateOutlet="
+              taskTemp;
+              context: {
+                $implicit: task,
+                showBtn: false
+              }
+            "
+          ></ng-container>
+        </ng-container>
+      </div>
+      <div class="content rounded p-2 mb-2 w-100" *ngIf="demo.shownTasks?.length">
+        <div
+          [ngClass]="{ 'mb-2': true }"
+          class="header d-flex justify-content-between align-items-center"
+        >
+          <div class="name">
+            <span class="d-block mr-2">
+              <i class="fas fa-chevron-right mr-2" [ngClass]="{ opened: true }"></i>
+              Принятые задачи
+            </span>
+          </div>
+        </div>
+
+        <ng-container *ngFor="let task of demo.shownTasks">
+          <ng-container
+            *ngTemplateOutlet="
+              taskTemp;
+              context: {
+                $implicit: task,
+                showBtn: false
+              }
+            "
+          ></ng-container>
+        </ng-container>
+      </div>
+    </div>
+    <div class="active-task w-75">
+      <ng-container *ngIf="activeTask; else noData">
+        <div class="task pl-3 mb-0">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0">
+              {{ activeTask.task.name }}
+              <span class="badge badge-success" *ngIf="activeTask.isFinished">Принята</span>
+            </h4>
+            <button
+              class="btn btn-primary"
+              (click)="acceptTask(activeTask.id)"
+              *ngIf="!activeTask.isFinished"
+            >
+              Принять
+            </button>
+          </div>
+
+          <div class="form-group">
+            <small class="text-muted">Описание</small>
+            <p [innerHTML]="activeTask.task.description"></p>
+          </div>
+          <div class="row">
+            <div class="col-4">
+              <div class="form-group">
+                <small class="text-muted">Приоритет</small>
+                <h6>{{ activeTask.task.priorityId | priority }}</h6>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="form-group">
+                <small class="text-muted">Тип задачи</small>
+                <h6>{{ activeTask.task.typeId | taskType }}</h6>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #taskTemp let-task let-show="showBtn">
+  <div
+    class="task rounded w-100 d-flex flex-wrap align-items-center"
+    [ngClass]="{ active: activeTask?.id === task.id }"
+    (click)="onTaskClick(task.id)"
+  >
+    <small class="text-muted mr-3">#{{ task.task.id }}</small>
+    <h6 class="d-inline text-dark mb-0">{{ task.task.name }}</h6>
+  </div>
+</ng-template>
+
+<ng-template #noData>
+  <div class="d-flex justify-content-center align-items-center text-muted w-100 h-100">
+    Задача не выбрана
+  </div>
+</ng-template>

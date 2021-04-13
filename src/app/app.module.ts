@@ -45,6 +45,7 @@ import { ScrumPokerComponent } from './project/planning/scrum-poker/scrum-poker.
 import { MarkTasksComponent } from './project/planning/mark-tasks/mark-tasks.component';
 import { DemoComponent } from './project/demo/demo.component';
 import { RetroComponent } from './project/retro/retro.component';
+import { DemoService } from './services/demo.service';
 
 @NgModule({
   declarations: [
@@ -97,6 +98,7 @@ import { RetroComponent } from './project/retro/retro.component';
     ProfileService,
     ProjectDataService,
     TaskService,
+    DemoService,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ContentTypeInterceptor, multi: true },
   ],

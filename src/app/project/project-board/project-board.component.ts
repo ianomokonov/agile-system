@@ -7,6 +7,7 @@ import { TaskShortView } from 'back/src/models/responses/task-short-view';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
 import { Sprint } from 'back/src/models/sprint';
 import { forkJoin } from 'rxjs';
+import { DemoService } from 'src/app/services/demo.service';
 import { ProjectDataService } from 'src/app/services/project-data.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { TaskService } from 'src/app/services/task.service';
@@ -29,6 +30,7 @@ export class ProjectBoardComponent implements OnInit {
     private projectDataService: ProjectDataService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
+    private demoService: DemoService,
   ) {}
   public ngOnInit() {
     this.activatedRoute.parent?.params.subscribe((params) => {
@@ -97,5 +99,17 @@ export class ProjectBoardComponent implements OnInit {
       this.statuses = info.statuses;
       this.setTasks(info.sprint?.tasks);
     });
+  }
+
+  public onStartDemo() {
+    this.demoService
+      .start(this.projectDataService.project?.id, this.sprint?.id)
+      .subscribe((demoId) => {
+        this.projectDataService
+          .getProject(this.projectDataService.project?.id, true)
+          .subscribe(() => {
+            this.router.navigate(['../demo', demoId], { relativeTo: this.activatedRoute });
+          });
+      });
   }
 }
