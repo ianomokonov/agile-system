@@ -262,6 +262,38 @@ CREATE TABLE `projectSprint` (
 ) COMMENT 'спринты проекта';
 
 -- ---
+-- Table 'projectRetro'
+-- ретро проекта
+-- ---
+DROP TABLE IF EXISTS `projectRetro`;
+
+CREATE TABLE `projectRetro` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `createDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `sprintId` int(11) NOT NULL,
+  `isFinished` bit NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`)
+) COMMENT 'ретро проекта';
+
+-- ---
+-- Table 'projectRetroCard'
+-- карты ретро проекта
+-- ---
+DROP TABLE IF EXISTS `projectRetroCard`;
+
+CREATE TABLE `projectRetroCard` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `retroId` int(11) NOT NULL,
+  `category` int(1) NOT NULL,
+  `text` text NOT NULL,
+  `userId` int(11) NOT NULL,
+  `completeRetroId` int(11) NULL,
+  `isCompleted` bit NOT NULL DEFAULT 0,
+  `executorId` int(11) NULL,
+  PRIMARY KEY (`id`)
+) COMMENT 'карты ретро проекта';
+
+-- ---
 -- Table 'projectDemo'
 -- демо проекта
 -- ---
@@ -501,6 +533,31 @@ ALTER TABLE
   `projectDemoTask`
 ADD
   FOREIGN KEY (taskId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectRetro`
+ADD
+  FOREIGN KEY (sprintId) REFERENCES `projectSprint` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectRetroCard`
+ADD
+  FOREIGN KEY (userId) REFERENCES `user` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectRetroCard`
+ADD
+  FOREIGN KEY (executorId) REFERENCES `projectUser` (`id`) ON DELETE SET NULL;
+
+ALTER TABLE
+  `projectRetroCard`
+ADD
+  FOREIGN KEY (retroId) REFERENCES `projectRetro` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectRetroCard`
+ADD
+  FOREIGN KEY (completeRetroId) REFERENCES `projectRetro` (`id`) ON DELETE SET NULL;
 
 INSERT INTO
   `projectTaskStatus` (`name`)

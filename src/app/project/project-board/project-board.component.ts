@@ -9,6 +9,7 @@ import { forkJoin } from 'rxjs';
 import { DemoService } from 'src/app/services/demo.service';
 import { ProjectDataService } from 'src/app/services/project-data.service';
 import { ProjectService } from 'src/app/services/project.service';
+import { RetroService } from 'src/app/services/retro.service';
 import { TaskService } from 'src/app/services/task.service';
 import { CreateTaskComponent } from './create-task/create-task.component';
 
@@ -29,6 +30,7 @@ export class ProjectBoardComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private demoService: DemoService,
+    private retroService: RetroService,
   ) {}
   public ngOnInit() {
     this.activatedRoute.parent?.params.subscribe((params) => {
@@ -106,6 +108,18 @@ export class ProjectBoardComponent implements OnInit {
           .getProject(this.projectDataService.project?.id, true)
           .subscribe(() => {
             this.router.navigate(['../demo', demoId], { relativeTo: this.activatedRoute });
+          });
+      });
+  }
+
+  public onStartRetro() {
+    this.retroService
+      .start(this.projectDataService.project?.id, this.projectDataService.project?.sprint?.id)
+      .subscribe((retroId) => {
+        this.projectDataService
+          .getProject(this.projectDataService.project?.id, true)
+          .subscribe(() => {
+            this.router.navigate(['../retro', retroId], { relativeTo: this.activatedRoute });
           });
       });
   }

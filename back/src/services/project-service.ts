@@ -10,6 +10,7 @@ import { Backlog } from '../models/responses/backlog';
 import { ProjectEditInfo } from '../models/responses/project-edit-info';
 import { ProjectResponse } from '../models/responses/project.response';
 import projectRepository from '../repositories/project.repository';
+import retroRepository from '../repositories/retro.repository';
 import { Permissions } from '../utils';
 import demoService from './demo-service';
 import planningService from './planning-service';
@@ -69,8 +70,12 @@ class ProjectService {
     ]);
 
     if (sprint) {
-      const demo = await demoService.getBySprintId(sprint?.id);
+      const [demo, retro] = await Promise.all([
+        demoService.getBySprintId(sprint?.id),
+        retroRepository.getByProjectSprintId(sprint?.id),
+      ]);
       project.demo = demo;
+      project.retro = retro;
     }
     project.sprint = sprint;
     project.statuses = statuses;

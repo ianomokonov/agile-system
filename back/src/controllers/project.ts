@@ -15,6 +15,7 @@ import checkPermissions from '../middleware/check-project-permissions';
 import { Permissions } from '../utils';
 import demoRouter from './demo';
 import planningRouter from './planning';
+import retroRouter from './retro';
 import sprintRouter from './sprint';
 
 const projectRouter = Router();
@@ -193,5 +194,6 @@ projectRouter.post(
 projectRouter.use('/:projectId/sprint', sprintRouter);
 projectRouter.use('/:projectId/planning', planningRouter);
 projectRouter.use('/:projectId/demo', demoRouter);
+projectRouter.use('/:projectId/retro', retroRouter);
 
 export default projectRouter;

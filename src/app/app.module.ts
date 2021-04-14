@@ -38,6 +38,7 @@ import { CreateSprintComponent } from './project/create-sprint/create-sprint.com
 import { EditTaskComponent } from './project/project-board/task/edit-task/edit-task.component';
 import { PriorityPipe } from './shared/pipes/priority.pipe';
 import { TaskTypePipe } from './shared/pipes/task-type.pipe';
+import { RetroService } from './services/retro.service';
 import { PlanningComponent } from './project/planning/planning.component';
 import { DiscussNewTasksComponent } from './project/planning/discuss-new-tasks/discuss-new-tasks.component';
 import { TaskListComponent } from './project/planning/task-list/task-list.component';
@@ -98,6 +99,7 @@ import { DemoService } from './services/demo.service';
     ProfileService,
     ProjectDataService,
     TaskService,
+    RetroService,
     DemoService,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ContentTypeInterceptor, multi: true },
