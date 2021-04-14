@@ -1,0 +1,61 @@
+@import '../../../styles/variables.less';
+
+.field {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  background-color: @bg-light;
+
+  & > div {
+    width: calc(50% - 0.5rem);
+    height: calc(50% - 0.5rem);
+    margin-right: -0.4rem;
+    margin-bottom: -0.4rem;
+    background: white;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-content: flex-start;
+    flex-wrap: wrap;
+    position: relative;
+    padding: 0.5rem;
+    .placeholder {
+      text-transform: uppercase;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: bold;
+      color: rgba(199, 199, 199, 0.5);
+      left: 0;
+      top: 0;
+    }
+
+    .retro-card {
+      position: relative;
+      z-index: 2;
+      background-color: #ccffcc;
+      width: 120px;
+      padding: 0.25rem;
+      box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.466);
+      margin-right: 0.4rem;
+      margin-bottom: 0.4rem;
+      height: 90px;
+    }
+
+    &.bad {
+      .retro-card {
+        background-color: #ffcccc;
+      }
+    }
+    &.improvments {
+      .retro-card {
+        background-color: #99ccff86;
+      }
+    }
+  }
+}
