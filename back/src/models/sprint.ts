@@ -11,6 +11,7 @@ export interface Sprint {
   endDate?: Date;
   isOpened?: boolean;
   planningId?: number;
+  demo: { id: number; isFinished: number };
 
   tasks: TaskShortView[];
 }

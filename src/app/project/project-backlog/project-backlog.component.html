@@ -34,10 +34,17 @@
           Перейти к планированию
         </button>
         <ng-container *ngIf="sprint.isActive">
-          <button class="btn btn-outline-info" [routerLink]="['../planning', sprint.planningId]">
+          <button
+            *ngIf="!sprint.demo?.isFinished"
+            class="btn btn-outline-info"
+            [routerLink]="['../planning', sprint.planningId]"
+          >
             Начать демо
           </button>
-          <button class="btn btn-outline-primary ml-2" [routerLink]="['../planning', sprint.planningId]">
+          <button
+            class="btn btn-outline-primary ml-2"
+            [routerLink]="['../planning', sprint.planningId]"
+          >
             Начать ретроспективу
           </button></ng-container
         >
