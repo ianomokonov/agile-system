@@ -4,6 +4,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Backlog } from 'back/src/models/responses/backlog';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
 import { Sprint } from 'back/src/models/sprint';
+import { DemoService } from 'src/app/services/demo.service';
 import { ProjectDataService } from 'src/app/services/project-data.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { TaskService } from 'src/app/services/task.service';
@@ -22,6 +23,7 @@ export class ProjectBacklogComponent implements OnInit {
   constructor(
     private projectService: ProjectService,
     public projectDataService: ProjectDataService,
+    private demoService: DemoService,
     private activatedRoute: ActivatedRoute,
     private taskService: TaskService,
     private modalService: NgbModal,
@@ -100,6 +102,16 @@ export class ProjectBacklogComponent implements OnInit {
             });
           });
       });
+  }
+
+  public onStartDemo(sprintId) {
+    this.demoService.start(this.projectDataService.project?.id, sprintId).subscribe((demoId) => {
+      this.projectDataService
+        .getProject(this.projectDataService.project?.id, true)
+        .subscribe(() => {
+          this.router.navigate(['../demo', demoId], { relativeTo: this.activatedRoute });
+        });
+    });
   }
 
   public onFinishSprint(sprintId) {
