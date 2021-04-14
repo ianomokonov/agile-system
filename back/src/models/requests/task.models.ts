@@ -1,9 +1,14 @@
+import { Priority } from '../priority';
+import { TaskType } from '../task-type';
+
 export interface CreateTaskRequest {
-  projectId?: number;
   name: string;
   description: string;
   projectUserId?: number;
   creatorId?: number;
+  priorityId: Priority;
+  typeId: TaskType;
+  projectSprintId?: number;
 }
 
 export interface UpdateTaskRequest {

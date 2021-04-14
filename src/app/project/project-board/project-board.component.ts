@@ -2,10 +2,9 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/dr
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { StatusResponse } from 'back/src/models/responses/status.response';
+import { ProjectResponse } from 'back/src/models/responses/project.response';
 import { TaskShortView } from 'back/src/models/responses/task-short-view';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
-import { Sprint } from 'back/src/models/sprint';
 import { forkJoin } from 'rxjs';
 import { DemoService } from 'src/app/services/demo.service';
 import { ProjectDataService } from 'src/app/services/project-data.service';
@@ -19,10 +18,9 @@ import { CreateTaskComponent } from './create-task/create-task.component';
   styleUrls: ['./project-board.component.less'],
 })
 export class ProjectBoardComponent implements OnInit {
-  public statuses: StatusResponse[];
+  public project: ProjectResponse;
   private users: UserShortView[];
   public tasks: TaskShortView[][] = [];
-  public sprint: Sprint;
   constructor(
     private taskService: TaskService,
     private modalService: NgbModal,
@@ -42,8 +40,7 @@ export class ProjectBoardComponent implements OnInit {
           this.router.navigate(['../backlog'], { relativeTo: this.activatedRoute });
           return;
         }
-        this.sprint = project.sprint;
-        this.statuses = project.statuses;
+        this.project = project;
         this.setTasks(project.sprint?.tasks);
         this.users = users;
       });
@@ -59,7 +56,7 @@ export class ProjectBoardComponent implements OnInit {
   }
   private setTasks(tasks: TaskShortView[]) {
     this.tasks = [];
-    this.statuses?.forEach((status) => {
+    this.project?.statuses?.forEach((status) => {
       this.tasks.push(tasks.filter((task) => task.statusId === status.id));
     });
   }
@@ -96,14 +93,14 @@ export class ProjectBoardComponent implements OnInit {
 
   public refreshProjectInfo(id: number) {
     this.projectDataService.getProject(id, true).subscribe((info) => {
-      this.statuses = info.statuses;
+      this.project = info;
       this.setTasks(info.sprint?.tasks);
     });
   }
 
   public onStartDemo() {
     this.demoService
-      .start(this.projectDataService.project?.id, this.sprint?.id)
+      .start(this.projectDataService.project?.id, this.project?.sprint?.id)
       .subscribe((demoId) => {
         this.projectDataService
           .getProject(this.projectDataService.project?.id, true)

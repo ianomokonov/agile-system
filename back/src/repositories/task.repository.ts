@@ -1,7 +1,6 @@
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import * as sql from 'sql-query-generator';
 import logger from '../logger';
-import { CRUD } from '../models/crud.interface';
 import { CreateTaskRequest, UpdateTaskRequest } from '../models/requests/task.models';
 import { StatusResponse } from '../models/responses/status.response';
 import { TaskShortView } from '../models/responses/task-short-view';
@@ -12,7 +11,7 @@ import projectRepository from './project.repository';
 
 sql.use('mysql');
 
-class TaskRepository implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
+class TaskRepository {
   public async getProjectId(taskId: number) {
     const query = sql.select('projecttask', 'projectId').where({ id: taskId });
 
@@ -105,12 +104,12 @@ class TaskRepository implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
     return tasks as TaskResponse[];
   }
 
-  public async create(request: CreateTaskRequest) {
+  public async create(projectId: number, request: CreateTaskRequest) {
     const { id: creatorId } = await projectRepository.getProjectUserByUserId(
       request.creatorId,
-      request.projectId,
+      projectId,
     );
-    const query = sql.insert('projecttask', { ...request, statusId: 1, creatorId });
+    const query = sql.insert('projecttask', { ...request, statusId: 1, creatorId, projectId });
 
     const [{ insertId }] = await dbConnection.query<ResultSetHeader>(
       getQueryText(query.text),

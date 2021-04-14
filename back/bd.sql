@@ -492,6 +492,16 @@ ALTER TABLE
 ADD
   FOREIGN KEY (sessionId) REFERENCES `projectPlanningTaskSession` (`id`) ON DELETE CASCADE;
 
+ALTER TABLE
+  `projectDemoTask`
+ADD
+  FOREIGN KEY (demoId) REFERENCES `projectDemo` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectDemoTask`
+ADD
+  FOREIGN KEY (taskId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
+
 INSERT INTO
   `projectTaskStatus` (`name`)
 VALUES

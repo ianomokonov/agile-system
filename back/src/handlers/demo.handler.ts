@@ -4,8 +4,8 @@ export class PlanningHandler {
   public async start(projectId: number, sprintId: number) {
     return demoService.start(projectId, sprintId);
   }
-  public async read(projectId) {
-    return demoService.read(projectId);
+  public async read(demoId) {
+    return demoService.read(demoId);
   }
 
   public async finishDemo(demoId: number) {

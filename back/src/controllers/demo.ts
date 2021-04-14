@@ -14,9 +14,9 @@ demoRouter.post(`/start`, async (req, res) => {
   res.status(StatusCodes.OK).json(demoId);
 });
 
-demoRouter.get(`/read`, async (req, res) => {
+demoRouter.get(`/:demoId`, async (req, res) => {
   try {
-    const planning = await demoHandler.read(res.locals.projectId);
+    const planning = await demoHandler.read(+req.params.demoId);
     res.status(StatusCodes.OK).json(planning);
   } catch (error) {
     logger.error(error);

@@ -2,7 +2,13 @@
   <div class="d-flex justify-content-between mb-3">
     <h4 class="mb-0">Демо спринта "{{ demo.sprintName }}"</h4>
     <div class="text-right">
-      <div class="btn btn-outline-primary">Завершить демо</div>
+      <div
+        class="btn btn-outline-primary"
+        (click)="finishDemo(false, createDemoTask)"
+        *ngIf="!demo.isFinished"
+      >
+        Завершить демо
+      </div>
     </div>
   </div>
   <div class="d-flex">
@@ -59,8 +65,8 @@
       </div>
     </div>
     <div class="active-task w-75">
-      <ng-container *ngIf="activeTask; else noData">
-        <div class="task pl-3 mb-0">
+      <div class="border-bottom ml-2 mb-3" *ngIf="activeTask">
+        <div class="task mb-0">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="mb-0">
               {{ activeTask.task.name }}
@@ -94,7 +100,11 @@
             </div>
           </div>
         </div>
-      </ng-container>
+      </div>
+      <div class="ml-2">
+        <p class="mb-1">Замечания:</p>
+        <ckeditor [editor]="editor" [formControl]="commentControl"></ckeditor>
+      </div>
     </div>
   </div>
 </ng-container>
@@ -113,5 +123,45 @@
 <ng-template #noData>
   <div class="d-flex justify-content-center align-items-center text-muted w-100 h-100">
     Задача не выбрана
+  </div>
+</ng-template>
+
+<ng-template #createDemoTask>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-title">Создание задачи с замечаниями</h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close button"
+      aria-describedby="modal-title"
+      (click)="modalService.dismissAll()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div class="modal-body" [formGroup]="demoTaskForm">
+    <div class="form-group">
+      <input
+        type="text"
+        class="form-control"
+        formControlName="name"
+        placeholder="Название"
+        ngbAutofocus
+      />
+    </div>
+    <div class="form-group">
+      <ckeditor
+        [editor]="editor"
+        formControlName="comment"
+        [config]="{ placeholder: 'Описание' }"
+      ></ckeditor>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modalService.dismissAll()">
+      Отмена
+    </button>
+    <button class="btn btn-primary" (click)="finishDemo(true)">Создать и завершить демо</button>
   </div>
 </ng-template>

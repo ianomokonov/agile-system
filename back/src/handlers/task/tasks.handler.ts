@@ -1,10 +1,9 @@
-import { CRUD } from '../../models/crud.interface';
 import { CreateTaskRequest, UpdateTaskRequest } from '../../models/requests/task.models';
 import taskService from '../../services/task-service';
 
-export class TasksHandler implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
-  public async create(request: CreateTaskRequest) {
-    return taskService.create(request);
+export class TasksHandler {
+  public async create(projectId: number, request: CreateTaskRequest) {
+    return taskService.create(projectId, request);
   }
   public async update(request: UpdateTaskRequest) {
     return taskService.update(request);

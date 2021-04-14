@@ -10,8 +10,8 @@ export interface ProjectResponse {
   isClosed: boolean;
   sprint: Sprint;
   activePlanningId?: number;
-  activeRetroId?: number;
-  activeDemoId?: number;
+  retro?: { id: number; isFinished };
+  demo?: { id: number; isFinished };
   statuses: StatusResponse[];
   users: UserShortView[];
 }

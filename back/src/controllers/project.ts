@@ -182,8 +182,7 @@ projectRouter.post(
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
     const { userId } = res.locals;
-    const newTaskId = await tasksHandler.create({
-      projectId: res.locals.projectId,
+    const newTaskId = await tasksHandler.create(res.locals.projectId, {
       ...req.body,
       creatorId: userId,
     });

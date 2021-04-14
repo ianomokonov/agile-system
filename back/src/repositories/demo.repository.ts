@@ -23,7 +23,7 @@ class DemoRepository {
     return demoId;
   }
 
-  public async read(projectId: number, shortView = false) {
+  public async read(demoId: number) {
     const query = sql
       .select('projectDemo', [
         'projectDemo.id',
@@ -33,7 +33,7 @@ class DemoRepository {
         'projectSprint.name as sprintName',
       ])
       .join('projectSprint', { sprintId: 'projectSprint.id' }, 'LEFT')
-      .where({ 'projectDemo.projectId': projectId, 'projectDemo.isFinished': false });
+      .where({ 'projectDemo.id': demoId });
     const [[demo]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
@@ -41,11 +41,25 @@ class DemoRepository {
     if (!demo) {
       return null;
     }
-    if (!shortView) {
-      [demo.taskToShow, demo.shownTasks] = await this.getDemoTasks(demo.id);
-    }
+    [demo.taskToShow, demo.shownTasks] = await this.getDemoTasks(demo.id);
 
     return demo;
+  }
+
+  public async getByProjectSprintId(sprintId: number) {
+    if (!sprintId) {
+      return null;
+    }
+    const query = sql.select('projectDemo', ['id', 'isFinished']).where({ sprintId });
+    const [[demo]] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    if (!demo) {
+      return null;
+    }
+
+    return demo as { id: number; isFinished: number };
   }
 
   private async getDemoTasks(demoId: number) {

@@ -4,8 +4,12 @@ class DemoService {
   public async start(projectId: number, sprintId: number) {
     return demoRepository.start(projectId, sprintId);
   }
-  public async read(projectId, shortView = false) {
-    return demoRepository.read(projectId, shortView);
+  public async read(id: number) {
+    return demoRepository.read(id);
+  }
+
+  public async getBySprintId(id: number) {
+    return demoRepository.getByProjectSprintId(id);
   }
 
   public async finishDemo(demoId: number) {

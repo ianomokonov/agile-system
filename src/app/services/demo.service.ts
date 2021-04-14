@@ -12,8 +12,8 @@ export class DemoService {
     return this.http.post<number>(`${this.baseUrl}/${projectId}/demo/start`, { sprintId });
   }
 
-  public read(projectId: number): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/${projectId}/demo/read`);
+  public read(projectId: number, demoId: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/${projectId}/demo/${demoId}`);
   }
 
   public finish(projectId: number, demoId: number): Observable<void> {

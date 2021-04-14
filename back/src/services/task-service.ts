@@ -1,12 +1,11 @@
 import { StatusCodes } from 'http-status-codes';
-import { CRUD } from '../models/crud.interface';
 import { WebError } from '../models/error';
 import { CreateTaskRequest, UpdateTaskRequest } from '../models/requests/task.models';
 import projectRepository from '../repositories/project.repository';
 import taskRepository from '../repositories/task.repository';
 
-class TaskService implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
-  public async create(request: CreateTaskRequest) {
+class TaskService {
+  public async create(projectId: number, request: CreateTaskRequest) {
     if (request.projectUserId) {
       const user = await projectRepository.getProjectUser(request.projectUserId);
       if (!user) {
@@ -14,7 +13,7 @@ class TaskService implements CRUD<CreateTaskRequest, UpdateTaskRequest> {
       }
     }
 
-    return taskRepository.create(request);
+    return taskRepository.create(projectId, request);
   }
   public async update(request: UpdateTaskRequest) {
     taskRepository.update(request);
