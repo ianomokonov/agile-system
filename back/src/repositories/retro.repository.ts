@@ -18,6 +18,25 @@ class RetroRepository {
     return retroId;
   }
 
+  public async addCard(retroId: number, card) {
+    const query = sql.insert('projectRetroCard', {
+      retroId,
+      ...card,
+    });
+
+    const [{ insertId: cardId }] = await dbConnection.query<ResultSetHeader>(
+      getQueryText(query.text),
+      query.values,
+    );
+    return cardId;
+  }
+
+  public async removeCard(cardId: number) {
+    const query = sql.deletes('projectRetroCard').where({ id: cardId });
+
+    await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
+  }
+
   public async read(retroId: number) {
     const query = sql
       .select('projectRetro', [
@@ -57,12 +76,14 @@ class RetroRepository {
         'retroId',
         'category',
         'text',
+        'fontSize',
         'user.name as userName',
         'user.surname as userSurname',
         `(user.id = ${userId}) as isMy`,
       ])
       .join('user', { 'projectRetroCard.userId': 'user.id' })
-      .where({ retroId });
+      .where({ retroId })
+      .orderby('id');
     const [cards] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,

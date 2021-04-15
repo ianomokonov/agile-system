@@ -39,22 +39,51 @@
       position: relative;
       z-index: 2;
       background-color: #ccffcc;
+      border: 1px solid #ccffcc;
       width: 120px;
       padding: 0.25rem;
       box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.466);
       margin-right: 0.4rem;
       margin-bottom: 0.4rem;
-      height: 90px;
+      height: 95px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      span {
+        width: 100%;
+        white-space: pre-line;
+        overflow-wrap: break-word;
+        text-align: center;
+      }
+
+      &.isMy {
+        border-color: @primary-color !important;
+      }
+    }
+    .create-btn {
+      z-index: 10;
+      position: absolute;
+      right: 1rem;
+      bottom: 1rem;
     }
 
     &.bad {
       .retro-card {
         background-color: #ffcccc;
+        border-color: #ffcccc;
       }
     }
     &.improvments {
       .retro-card {
         background-color: #99ccff86;
+        border-color: #99ccff86;
+      }
+    }
+
+    &.actions {
+      .retro-card {
+        background-color: #cc99ff;
+        border-color: #cc99ff;
       }
     }
   }

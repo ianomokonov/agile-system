@@ -15,6 +15,14 @@ export class PlanningHandler {
   public async updateCard(cardId: number, request) {
     return retroService.updateCard(cardId, request);
   }
+
+  public async createCard(retroId: number, request) {
+    return retroService.createCard(retroId, request);
+  }
+
+  public async removeCard(cardId: number) {
+    return retroService.removeCard(cardId);
+  }
 }
 
 export default new PlanningHandler();

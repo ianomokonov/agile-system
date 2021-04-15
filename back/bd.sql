@@ -285,8 +285,9 @@ CREATE TABLE `projectRetroCard` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `retroId` int(11) NOT NULL,
   `category` int(1) NOT NULL,
-  `text` text NOT NULL,
+  `text` text NULL,
   `userId` int(11) NOT NULL,
+  `fontSize` DECIMAL(10, 2) NULL,
   `completeRetroId` int(11) NULL,
   `isCompleted` bit NOT NULL DEFAULT 0,
   `executorId` int(11) NULL,
@@ -547,7 +548,9 @@ ADD
 ALTER TABLE
   `projectRetroCard`
 ADD
-  FOREIGN KEY (executorId) REFERENCES `projectUser` (`id`) ON DELETE SET NULL;
+  FOREIGN KEY (executorId) REFERENCES `projectUser` (`id`) ON DELETE
+SET
+  NULL;
 
 ALTER TABLE
   `projectRetroCard`
@@ -557,7 +560,9 @@ ADD
 ALTER TABLE
   `projectRetroCard`
 ADD
-  FOREIGN KEY (completeRetroId) REFERENCES `projectRetro` (`id`) ON DELETE SET NULL;
+  FOREIGN KEY (completeRetroId) REFERENCES `projectRetro` (`id`) ON DELETE
+SET
+  NULL;
 
 INSERT INTO
   `projectTaskStatus` (`name`)

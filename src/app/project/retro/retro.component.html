@@ -2,33 +2,74 @@
   <div class="field rounded p-1">
     <div class="good m-1">
       <span class="placeholder">Что было хорошо?</span>
-      <div class="retro-card">Lorem ipsum dolor sit amet.</div>
-      <div class="retro-card">Lorem ipsum dolor sit amet.</div>
-      <div class="retro-card">Lorem ipsum dolor sit amet.</div>
-      <div class="retro-card">Lorem ipsum dolor sit amet.</div>
-      <div class="retro-card">Lorem ipsum dolor sit amet.</div>
-      <div class="retro-card">Lorem ipsum dolor sit amet.</div>
-      <div class="retro-card">Lorem ipsum dolor sit amet.</div>
-      <div class="retro-card">Lorem ipsum dolor sit amet.</div>
-      <div class="retro-card">Lorem ipsum dolor sit amet.</div>
-      <div class="retro-card">Lorem ipsum dolor sit amet.</div>
-      <div class="retro-card">Lorem ipsum dolor sit amet.</div>
-      <div class="retro-card">Lorem ipsum dolor sit amet.</div>
-      <div class="retro-card">Lorem ipsum dolor sit amet.</div>
-      <div class="retro-card" contenteditable="true" (input)="scale($event.target, $event)"></div>
+      <ng-container *ngFor="let card of goodCards">
+        <ng-container *ngTemplateOutlet="cardTemp; context: { $implicit: card }"> </ng-container>
+      </ng-container>
+      <!-- <div class="retro-card" contenteditable="true" (input)="scale($event.target, $event)"></div> -->
+      <button class="btn btn-primary create-btn" (click)="createCard(cardCategory.Good)">
+        <i class="fas fa-plus"></i>
+      </button>
     </div>
     <div class="bad m-1">
       <span class="placeholder">Что не получилось?</span>
-      <div class="retro-card">Lorem ipsum dolor sit amet.</div>
-      <div class="retro-card">Lorem ipsum dolor sit amet.</div>
-      <div class="retro-card">Lorem ipsum dolor sit amet.</div>
+      <ng-container *ngFor="let card of badCards">
+        <ng-container *ngTemplateOutlet="cardTemp; context: { $implicit: card }"> </ng-container>
+      </ng-container>
+      <button class="btn btn-primary create-btn" (click)="createCard(cardCategory.Bad)">
+        <i class="fas fa-plus"></i>
+      </button>
     </div>
     <div class="improvments m-1">
       <span class="placeholder">Что можно улучшить?</span>
-      <div class="retro-card">Lorem ipsum dolor sit amet.</div>
-      <div class="retro-card">Lorem ipsum dolor sit amet.</div>
-      <div class="retro-card">Lorem ipsum dolor sit amet.</div>
+      <ng-container *ngFor="let card of improvmentCards">
+        <ng-container *ngTemplateOutlet="cardTemp; context: { $implicit: card }"> </ng-container>
+      </ng-container>
+
+      <button class="btn btn-primary create-btn" (click)="createCard(cardCategory.Improvment)">
+        <i class="fas fa-plus"></i>
+      </button>
     </div>
-    <div class="decisions m-1"></div>
+    <div class="actions m-1">
+      <span class="placeholder">Дальнейшие действия</span>
+      <ng-container *ngFor="let card of actionCards">
+        <ng-container *ngTemplateOutlet="cardTemp; context: { $implicit: card }"> </ng-container>
+      </ng-container>
+      <button class="btn btn-primary create-btn" (click)="createCard(cardCategory.Actions)">
+        <i class="fas fa-plus"></i>
+      </button>
+    </div>
   </div>
 </div>
+<div class="pb-3" *ngIf="retro?.oldCards?.length">
+  <h4>Поинты с прошлого ретро</h4>
+  <div class="old-points">
+    <div class="point" *ngFor="let card of retro.oldCards; let index = index">
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          [id]="index + 'point'"
+          [(ngModel)]="card.isCompleted"
+        />
+        <label class="form-check-label" [for]="index + 'point'">
+          {{ card.name }}
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #cardTemp let-card>
+  <div class="retro-card" [ngClass]="{ isMy: card.isMy }" (click)="onCardClick($event)">
+    <span
+      *ngIf="card.isMy; else disabled"
+      contenteditable
+      [style.fontSize]="(card.fontSize || 16) + 'px'"
+      [textContent]="card.text"
+      (input)="scale($event.target, $event, card)"
+    ></span>
+    <ng-template #disabled>
+      <span [style.fontSize]="(card.fontSize || 16) + 'px'" [textContent]="card.text"></span>
+    </ng-template>
+  </div>
+</ng-template>

@@ -34,4 +34,17 @@ retroRouter.post(`/update-card/:cardId`, async (req, res) => {
   res.status(StatusCodes.OK).json('Задача обновлена');
 });
 
+retroRouter.post(`/remove-card/:cardId`, async (req, res) => {
+  await retroHandler.removeCard(+req.params.cardId);
+  res.status(StatusCodes.OK).json('Карточка удалена');
+});
+
+retroRouter.put(`/:retroId/create-card`, async (req, res) => {
+  const cardId = await retroHandler.createCard(+req.params.retroId, {
+    ...req.body,
+    userId: res.locals.userId,
+  });
+  res.status(StatusCodes.OK).json(cardId);
+});
+
 export default retroRouter;
