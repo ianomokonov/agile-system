@@ -46,7 +46,7 @@
         class="menu-item btn btn-outline-primary p-1"
         [routerLink]="['retro', project?.retro?.id]"
         routerLinkActive="active"
-        *ngIf="project?.retro"
+        *ngIf="project?.retro && !project?.retro?.isFinished"
       >
         <i class="far fa-comments"></i>
       </div>

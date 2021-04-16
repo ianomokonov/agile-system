@@ -34,7 +34,7 @@ retroRouter.post(`/update-card/:cardId`, async (req, res) => {
   res.status(StatusCodes.OK).json('Задача обновлена');
 });
 
-retroRouter.post(`/remove-card/:cardId`, async (req, res) => {
+retroRouter.delete(`/remove-card/:cardId`, async (req, res) => {
   await retroHandler.removeCard(+req.params.cardId);
   res.status(StatusCodes.OK).json('Карточка удалена');
 });

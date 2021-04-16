@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { RetroCardCategory } from 'back/src/models/retro-card-category';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -29,7 +29,11 @@ export class RetroComponent implements OnInit {
   public get actionCards() {
     return this.retro?.cards.filter((c) => c.category === RetroCardCategory.Actions);
   }
-  constructor(private activatedRoute: ActivatedRoute, private retroService: RetroService) {}
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private retroService: RetroService,
+    private router: Router,
+  ) {}
 
   public ngOnInit(): void {
     this.cardInput$.pipe(debounceTime(200)).subscribe((card) => {
@@ -112,6 +116,18 @@ export class RetroComponent implements OnInit {
     if (event.target.nodeName === 'DIV') {
       this.placeCaretAtEnd(event.target.firstChild);
     }
+  }
+
+  public onRemoveCard(cardId) {
+    this.retroService.removeCard(this.projectId, cardId).subscribe(() => {
+      this.retro.cards = this.retro.cards.filter((card) => card.id !== cardId);
+    });
+  }
+
+  public complete() {
+    this.retroService.finish(this.projectId, this.retro.id).subscribe(() => {
+      this.router.navigate(['../../', 'board'], { relativeTo: this.activatedRoute });
+    });
   }
 
   private placeCaretAtEnd(el) {
