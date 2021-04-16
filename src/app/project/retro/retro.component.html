@@ -53,9 +53,10 @@
           type="checkbox"
           [id]="index + 'point'"
           [(ngModel)]="card.isCompleted"
+          (change)="completePoint(card)"
         />
         <label class="form-check-label" [for]="index + 'point'">
-          {{ card.name }}
+          {{ card.text }}
         </label>
       </div>
     </div>

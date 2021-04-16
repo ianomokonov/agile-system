@@ -44,6 +44,7 @@
   <app-discuss-new-tasks
     *ngSwitchCase="planningStep.NewTasks"
     [tasks]="planning.newTasks"
+    (update)="getPlanning(planning.id)"
   ></app-discuss-new-tasks>
   <router-outlet *ngSwitchCase="planningStep.MarkTasks"></router-outlet>
 </ng-container>

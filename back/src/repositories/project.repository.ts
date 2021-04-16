@@ -22,6 +22,7 @@ import { CreateSprintRequest } from '../models/requests/create-sprint.request';
 import { IdNameResponse } from '../models/responses/id-name.response';
 // eslint-disable-next-line import/no-cycle
 import demoRepository from './demo.repository';
+import retroRepository from './retro.repository';
 
 sql.use('mysql');
 
@@ -131,6 +132,7 @@ class ProjectRepository {
     sprints = await Promise.all(
       sprints.map(async (sprintTemp) => {
         const sprint = sprintTemp;
+        sprint.retro = await retroRepository.getByProjectSprintId(sprint.id);
         sprint.demo = await demoRepository.getByProjectSprintId(sprint.id);
         sprint.tasks = await this.getSprintTasks(projectId, sprint.id);
         return sprint;

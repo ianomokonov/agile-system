@@ -21,13 +21,13 @@ export class PlanningComponent implements OnInit {
     this.activatedRoute.params.subscribe((params) => {
       if (params.planningId) {
         this.projectId = params.id;
-        this.getPlanning(params.id, params.planningId);
+        this.getPlanning(params.planningId);
       }
     });
   }
 
-  public getPlanning(projectId: number, id: number) {
-    this.projectService.getPlanning(projectId, id).subscribe((planning) => {
+  public getPlanning(id: number) {
+    this.projectService.getPlanning(this.projectId, id).subscribe((planning) => {
       this.planning = planning;
     });
   }

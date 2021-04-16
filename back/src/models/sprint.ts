@@ -12,6 +12,7 @@ export interface Sprint {
   isOpened?: boolean;
   planningId?: number;
   demo: { id: number; isFinished: number };
+  retro: { id: number; isFinished: number };
 
   tasks: TaskShortView[];
 }

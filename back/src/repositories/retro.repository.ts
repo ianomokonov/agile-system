@@ -1,5 +1,6 @@
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import * as sql from 'sql-query-generator';
+import { RetroCardCategory } from '../models/retro-card-category';
 import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
 
@@ -45,6 +46,7 @@ class RetroRepository {
         'projectRetro.sprintId',
         'projectRetro.isFinished',
         'projectSprint.name as sprintName',
+        'projectSprint.projectId',
       ])
       .join('projectSprint', { sprintId: 'projectSprint.id' }, 'LEFT')
       .where({ 'projectRetro.id': retroId });
@@ -106,13 +108,14 @@ class RetroRepository {
         'user.name as executorName',
         'user.surname as executorSurname',
       ])
-      .join('projectUser', { 'projectRetroCard.executorId': 'projectUser.id' })
-      .join('user', { 'projectUser.userId': 'user.id' })
+      .join('projectUser', { 'projectRetroCard.executorId': 'projectUser.id' }, 'LEFT')
+      .join('user', { 'projectUser.userId': 'user.id' }, 'LEFT')
       .join('projectRetro', { 'projectRetroCard.retroId': 'projectRetro.id' })
       .join('projectSprint', { 'projectRetro.sprintId': 'projectSprint.id' })
       .where({ retroId }, '!=')
-      .and({ 'projectSprint.projectId': projectId })
+      .and({ 'projectSprint.projectId': projectId, category: RetroCardCategory.Actions })
       .and({ completeRetroId: retroId, isCompleted: false }, '=', 'OR');
+
     const [cards] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,

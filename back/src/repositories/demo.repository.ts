@@ -2,6 +2,7 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import * as sql from 'sql-query-generator';
 import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
+// eslint-disable-next-line import/no-cycle
 import taskRepository from './task.repository';
 
 sql.use('mysql');

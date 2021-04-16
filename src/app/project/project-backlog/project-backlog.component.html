@@ -43,6 +43,7 @@
           </button>
           <button
             class="btn btn-outline-primary ml-2"
+            *ngIf="!sprint.retro?.isFinished"
             [routerLink]="['../planning', sprint.planningId]"
           >
             Начать ретроспективу

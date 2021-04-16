@@ -130,6 +130,15 @@ export class RetroComponent implements OnInit {
     });
   }
 
+  public completePoint(card) {
+    this.retroService
+      .updateCard(this.projectId, card.id, {
+        isCompleted: card.isCompleted,
+        completeRetroId: card.isCompleted ? this.retro.id : null,
+      })
+      .subscribe();
+  }
+
   private placeCaretAtEnd(el) {
     el.focus();
     if (typeof window.getSelection !== 'undefined' && typeof document.createRange !== 'undefined') {

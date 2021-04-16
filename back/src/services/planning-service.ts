@@ -1,6 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 import { WebError } from '../models/error';
 import { PlanningUpdateRequest } from '../models/requests/planning-update.request';
+import { PlanningStep } from '../models/responses/planning';
 import planningRepository from '../repositories/planning.repository';
 import taskRepository from '../repositories/task.repository';
 import taskService from './task-service';
@@ -23,6 +24,10 @@ class PlanningService {
 
       planning.newTasks = newTasks;
       planning.notMarkedTasks = notMarkedTasks;
+      if (!newTasks?.length) {
+        planning.activeStep = PlanningStep.MarkTasks;
+        this.update(planning.id, { activeStep: PlanningStep.MarkTasks });
+      }
     }
 
     return planning;
