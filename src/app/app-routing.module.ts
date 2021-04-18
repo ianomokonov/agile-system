@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { ProfileComponent } from './profile/profile.component';
 import { CreateComponent } from './profile/projects/create/create.component';
+import { DailyComponent } from './project/daily/daily.component';
 import { DemoComponent } from './project/demo/demo.component';
 import { EditProjectFormComponent } from './project/edit-project-form/edit-project-form.component';
 import { EditRolesComponent } from './project/edit/edit-roles/edit-roles.component';
@@ -83,6 +84,10 @@ const routes: Routes = [
       {
         path: 'retro/:retroId',
         component: RetroComponent,
+      },
+      {
+        path: 'daily',
+        component: DailyComponent,
       },
     ],
   },

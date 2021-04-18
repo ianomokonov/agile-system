@@ -27,6 +27,14 @@
         <i class="fas fa-book"></i>
       </div>
       <div
+        class="menu-item btn btn-outline-primary p-0"
+        *ngIf="project?.sprint"
+        routerLink="daily"
+        routerLinkActive="active"
+      >
+        <i class="fas fa-bread-slice"></i>
+      </div>
+      <div
         class="menu-item btn btn-outline-primary p-1"
         [routerLink]="['planning', project?.activePlanningId]"
         routerLinkActive="active"

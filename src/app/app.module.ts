@@ -47,6 +47,7 @@ import { MarkTasksComponent } from './project/planning/mark-tasks/mark-tasks.com
 import { DemoComponent } from './project/demo/demo.component';
 import { RetroComponent } from './project/retro/retro.component';
 import { DemoService } from './services/demo.service';
+import { DailyComponent } from './project/daily/daily.component';
 
 @NgModule({
   declarations: [
@@ -78,6 +79,7 @@ import { DemoService } from './services/demo.service';
     MarkTasksComponent,
     DemoComponent,
     RetroComponent,
+    DailyComponent,
   ],
   imports: [
     BrowserModule,
