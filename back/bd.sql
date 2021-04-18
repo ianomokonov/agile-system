@@ -295,6 +295,35 @@ CREATE TABLE `projectRetroCard` (
 ) COMMENT 'карты ретро проекта';
 
 -- ---
+-- Table 'projectDaily'
+-- дейли проекта
+-- ---
+DROP TABLE IF EXISTS `projectDaily`;
+
+CREATE TABLE `projectDaily` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `createDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `projectId` int(11) NOT NULL,
+  `isActive` bit NOT NULL DEFAULT 0,
+  'minutes' int(3) NOT NULL DEFAULT 0,
+  'seconds' int(3) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`)
+) COMMENT 'дейли проекта';
+
+DROP TABLE IF EXISTS `projectDailyParticipant`;
+
+CREATE TABLE `projectDailyParticipant` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `dailyId` int(11) NOT NULL,
+  `projectUserId` int(11) NOT NULL,
+  'minutes' int(3) NOT NULL DEFAULT 0,
+  'seconds' int(3) NOT NULL DEFAULT 0,
+  `isDone` bit NOT NULL DEFAULT 0,
+  `isActive` bit NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`)
+) COMMENT 'участники дейли проекта';
+
+-- ---
 -- Table 'projectDemo'
 -- демо проекта
 -- ---
@@ -563,6 +592,21 @@ ADD
   FOREIGN KEY (completeRetroId) REFERENCES `projectRetro` (`id`) ON DELETE
 SET
   NULL;
+
+ALTER TABLE
+  `projectDaily`
+ADD
+  FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectDailyParticipant`
+ADD
+  FOREIGN KEY (dailyId) REFERENCES `projectDaily` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectDailyParticipant`
+ADD
+  FOREIGN KEY (userId) REFERENCES `user` (`id`) ON DELETE CASCADE;
 
 INSERT INTO
   `projectTaskStatus` (`name`)
