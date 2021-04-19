@@ -1,7 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 import { constants } from '../constants';
-import logger from '../logger';
 import { WebError } from '../models/error';
 
 // eslint-disable-next-line consistent-return

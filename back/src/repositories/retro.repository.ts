@@ -19,17 +19,13 @@ class RetroRepository {
     return retroId;
   }
 
-  public async addCard(retroId: number, card) {
-    const query = sql.insert('projectRetroCard', {
-      retroId,
-      ...card,
-    });
-
+  public async addCard(card) {
+    const query = sql.insert('projectRetroCard', card);
     const [{ insertId: cardId }] = await dbConnection.query<ResultSetHeader>(
       getQueryText(query.text),
       query.values,
     );
-    return cardId;
+    return this.getCard(cardId);
   }
 
   public async removeCard(cardId: number) {
@@ -93,6 +89,27 @@ class RetroRepository {
     return cards;
   }
 
+  private async getCard(cardId: number, userId = 0) {
+    const query = sql
+      .select('projectRetroCard', [
+        'projectRetroCard.id',
+        'retroId',
+        'category',
+        'text',
+        'fontSize',
+        'user.name as userName',
+        'user.surname as userSurname',
+        `(user.id = ${userId}) as isMy`,
+      ])
+      .join('user', { 'projectRetroCard.userId': 'user.id' })
+      .where({ 'projectRetroCard.id': cardId });
+    const [[card]] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    return card;
+  }
+
   public async getOldRetroCards(retroId: number, projectId: number) {
     if (!retroId) {
       return [];
@@ -123,6 +140,31 @@ class RetroRepository {
     return cards;
   }
 
+  public async getOldRetroCard(cardId: number) {
+    const query = sql
+      .select('projectRetroCard', [
+        'projectRetroCard.id',
+        'retroId',
+        'category',
+        'text',
+        'executorId',
+        'isCompleted',
+        'user.name as executorName',
+        'user.surname as executorSurname',
+      ])
+      .join('projectUser', { 'projectRetroCard.executorId': 'projectUser.id' }, 'LEFT')
+      .join('user', { 'projectUser.userId': 'user.id' }, 'LEFT')
+      .join('projectRetro', { 'projectRetroCard.retroId': 'projectRetro.id' })
+      .join('projectSprint', { 'projectRetro.sprintId': 'projectSprint.id' })
+      .where({ 'projectRetroCard.id': cardId });
+
+    const [[card]] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    return card;
+  }
+
   public async finish(retroId: number) {
     const query = sql.update('projectRetro', { isFinished: true }).where({ id: retroId });
     await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
@@ -131,6 +173,7 @@ class RetroRepository {
   public async updateRetroCard(cardId: number, request) {
     const query = sql.update('projectRetroCard', request).where({ id: cardId });
     await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
+    return this.getCard(cardId);
   }
 }
 

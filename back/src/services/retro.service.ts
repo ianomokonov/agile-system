@@ -26,8 +26,8 @@ class RetroService {
     return retroRepository.removeCard(cardId);
   }
 
-  public async createCard(retroId: number, request) {
-    return retroRepository.addCard(retroId, request);
+  public async createCard(request) {
+    return retroRepository.addCard(request);
   }
 
   public async finish(id: number) {

@@ -24,27 +24,4 @@ retroRouter.get(`/:retroId`, async (req, res) => {
   }
 });
 
-retroRouter.delete(`/:retroId/finish`, async (req, res) => {
-  await retroHandler.finish(+req.params.retroId);
-  res.status(StatusCodes.OK).json('Демо завершено');
-});
-
-retroRouter.post(`/update-card/:cardId`, async (req, res) => {
-  await retroHandler.updateCard(+req.params.cardId, req.body);
-  res.status(StatusCodes.OK).json('Задача обновлена');
-});
-
-retroRouter.delete(`/remove-card/:cardId`, async (req, res) => {
-  await retroHandler.removeCard(+req.params.cardId);
-  res.status(StatusCodes.OK).json('Карточка удалена');
-});
-
-retroRouter.put(`/:retroId/create-card`, async (req, res) => {
-  const cardId = await retroHandler.createCard(+req.params.retroId, {
-    ...req.body,
-    userId: res.locals.userId,
-  });
-  res.status(StatusCodes.OK).json(cardId);
-});
-
 export default retroRouter;

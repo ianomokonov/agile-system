@@ -16,8 +16,8 @@ export class PlanningHandler {
     return retroService.updateCard(cardId, request);
   }
 
-  public async createCard(retroId: number, request) {
-    return retroService.createCard(retroId, request);
+  public async createCard(request) {
+    return retroService.createCard(request);
   }
 
   public async removeCard(cardId: number) {

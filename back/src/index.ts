@@ -10,6 +10,7 @@ import handleError from './middleware/handleError';
 import authSocketJWT from './middleware/authSocketJWT';
 import dailyRepository from './repositories/daily.repository';
 import { Time } from './models/time';
+import retroHandler from './handlers/retro.handler';
 
 const DEFAULT_PORT = 3000;
 
@@ -122,5 +123,32 @@ io.use(authSocketJWT).on('connection', (socket) => {
       socket.broadcast.to(socket.dailyRoom).emit('participantExit', socket.dailyParticipantId);
       socket.leave(socket.dailyRoom);
     }
+  });
+
+  socket.on('enterRetro', async (retroId) => {
+    socket.retroRoom = `retro${retroId}`;
+    socket.join(socket.retroRoom);
+  });
+
+  socket.on('addRetroCard', async (request) => {
+    const card = await retroHandler.createCard({ ...request, userId: socket.userId });
+    socket.broadcast.to(socket.retroRoom).emit('addRetroCard', card);
+    card.isMy = true;
+    socket.emit('addRetroCard', card);
+  });
+
+  socket.on('removeRetroCard', async (cardId) => {
+    await retroHandler.removeCard(cardId);
+    io.sockets.in(socket.retroRoom).emit('removeRetroCard', cardId);
+  });
+
+  socket.on('updateRetroCard', async (request) => {
+    retroHandler.updateCard(request.cardId, request.request);
+    socket.broadcast.to(socket.retroRoom).emit('updateRetroCard', request);
+  });
+
+  socket.on('finishRetro', async (retroId) => {
+    await retroHandler.finish(retroId);
+    io.sockets.in(socket.retroRoom).emit('finishRetro');
   });
 });

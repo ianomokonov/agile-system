@@ -3,8 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RetroCardCategory } from 'back/src/models/retro-card-category';
 import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
 import { RetroService } from 'src/app/services/retro.service';
+import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
   selector: 'app-retro',
@@ -32,20 +32,43 @@ export class RetroComponent implements OnInit {
   constructor(
     private activatedRoute: ActivatedRoute,
     private retroService: RetroService,
+    private socketService: SocketService,
     private router: Router,
-  ) {}
+  ) {
+    this.socketService.onAddRetroCard().subscribe((card) => {
+      this.retro?.cards.push(card);
+    });
+    this.socketService.onRemoveRetroCard().subscribe((cardId) => {
+      this.retro.cards = this.retro.cards.filter((c) => c.id !== cardId);
+    });
+    this.socketService.onUpdateRetroCard().subscribe((card) => {
+      const curCard =
+        this.retro?.cards.find((c) => c.id === card.cardId) ||
+        this.retro?.oldCards.find((c) => c.id === card.cardId);
+
+      if (curCard) {
+        Object.keys(curCard).forEach((key) => {
+          if (key in card.request) {
+            curCard[key] = card.request[key];
+          }
+        });
+      }
+    });
+    this.socketService.onFinishRetro().subscribe(() => {
+      this.router.navigate(['../../', 'board'], { relativeTo: this.activatedRoute });
+    });
+  }
 
   public ngOnInit(): void {
-    this.cardInput$.pipe(debounceTime(200)).subscribe((card) => {
-      this.retroService
-        .updateCard(this.projectId, card.id, {
-          text: card.text,
-          fontSize: card.fontSize,
-        })
-        .subscribe();
+    this.cardInput$.subscribe((card) => {
+      this.socketService.updateRetroCard(card.id, {
+        text: card.text,
+        fontSize: card.fontSize,
+      });
     });
     this.activatedRoute.params.subscribe((params) => {
       if (params.retroId) {
+        this.socketService.enterRetroRoom(params.retroId);
         this.projectId = params.id;
         this.getRetro(params.retroId);
       }
@@ -59,9 +82,7 @@ export class RetroComponent implements OnInit {
   }
 
   public createCard(category: RetroCardCategory) {
-    this.retroService.createCard(this.projectId, this.retro.id, { category }).subscribe(() => {
-      this.getRetro(this.retro.id);
-    });
+    this.socketService.addRetroCard(this.retro.id, category);
   }
 
   // eslint-disable-next-line complexity
@@ -119,24 +140,24 @@ export class RetroComponent implements OnInit {
   }
 
   public onRemoveCard(cardId) {
-    this.retroService.removeCard(this.projectId, cardId).subscribe(() => {
-      this.retro.cards = this.retro.cards.filter((card) => card.id !== cardId);
-    });
+    // this.retroService.removeCard(this.projectId, cardId).subscribe(() => {
+    //   this.retro.cards = this.retro.cards.filter((card) => card.id !== cardId);
+    // });
+    this.socketService.removeRetroCard(cardId);
   }
 
   public complete() {
-    this.retroService.finish(this.projectId, this.retro.id).subscribe(() => {
-      this.router.navigate(['../../', 'board'], { relativeTo: this.activatedRoute });
-    });
+    // this.retroService.finish(this.projectId, this.retro.id).subscribe(() => {
+    //   this.router.navigate(['../../', 'board'], { relativeTo: this.activatedRoute });
+    // });
+    this.socketService.finishRetro(this.retro.id);
   }
 
   public completePoint(card) {
-    this.retroService
-      .updateCard(this.projectId, card.id, {
-        isCompleted: card.isCompleted,
-        completeRetroId: card.isCompleted ? this.retro.id : null,
-      })
-      .subscribe();
+    this.socketService.updateRetroCard(card.id, {
+      isCompleted: card.isCompleted,
+      completeRetroId: card.isCompleted ? this.retro.id : null,
+    });
   }
 
   private placeCaretAtEnd(el) {
