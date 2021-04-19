@@ -1,22 +1,22 @@
 <div class="d-flex justify-content-center align-items-center h-100 flex-column">
-  <div class="cur-slider" *ngIf="started">
+  <div class="cur-slider" *ngIf="daily?.isActive">
     <h4
-      *ngFor="let participant of participants"
+      *ngFor="let participant of daily?.participants"
       [ngClass]="{ done: participant.isDone, active: participant.isActive }"
     >
-      {{ participant.name }}
+      {{ participant.userName }} {{ participant.userSurname }}
     </h4>
   </div>
 
-  <h1>{{ started ? getTime() : 'Stand Up!' }}</h1>
+  <h1>{{ daily?.isActive ? getTime() : 'Stand Up!' }}</h1>
   <div class="d-flex">
-    <button class="btn btn-primary start-btn" (click)="started && interval ? pause() : start()">
-      {{ interval ? 'Пауза' : 'Начать' }}<i class="fas fa-caret-right" *ngIf="!started"></i>
+    <button class="btn btn-primary start-btn" (click)="daily?.isActive && !isPaused ? pause() : start()">
+      {{ !isPaused && daily?.isActive ? 'Пауза' : 'Начать' }}<i class="fas fa-caret-right" *ngIf="!daily?.isActive"></i>
     </button>
     <button
-      *ngIf="started"
+      *ngIf="daily?.isActive"
       class="btn btn-primary start-btn next-btn"
-      (click)="lastParticipant ? pause() : next()"
+      (click)="lastParticipant ? stop() : next()"
     >
       <i
         class="fas"
@@ -25,7 +25,7 @@
     </button>
   </div>
   <small class="text-muted">{{
-    started ? 'Общее время: ' + getDailyTime() : getParticipantsCount()
+    daily?.isActive ? 'Общее время: ' + getDailyTime() : getParticipantsCount()
   }}</small>
   <div class="participants d-flex">
     <div
@@ -33,7 +33,7 @@
       *ngFor="let participant of nextParticipants; let last = last"
       [ngClass]="{ next: last }"
     >
-      {{ participant.name }}
+      {{ participant.userName }} {{ participant.userSurname }}
       <i class="fas fa-angle-double-right ml-2" *ngIf="last"></i>
     </div>
   </div>

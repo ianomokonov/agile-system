@@ -1,93 +1,113 @@
-import { Component, OnInit } from '@angular/core';
-import { Time } from './time';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { DailyService } from 'src/app/services/daily.service';
+import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
   selector: 'app-daily',
   templateUrl: './daily.component.html',
   styleUrls: ['./daily.component.less'],
 })
-export class DailyComponent implements OnInit {
-  public started = false;
-  public time: Time;
-  public dailyTime: Time;
-  public interval;
+export class DailyComponent implements OnInit, OnDestroy {
+  public time = '00:00';
+  public dailyTime = '00:00';
   public lastParticipant = false;
+  public isPaused = false;
   public get nextParticipants() {
-    return this.participants.filter((p) => !p.isActive && !p.isDone);
+    return this.daily?.participants?.filter((p) => !p.isActive && !p.isDone);
   }
-  public participants = [
-    { name: 'Иван Номоконов', isActive: false, isDone: false },
-    { name: 'Иван Номоконов', isActive: false, isDone: false },
-    { name: 'Иван Номоконов', isActive: false, isDone: false },
-    { name: 'Иван Номоконов', isActive: false, isDone: false },
-    { name: 'Иван Номоконов', isActive: false, isDone: false },
-    { name: 'Иван Номоконов', isActive: false, isDone: false },
-    { name: 'Иван Номоконов', isActive: false, isDone: false },
-    { name: 'Иван Номоконов', isActive: false, isDone: false },
-    { name: 'Иван Номоконов', isActive: false, isDone: false },
-    { name: 'Иван Номоконов', isActive: false, isDone: false },
-  ];
-  constructor() {}
+  public daily;
+  public projectId: number;
+  constructor(
+    private socketService: SocketService,
+    private activatedRoute: ActivatedRoute,
+    private dailyService: DailyService,
+  ) {
+    activatedRoute.params.subscribe((params) => {
+      if (params.id) {
+        this.projectId = params.id;
+        this.getDaily();
+      }
+    });
+  }
 
-  ngOnInit(): void {}
+  public ngOnDestroy() {
+    this.socketService.leaveDaily();
+  }
+
+  public getDaily() {
+    this.dailyService.read(this.projectId).subscribe((daily) => {
+      this.daily = daily;
+      this.socketService.enterDaily(daily.id);
+    });
+  }
+
+  public ngOnInit(): void {
+    this.socketService.newParticipant().subscribe((m) => {
+      this.daily.participants = m;
+      if (!this.nextParticipants?.length) {
+        this.lastParticipant = true;
+        return;
+      }
+      this.lastParticipant = false;
+    });
+    this.socketService.nextDailyParticipant().subscribe((parts) => {
+      this.daily.participants = parts;
+
+      this.lastParticipant = !this.nextParticipants?.length;
+      this.daily.isActive = true;
+    });
+    this.socketService.participantExit().subscribe((id: number) => {
+      this.daily.participants = this.daily.participants.filter((p) => p.id !== id);
+    });
+    this.socketService.dailyPause().subscribe(() => {
+      this.isPaused = true;
+    });
+    this.socketService.dailyResume().subscribe(() => {
+      this.isPaused = false;
+    });
+    this.socketService.participantExit().subscribe((id: number) => {
+      this.daily.participants = this.daily.participants.filter((p) => p.id !== id);
+    });
+    this.socketService.onStopDaily().subscribe(() => {
+      this.getDaily();
+    });
+
+    this.socketService.dailyTime().subscribe(([time, activeTime]) => {
+      this.dailyTime = time;
+      this.time = activeTime;
+    });
+  }
 
   public start() {
-    if (!this.participants?.length) {
+    if (!this.daily?.participants?.length) {
       return;
     }
-    if (!this.time) {
-      this.time = new Time(0, 0, 0);
+    if (this.daily.isActive) {
+      this.socketService.resumeDaily(this.daily.id);
+      return;
     }
-    if (!this.dailyTime) {
-      this.dailyTime = new Time(0, 0, 0);
-    }
-    this.started = true;
-    this.interval = setInterval(() => {
-      this.time.updateSecond(this.time.second + 1);
-      this.dailyTime.updateSecond(this.dailyTime.second + 1);
-    }, 1000);
-    this.participants[this.participants.length - 1].isActive = true;
-    if (this.participants.length === 1) {
-      this.lastParticipant = true;
-    }
+    this.socketService.startDaily(this.daily?.id);
+    this.daily.isActive = true;
   }
   public next() {
-    this.pause();
-    const activeIndex = this.participants.findIndex((p) => p.isActive);
-    if (activeIndex < 0) {
-      this.participants[this.participants.length - 1].isActive = true;
-      if (this.participants.length === 1) {
-        this.lastParticipant = true;
-      }
-      return;
-    }
-    this.participants[activeIndex].isActive = false;
-    this.participants[activeIndex].isDone = true;
-    if (this.participants[activeIndex - 1]) {
-      this.participants[activeIndex - 1].isActive = true;
-      this.time = new Time(0, 0, 0);
-      this.interval = setInterval(() => {
-        this.time.updateSecond(this.time.second + 1);
-        this.dailyTime.updateSecond(this.dailyTime.second + 1);
-      }, 1000);
-    }
-    if (activeIndex - 1 === 0) {
-      this.lastParticipant = true;
-    }
+    this.socketService.dailyNext(this.daily.id);
   }
   public getTime() {
-    return this.time.toString();
+    return this.time?.toString();
   }
   public getDailyTime() {
-    return this.dailyTime.toString();
+    return this.dailyTime;
   }
   public pause() {
-    clearInterval(this.interval);
-    this.interval = null;
+    this.socketService.pauseDaily(this.daily?.id);
+  }
+  public stop() {
+    this.socketService.stopDaily(this.daily.id);
   }
   public getParticipantsCount() {
-    return `${this.participants?.length} ${this.getParticipantsCountLabel(
-      this.participants.length,
+    return `${this.daily?.participants?.length} ${this.getParticipantsCountLabel(
+      this.daily?.participants.length,
     )}`;
   }
 

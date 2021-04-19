@@ -8,6 +8,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { SocketIoModule } from 'ngx-socket-io';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SingUpComponent } from './security/sing-up/sing-up.component';
@@ -48,6 +49,9 @@ import { DemoComponent } from './project/demo/demo.component';
 import { RetroComponent } from './project/retro/retro.component';
 import { DemoService } from './services/demo.service';
 import { DailyComponent } from './project/daily/daily.component';
+import { SocketService } from './services/socket.service';
+import { AuthSocket } from './services/auth-socket';
+import { DailyService } from './services/daily.service';
 
 @NgModule({
   declarations: [
@@ -92,6 +96,7 @@ import { DailyComponent } from './project/daily/daily.component';
     NgSelectModule,
     CKEditorModule,
     DragDropModule,
+    SocketIoModule,
   ],
   providers: [
     FormBuilder,
@@ -103,6 +108,9 @@ import { DailyComponent } from './project/daily/daily.component';
     TaskService,
     RetroService,
     DemoService,
+    SocketService,
+    AuthSocket,
+    DailyService,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ContentTypeInterceptor, multi: true },
   ],

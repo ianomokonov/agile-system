@@ -13,6 +13,7 @@ import tasksHandler from '../handlers/task/tasks.handler';
 import authJWT from '../middleware/authJWT';
 import checkPermissions from '../middleware/check-project-permissions';
 import { Permissions } from '../utils';
+import dailyRouter from './daily';
 import demoRouter from './demo';
 import planningRouter from './planning';
 import retroRouter from './retro';
@@ -195,5 +196,6 @@ projectRouter.use('/:projectId/sprint', sprintRouter);
 projectRouter.use('/:projectId/planning', planningRouter);
 projectRouter.use('/:projectId/demo', demoRouter);
 projectRouter.use('/:projectId/retro', retroRouter);
+projectRouter.use('/:projectId/daily', dailyRouter);
 
 export default projectRouter;
