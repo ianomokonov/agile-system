@@ -8,6 +8,10 @@ class DemoService {
     return demoRepository.read(id);
   }
 
+  public async setActiveTask(demoId: number, taskId: number) {
+    return demoRepository.setActiveTask(demoId, taskId);
+  }
+
   public async getBySprintId(id: number) {
     return demoRepository.getByProjectSprintId(id);
   }
@@ -16,8 +20,8 @@ class DemoService {
     return demoRepository.finish(demoId);
   }
 
-  public async finishTasks(demoId: number) {
-    return demoRepository.finishDemoTasks(demoId);
+  public async finishTask(taskId: number) {
+    return demoRepository.finishDemoTask(taskId);
   }
 }
 

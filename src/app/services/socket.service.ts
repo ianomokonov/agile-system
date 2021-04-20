@@ -6,6 +6,8 @@ import { AuthSocket } from './auth-socket';
 export class SocketService {
   constructor(private socket: AuthSocket) {}
 
+  // --------------------------- DAILY ------------------------------------
+
   public enterDaily(dailyId: number) {
     this.socket.emit('enterDaily', dailyId);
   }
@@ -54,6 +56,10 @@ export class SocketService {
     return this.socket.fromEvent<{ isLast: boolean; participants: any[] }>('nextDailyParticipant');
   }
 
+  // --------------------------- DAILY ------------------------------------
+
+  // --------------------------- RETRO ------------------------------------
+
   public enterRetroRoom(retroId) {
     this.socket.emit('enterRetro', retroId);
   }
@@ -93,4 +99,38 @@ export class SocketService {
   public onFinishRetro() {
     return this.socket.fromEvent<any>('finishRetro');
   }
+
+  // --------------------------- RETRO ------------------------------------
+
+  // --------------------------- DEMO ------------------------------------
+
+  public enterDemoRoom(demoId) {
+    this.socket.emit('enterDemo', demoId);
+  }
+
+  public activeDemoTask(taskId) {
+    this.socket.emit('activeDemoTask', taskId);
+  }
+
+  public acceptDemoTask(taskId) {
+    this.socket.emit('acceptDemoTask', taskId);
+  }
+
+  public finishDemo() {
+    this.socket.emit('finishDemo');
+  }
+
+  public onActiveDemoTask() {
+    return this.socket.fromEvent<any>('activeDemoTask');
+  }
+
+  public onAcceptDemoTask() {
+    return this.socket.fromEvent<any>('acceptDemoTask');
+  }
+
+  public onFinishDemo() {
+    return this.socket.fromEvent<any>('finishDemo');
+  }
+
+  // --------------------------- DEMO ------------------------------------
 }

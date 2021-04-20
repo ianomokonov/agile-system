@@ -12,8 +12,12 @@ export class PlanningHandler {
     return demoService.finishDemo(demoId);
   }
 
-  public async finishTasks(demoId: number) {
-    return demoService.finishTasks(demoId);
+  public async setActiveTask(demoId: number, taskId: number) {
+    return demoService.setActiveTask(demoId, taskId);
+  }
+
+  public async finishTask(taskId: number) {
+    return demoService.finishTask(taskId);
   }
 }
 

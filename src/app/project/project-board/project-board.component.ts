@@ -123,4 +123,12 @@ export class ProjectBoardComponent implements OnInit {
           });
       });
   }
+
+  public canStartDemo(): boolean {
+    if (this.project.demo) {
+      return false;
+    }
+
+    return !!this.project.sprint?.tasks.find((t) => t.statusId === 7);
+  }
 }

@@ -11,6 +11,7 @@ import authSocketJWT from './middleware/authSocketJWT';
 import dailyRepository from './repositories/daily.repository';
 import { Time } from './models/time';
 import retroHandler from './handlers/retro.handler';
+import demoHandler from './handlers/demo.handler';
 
 const DEFAULT_PORT = 3000;
 
@@ -38,6 +39,8 @@ app.use('/task', taskRouter);
 const activeDailyTimers = [];
 
 io.use(authSocketJWT).on('connection', (socket) => {
+  // --------------------------- DAILY ------------------------------------
+
   socket.on('enterDaily', async (dailyId) => {
     const [id, participants] = await dailyRepository.enter(socket.userId, dailyId);
     const roomName = `daily${dailyId}`;
@@ -125,6 +128,10 @@ io.use(authSocketJWT).on('connection', (socket) => {
     }
   });
 
+  // --------------------------- DAILY ------------------------------------
+
+  // --------------------------- RETRO ------------------------------------
+
   socket.on('enterRetro', async (retroId) => {
     socket.retroRoom = `retro${retroId}`;
     socket.join(socket.retroRoom);
@@ -150,5 +157,48 @@ io.use(authSocketJWT).on('connection', (socket) => {
   socket.on('finishRetro', async (retroId) => {
     await retroHandler.finish(retroId);
     io.sockets.in(socket.retroRoom).emit('finishRetro');
+    io.sockets.clients(socket.retroRoom).forEach((s) => {
+      s.leave(s.retroRoom);
+      s.retroId = undefined;
+      s.retroRoom = undefined;
+    });
   });
+
+  // --------------------------- RETRO ------------------------------------
+
+  // --------------------------- DEMO ------------------------------------
+
+  socket.on('enterDemo', async (demoId) => {
+    socket.demoRoom = `demo${demoId}`;
+    socket.demoId = demoId;
+    socket.join(socket.demoRoom);
+  });
+
+  socket.on('activeDemoTask', async (taskId) => {
+    if (!socket.demoId) {
+      return;
+    }
+    demoHandler.setActiveTask(socket.demoId, taskId);
+    io.sockets.in(socket.demoRoom).emit('activeDemoTask', taskId);
+  });
+
+  socket.on('acceptDemoTask', async (taskId) => {
+    demoHandler.finishTask(taskId);
+    io.sockets.in(socket.demoRoom).emit('acceptDemoTask', taskId);
+  });
+
+  socket.on('finishDemo', async () => {
+    if (!socket.demoId) {
+      return;
+    }
+    demoHandler.finishDemo(socket.demoId);
+    io.sockets.in(socket.demoRoom).emit('finishDemo');
+    io.sockets.clients(socket.demoRoom).forEach((s) => {
+      s.leave(s.demoRoom);
+      s.demoId = undefined;
+      s.demoRoom = undefined;
+    });
+  });
+
+  // --------------------------- DEMO ------------------------------------
 });

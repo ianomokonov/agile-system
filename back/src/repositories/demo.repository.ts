@@ -76,6 +76,11 @@ class DemoRepository {
     return [tasks.filter((t) => !t.isFinished), tasks.filter((t) => t.isFinished)];
   }
 
+  public async setActiveTask(demoId: number, taskId: number) {
+    const query = sql.update('projectDemo', { activeTaskId: taskId }).where({ id: demoId });
+    await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
+  }
+
   public async finish(demoId: number) {
     let query = sql.update('projectDemo', { isFinished: true }).where({ id: demoId });
     await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
@@ -84,7 +89,7 @@ class DemoRepository {
     await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
   }
 
-  public async finishDemoTasks(demoTaskId: number) {
+  public async finishDemoTask(demoTaskId: number) {
     const query = sql.update('projectDemoTask', { isFinished: true }).where({ id: demoTaskId });
     await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
   }

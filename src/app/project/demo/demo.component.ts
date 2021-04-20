@@ -8,6 +8,7 @@ import { ProjectService } from 'src/app/services/project.service';
 import { TaskType } from 'back/src/models/task-type';
 import { Priority } from 'back/src/models/priority';
 import { forkJoin } from 'rxjs';
+import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
   selector: 'app-demo',
@@ -31,6 +32,7 @@ export class DemoComponent implements OnInit {
     public modalService: NgbModal,
     private fb: FormBuilder,
     private projectService: ProjectService,
+    private socketService: SocketService,
   ) {
     this.demoTaskForm = this.fb.group({
       name: [null, Validators.required],
@@ -42,6 +44,24 @@ export class DemoComponent implements OnInit {
   }
 
   public ngOnInit(): void {
+    this.socketService.onFinishDemo().subscribe(() => {
+      sessionStorage.removeItem(this.commentKey);
+      this.router.navigate(['../../', 'board'], { relativeTo: this.activatedRoute });
+    });
+    this.socketService.onAcceptDemoTask().subscribe((taskId) => {
+      const taskIndex = this.demo.taskToShow?.findIndex((t) => t.id === taskId);
+      if ((taskIndex || taskIndex === 0) && taskIndex > -1) {
+        this.demo.taskToShow[taskIndex].isFinished = true;
+        this.demo.shownTasks.unshift(this.demo.taskToShow[taskIndex]);
+        this.demo.taskToShow.splice(taskIndex, 1);
+      }
+    });
+    this.socketService.onActiveDemoTask().subscribe((demoTaskId) => {
+      this.router.navigate([], {
+        queryParams: { demoTaskId },
+        relativeTo: this.activatedRoute,
+      });
+    });
     if (sessionStorage.getItem(this.commentKey)) {
       this.commentControl.setValue(sessionStorage.getItem(this.commentKey), { emitEvent: false });
     }
@@ -59,23 +79,17 @@ export class DemoComponent implements OnInit {
   }
 
   public onTaskClick(demoTaskId) {
-    this.router.navigate([], {
-      queryParams: { demoTaskId },
-      relativeTo: this.activatedRoute,
-    });
+    this.socketService.activeDemoTask(demoTaskId);
   }
 
   public acceptTask(demoTaskId) {
     if (!this.activeTask) {
       return;
     }
-
-    this.demoService.finishTask(this.projectId, demoTaskId).subscribe(() => {
-      if (this.demo.taskToShow.length !== 1) {
-        this.onTaskClick(this.demo.taskToShow.find((t) => t.id !== demoTaskId).id);
-      }
-      this.getDemo(this.demo.id);
-    });
+    if (this.demo.taskToShow.length !== 1) {
+      this.onTaskClick(this.demo.taskToShow.find((t) => t.id !== demoTaskId).id);
+    }
+    this.socketService.acceptDemoTask(demoTaskId);
   }
 
   public finishDemo(createTask = false, template?) {
@@ -88,7 +102,7 @@ export class DemoComponent implements OnInit {
       return;
     }
 
-    const subscriptions: any[] = [this.demoService.finish(this.projectId, this.demo.id)];
+    const subscriptions: any[] = [];
 
     if (createTask) {
       const formValue = this.demoTaskForm.getRawValue();
@@ -103,11 +117,14 @@ export class DemoComponent implements OnInit {
       );
     }
 
-    forkJoin(subscriptions).subscribe(() => {
-      this.dismiss();
-      sessionStorage.removeItem(this.commentKey);
-      this.router.navigate(['../../', 'board'], { relativeTo: this.activatedRoute });
-    });
+    if (subscriptions.length) {
+      forkJoin(subscriptions).subscribe(() => {
+        this.dismiss();
+        this.socketService.finishDemo();
+      });
+      return;
+    }
+    this.socketService.finishDemo();
   }
 
   public dismiss() {
@@ -118,14 +135,18 @@ export class DemoComponent implements OnInit {
 
   private getDemo(id: number) {
     this.demoService.read(this.projectId, id).subscribe((demo) => {
-      if (demo.isFinished) {
+      if (demo.isFinished || (!demo.taskToShow?.length && !demo.shownTasks?.length)) {
         this.router.navigate(['../../', 'board'], { relativeTo: this.activatedRoute });
+        return;
       }
       this.demo = demo;
+      this.socketService.enterDemoRoom(demo.id);
 
       if (this.activatedRoute.snapshot.queryParams.demoTaskId) {
         this.setActiveTask(this.activatedRoute.snapshot.queryParams.demoTaskId);
+        return;
       }
+      this.onTaskClick(this.demo.taskToShow[0]?.id || this.demo.shownTasks[0]?.id);
     });
   }
 

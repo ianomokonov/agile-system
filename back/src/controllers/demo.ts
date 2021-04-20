@@ -30,7 +30,7 @@ demoRouter.delete(`/:demoId/finish`, async (req, res) => {
 });
 
 demoRouter.delete(`/finish-task/:demoTaskId`, async (req, res) => {
-  await demoHandler.finishTasks(+req.params.demoTaskId);
+  await demoHandler.finishTask(+req.params.demoTaskId);
   res.status(StatusCodes.OK).json('Задача обновлена');
 });
 
