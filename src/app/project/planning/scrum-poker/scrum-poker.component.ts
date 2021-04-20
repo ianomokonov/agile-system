@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProjectService } from 'src/app/services/project.service';
+import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
   selector: 'app-scrum-poker',
@@ -21,8 +22,12 @@ export class ScrumPokerComponent {
   constructor(
     private projectService: ProjectService,
     private activatedRoute: ActivatedRoute,
+    private socketService: SocketService,
     private router: Router,
   ) {
+    this.socketService.of('updatePlanningSession').subscribe(() => {
+      this.getSession({ id: this.projectId, taskId: this.taskId, planningId: this.planningId });
+    });
     activatedRoute.params.subscribe((params) => {
       if (params.taskId && params.planningId) {
         this.getSession(params as any);
@@ -34,6 +39,8 @@ export class ScrumPokerComponent {
   }
 
   public getSession({ id, taskId, planningId }) {
+    this.mantionedCards = [];
+    this.showResultValue = false;
     this.projectService.getPlanningSession(id, planningId, taskId).subscribe(
       (session) => {
         this.session = session;
@@ -52,38 +59,19 @@ export class ScrumPokerComponent {
   }
 
   public setCard(value) {
-    this.projectService.setSessionCard(this.projectId, this.session?.id, value).subscribe(() => {
-      this.getSession({
-        id: this.projectId,
-        taskId: this.session.task.id,
-        planningId: this.planningId,
-      });
-    });
+    this.socketService.planningVote(this.session?.id, value);
   }
 
   public openCards() {
-    this.projectService.setShowCards(this.projectId, this.session.id, true).subscribe(() => {
-      this.session.showCards = true;
-      this.mantionedCards = this.getMantionedCards(this.session.cards);
-    });
+    this.socketService.showPlanningCards(this.session.id);
   }
 
   public closeSession(value) {
-    this.projectService
-      .closeSession(this.projectId, this.session.id, value, this.taskId)
-      .subscribe(() => {
-        this.session.resultValue = value;
-        this.showResultValue = true;
-      });
+    this.socketService.setPlanningPoints(this.session.id, this.taskId, value);
   }
 
   public resetCards() {
-    this.projectService.resetCards(this.projectId, this.session.id).subscribe(() => {
-      this.session.cards = [];
-      this.activeMark = false;
-      this.session.showCards = false;
-      this.mantionedCards = [];
-    });
+    this.socketService.resetPlanningCards(this.session.id);
   }
 
   private getMantionedCards(cards) {

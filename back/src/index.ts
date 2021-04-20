@@ -12,6 +12,9 @@ import dailyRepository from './repositories/daily.repository';
 import { Time } from './models/time';
 import retroHandler from './handlers/retro.handler';
 import demoHandler from './handlers/demo.handler';
+import planningHandler from './handlers/planning.handler';
+import tasksHandler from './handlers/task/tasks.handler';
+import projectSprintHandler from './handlers/project/project-sprint.handler';
 
 const DEFAULT_PORT = 3000;
 
@@ -201,4 +204,84 @@ io.use(authSocketJWT).on('connection', (socket) => {
   });
 
   // --------------------------- DEMO ------------------------------------
+
+  // --------------------------- PLANNING ------------------------------------
+
+  socket.on('enterPlanning', async (planningId) => {
+    socket.planningRoom = `planning${planningId}`;
+    socket.planningId = planningId;
+    socket.join(socket.planningRoom);
+  });
+
+  socket.on('leavePlanning', async () => {
+    socket.leave(socket.planningRoom);
+    socket.planningRoom = undefined;
+    socket.planningId = undefined;
+  });
+
+  socket.on('takePlanningTask', async ({ taskId, sprintId }) => {
+    if (!socket.planningId) {
+      return;
+    }
+    tasksHandler.update({ id: taskId, projectSprintId: sprintId });
+    io.sockets.in(socket.planningRoom).emit('updatePlanning');
+  });
+
+  socket.on('removePlanningTask', async (taskId) => {
+    if (!socket.planningId) {
+      return;
+    }
+    tasksHandler.update({ id: taskId, projectSprintId: null });
+    io.sockets.in(socket.planningRoom).emit('updatePlanning');
+  });
+
+  socket.on('startPocker', async (taskId) => {
+    if (!socket.planningId) {
+      return;
+    }
+    const sessionId = await planningHandler.update(socket.planningId, { activeTaskId: taskId });
+    io.sockets.in(socket.planningRoom).emit('startPocker', { taskId, sessionId });
+  });
+
+  socket.on('planningVote', async ({ sessionId, points }) => {
+    if (!socket.planningId) {
+      return;
+    }
+    await planningHandler.setCard(sessionId, socket.userId, points);
+    io.sockets.in(socket.planningRoom).emit('updatePlanningSession');
+  });
+
+  socket.on('setPlanningPoints', async ({ sessionId, taskId, points }) => {
+    if (!socket.planningId) {
+      return;
+    }
+    await planningHandler.closeSession(sessionId, points, taskId);
+    io.sockets.in(socket.planningRoom).emit('updatePlanningSession');
+  });
+
+  socket.on('showPlanningCards', async (sessionId) => {
+    if (!socket.planningId) {
+      return;
+    }
+    await planningHandler.setShowCards(sessionId, true);
+    io.sockets.in(socket.planningRoom).emit('updatePlanningSession');
+  });
+
+  socket.on('resetPlanningCards', async (sessionId) => {
+    if (!sessionId) {
+      return;
+    }
+    await planningHandler.reset(sessionId);
+    io.sockets.in(socket.planningRoom).emit('updatePlanningSession');
+  });
+
+  socket.on('startPlanningSprint', async ({ sprintId, projectId }) => {
+    if (!sprintId) {
+      return;
+    }
+    await projectSprintHandler.start(sprintId, projectId);
+    io.sockets.in(socket.planningRoom).emit('startPlanningSprint');
+  });
+
+  // --------------------------- PLANNING ------------------------------------
 });

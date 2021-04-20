@@ -478,7 +478,7 @@ class ProjectRepository {
   }
 
   public async startSprint(sprintId: number, projectId: number) {
-    let query = sql.select('projectsprint', ['id']).where({ isActive: true });
+    let query = sql.select('projectsprint', ['id']).where({ isActive: true, projectId });
     const [[sprint]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,

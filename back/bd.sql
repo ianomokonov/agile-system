@@ -335,6 +335,7 @@ CREATE TABLE `projectDemo` (
   `sprintId` int(11) NOT NULL,
   `isFinished` bit DEFAULT 0,
   `projectId` int(11) NOT NULL,
+  `activeTaskId` int(11) NULL,
   PRIMARY KEY (`id`)
 ) COMMENT 'демо проекта';
 
@@ -366,6 +367,7 @@ CREATE TABLE `projectPlanning` (
   `isActive` bit DEFAULT 0,
   `isFinished` bit DEFAULT 0,
   `projectId` int(11) NOT NULL,
+  `activeTaskId` int(11) NULL,
   `activeStep` int(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`)
 ) COMMENT 'планирования проекта';
@@ -553,6 +555,20 @@ ALTER TABLE
   `planningTaskSessionCard`
 ADD
   FOREIGN KEY (sessionId) REFERENCES `projectPlanningTaskSession` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
+  `projectDemo`
+ADD
+  FOREIGN KEY (activeTaskId) REFERENCES `projectDemoTask` (`id`) ON DELETE
+SET
+  NULL;
+
+ALTER TABLE
+  `projectPlanning`
+ADD
+  FOREIGN KEY (activeTaskId) REFERENCES `projectTask` (`id`) ON DELETE
+SET
+  NULL;
 
 ALTER TABLE
   `projectDemoTask`

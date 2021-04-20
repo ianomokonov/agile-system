@@ -2,7 +2,7 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import * as sql from 'sql-query-generator';
 import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
-import { PlanningFullView, PlanningStep } from '../models/responses/planning';
+import { PlanningFullView } from '../models/responses/planning';
 import { PlanningUpdateRequest } from '../models/requests/planning-update.request';
 import taskRepository from './task.repository';
 
@@ -15,7 +15,6 @@ class PlanningRepository {
       sprintId,
       activeSprintId,
       isActive: true,
-      activeStep: activeSprintId ? PlanningStep.NewTasks : PlanningStep.MarkTasks,
     });
 
     const [result] = await dbConnection.query<ResultSetHeader>(
@@ -37,7 +36,6 @@ class PlanningRepository {
       .select('projectplanning', [
         'projectplanning.id',
         'projectplanning.isActive',
-        'projectplanning.activeStep',
         'projectplanning.activeTaskId',
         'projectplanning.createDate',
         'projectplanning.sprintId',
@@ -124,6 +122,8 @@ class PlanningRepository {
   }
 
   public async resetSessionCards(sessionId: number) {
+    console.log(sessionId);
+
     const query = sql.deletes('planningTaskSessionCard').where({ sessionId });
     await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
   }
@@ -167,12 +167,9 @@ class PlanningRepository {
       query = sql.update('planningTaskSessionCard', { value }).where({ id: cardId });
     }
 
-    const [result] = await dbConnection.query<ResultSetHeader>(
-      getQueryText(query.text),
-      query.values,
-    );
+    await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
 
-    return result?.insertId;
+    return this.getSessionCard(sessionId, userId);
   }
 
   public async closeSession(sessionId: number, value: number) {

@@ -5,7 +5,7 @@ export class TasksHandler {
   public async create(projectId: number, request: CreateTaskRequest) {
     return taskService.create(projectId, request);
   }
-  public async update(request: UpdateTaskRequest) {
+  public async update(request: Partial<UpdateTaskRequest>) {
     return taskService.update(request);
   }
   public async read(taskId: number) {

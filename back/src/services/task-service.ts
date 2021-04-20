@@ -15,7 +15,7 @@ class TaskService {
 
     return taskRepository.create(projectId, request);
   }
-  public async update(request: UpdateTaskRequest) {
+  public async update(request: Partial<UpdateTaskRequest>) {
     taskRepository.update(request);
   }
   public async updateTaskStatus(taskId: number, statusId: number) {

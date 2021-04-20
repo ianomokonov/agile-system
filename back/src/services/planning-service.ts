@@ -24,9 +24,9 @@ class PlanningService {
 
       planning.newTasks = newTasks;
       planning.notMarkedTasks = notMarkedTasks;
-      if (!newTasks?.length) {
-        planning.activeStep = PlanningStep.MarkTasks;
-        this.update(planning.id, { activeStep: PlanningStep.MarkTasks });
+      planning.activeStep = PlanningStep.MarkTasks;
+      if (newTasks?.length) {
+        planning.activeStep = PlanningStep.NewTasks;
       }
     }
 
@@ -34,10 +34,12 @@ class PlanningService {
   }
 
   public async update(planningId: number, request: PlanningUpdateRequest) {
+    const update = planningRepository.update(planningId, request);
     if (request.activeTaskId) {
-      planningRepository.createSession(planningId, request.activeTaskId);
+      return planningRepository.createSession(planningId, request.activeTaskId);
     }
-    return planningRepository.update(planningId, request);
+
+    return update;
   }
 
   public async getSession(planningId: number, taskId: number, userId: number) {

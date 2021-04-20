@@ -1,8 +1,7 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TaskResponse } from 'back/src/models/responses/task.response';
-import { ProjectService } from 'src/app/services/project.service';
-import { TaskService } from 'src/app/services/task.service';
+import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
   selector: 'app-discuss-new-tasks',
@@ -14,7 +13,11 @@ export class DiscussNewTasksComponent {
   @Input() public newSprintId: number;
   @Input() public set tasks(tasks) {
     this.tasksPrivate = tasks;
-    if (this.activatedRoute.snapshot.queryParams.taskId) {
+
+    if (
+      this.activatedRoute.snapshot.queryParams.taskId &&
+      this.tasks.find((t) => t.id === +this.activatedRoute.snapshot.queryParams.taskId)
+    ) {
       this.setActiveTask(this.activatedRoute.snapshot.queryParams.taskId);
       return;
     }
@@ -26,12 +29,10 @@ export class DiscussNewTasksComponent {
   public get tasks(): TaskResponse[] {
     return this.tasksPrivate;
   }
-  @Output() public update: EventEmitter<void> = new EventEmitter();
   public activeTask: TaskResponse | undefined;
   constructor(
     private activatedRoute: ActivatedRoute,
-    private projectService: ProjectService,
-    private taskService: TaskService,
+    private socketService: SocketService,
     private router: Router,
   ) {
     this.activatedRoute.queryParams.subscribe((params) => {
@@ -49,15 +50,11 @@ export class DiscussNewTasksComponent {
   }
 
   public takeToSprint(taskId: number) {
-    this.taskService.editTask(taskId, { projectSprintId: this.newSprintId }).subscribe(() => {
-      this.update.emit();
-    });
+    this.socketService.takePlanningTask(taskId, this.newSprintId);
   }
 
   public removeFromSprint(taskId: number) {
-    this.taskService.editTask(taskId, { projectSprintId: null }).subscribe(() => {
-      this.update.emit();
-    });
+    this.socketService.removePlanningTask(taskId);
   }
 
   private setActiveTask(taskId) {

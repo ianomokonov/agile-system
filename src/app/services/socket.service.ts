@@ -133,4 +133,48 @@ export class SocketService {
   }
 
   // --------------------------- DEMO ------------------------------------
+
+  // --------------------------- PLANNING ------------------------------------
+
+  public enterPlanningRoom(planningId) {
+    this.socket.emit('enterPlanning', planningId);
+  }
+
+  public takePlanningTask(taskId, sprintId) {
+    this.socket.emit('takePlanningTask', { taskId, sprintId });
+  }
+
+  public removePlanningTask(taskId) {
+    this.socket.emit('removePlanningTask', taskId);
+  }
+
+  public startPocker(taskId) {
+    this.socket.emit('startPocker', taskId);
+  }
+
+  public planningVote(sessionId, points) {
+    this.socket.emit('planningVote', { sessionId, points });
+  }
+
+  public showPlanningCards(sessionId) {
+    this.socket.emit('showPlanningCards', sessionId);
+  }
+
+  public resetPlanningCards(sessionId) {
+    this.socket.emit('resetPlanningCards', sessionId);
+  }
+
+  public setPlanningPoints(sessionId, taskId, points) {
+    this.socket.emit('setPlanningPoints', { sessionId, taskId, points });
+  }
+
+  public startPlanningSprint(sprintId, projectId) {
+    this.socket.emit('startPlanningSprint', { sprintId, projectId });
+  }
+
+  public of(eventName: string) {
+    return this.socket.fromEvent<any>(eventName);
+  }
+
+  // --------------------------- PLANNING ------------------------------------
 }

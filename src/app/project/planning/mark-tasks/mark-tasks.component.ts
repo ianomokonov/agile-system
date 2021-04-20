@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PlanningFullView } from 'back/src/models/responses/planning';
 import { TaskResponse } from 'back/src/models/responses/task.response';
 import { ProjectService } from 'src/app/services/project.service';
-import { TaskService } from 'src/app/services/task.service';
+import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
   selector: 'app-mark-tasks',
@@ -16,10 +16,23 @@ export class MarkTasksComponent implements OnInit {
   constructor(
     private activatedRoute: ActivatedRoute,
     private projectService: ProjectService,
-    private taskService: TaskService,
+    private socketService: SocketService,
     private router: Router,
   ) {}
   public ngOnInit(): void {
+    this.socketService.of('startPlanningSprint').subscribe(() => {
+      this.router.navigate(['../../board'], { relativeTo: this.activatedRoute });
+    });
+    this.socketService.of('updatePlanning').subscribe(() => {
+      this.getPlanning(this.projectId, this.planning?.id);
+    });
+    this.socketService.of('startPocker').subscribe(({ taskId, sessionId }) => {
+      const task = this.planning?.notMarkedTasks.find((t) => t.id === taskId);
+      if (task) {
+        task.activeSessionId = sessionId;
+        this.onStartPokerClick(task);
+      }
+    });
     this.activatedRoute.params.subscribe((params) => {
       if (params.planningId) {
         this.projectId = params.id;
@@ -29,14 +42,13 @@ export class MarkTasksComponent implements OnInit {
   }
 
   public onRemoveFromSprintClick(taskId: number) {
-    this.taskService.editTask(taskId, { projectSprintId: null }).subscribe(() => {
-      if (this.planning) {
-        this.planning.notMarkedTasks = this.planning?.notMarkedTasks.filter((t) => t.id !== taskId);
-      }
-    });
+    this.socketService.removePlanningTask(taskId);
   }
 
-  public getPlanning(projectId: number, id: number) {
+  public getPlanning(projectId: number, id?: number) {
+    if (!id) {
+      return;
+    }
     this.projectService.getPlanning(projectId, id).subscribe((planning) => {
       this.planning = planning;
     });
@@ -46,9 +58,7 @@ export class MarkTasksComponent implements OnInit {
     if (!this.planning) {
       return;
     }
-    this.projectService.startSprint(this.projectId, this.planning?.sprintId).subscribe(() => {
-      this.router.navigate(['../../board'], { relativeTo: this.activatedRoute });
-    });
+    this.socketService.startPlanningSprint(this.planning?.sprintId, this.projectId);
   }
 
   public onStartPokerClick(task: TaskResponse) {
@@ -59,10 +69,6 @@ export class MarkTasksComponent implements OnInit {
       this.router.navigate(['task', task.id], { relativeTo: this.activatedRoute });
       return;
     }
-    this.projectService
-      .updatePlanning(this.projectId, this.planning.id, { activeTaskId: task.id })
-      .subscribe(() => {
-        this.router.navigate(['task', task.id], { relativeTo: this.activatedRoute });
-      });
+    this.socketService.startPocker(task.id);
   }
 }
