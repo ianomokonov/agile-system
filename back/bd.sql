@@ -350,7 +350,8 @@ CREATE TABLE `projectDemoTask` (
   `demoId` int(11) NOT NULL,
   `isFinished` bit DEFAULT 0,
   `taskId` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  CONSTRAINT uniqPDT UNIQUE (demoId, taskId)
 ) COMMENT 'задачи демо проекта';
 
 -- ---

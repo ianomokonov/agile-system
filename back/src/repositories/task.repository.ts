@@ -61,8 +61,10 @@ class TaskRepository {
         'statusId',
         'typeId',
         'priorityId',
+        'projectId',
         'createDate',
         'projectUserId',
+        'projectSprintId',
         'points',
       ])
       .where({ id: taskId });
@@ -120,8 +122,16 @@ class TaskRepository {
     return insertId;
   }
 
+  // eslint-disable-next-line complexity
   public async update(request: Partial<UpdateTaskRequest>) {
     try {
+      if ('projectSprintId' in request) {
+        const query = sql
+          .update('projectPlanningTaskSession', { isCanceled: true })
+          .where({ taskId: request.id })
+          .and({ resultValue: null }, 'IS');
+        dbConnection.query(getQueryText(query.text), query.values);
+      }
       const model = {} as any;
       const specialKeys = ['id'];
       Object.keys(request)
@@ -132,14 +142,26 @@ class TaskRepository {
 
       let query = sql.update('projecttask', model).where({ id: request.id });
 
-      dbConnection.query(getQueryText(query.text), query.values);
+      await dbConnection.query(getQueryText(query.text), query.values);
 
-      if ('projectSprintId' in request) {
+      if ('statusId' in request && request.statusId === 7) {
+        const task = await this.getShortTaskView(request.id);
+
+        if (!task.projectSprintId) {
+          return;
+        }
         query = sql
-          .update('projectPlanningTaskSession', { isCanceled: true })
-          .where({ taskId: request.id })
-          .and({ resultValue: null }, 'IS');
-        dbConnection.query(getQueryText(query.text), query.values);
+          .select('projectdemo', '*')
+          .where({ sprintId: task.projectSprintId, isFinished: false });
+        const [[demo]] = await dbConnection.query<RowDataPacket[]>(
+          getQueryText(query.text),
+          query.values,
+        );
+
+        if (demo) {
+          query = sql.insert('projectdemotask', { demoId: demo.id, taskId: task.id });
+          await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
+        }
       }
     } catch (error) {
       logger.error(error);
@@ -147,12 +169,7 @@ class TaskRepository {
   }
 
   public async updateTaskStatus(taskId: number, statusId: number) {
-    const query = sql
-      .update('projecttask', {
-        statusId,
-      })
-      .where({ id: taskId });
-    dbConnection.query(getQueryText(query.text), query.values);
+    this.update({ id: taskId, statusId });
   }
 
   public async delete(taskId: number) {

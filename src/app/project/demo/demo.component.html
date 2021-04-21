@@ -3,7 +3,11 @@
     <h4 class="mb-0">Демо спринта "{{ demo.sprintName }}"</h4>
     <div class="text-right">
       <div
-        class="btn btn-outline-primary"
+        class="btn"
+        [ngClass]="{
+          'btn-outline-primary': demo.taskToShow?.length,
+          'btn-primary': !demo.taskToShow?.length
+        }"
         (click)="finishDemo(false, createDemoTask)"
         *ngIf="!demo.isFinished"
       >

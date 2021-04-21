@@ -7,8 +7,10 @@ export interface TaskShortView {
   name: string;
   statusId: number;
   createDate: Date;
+  projectId: number;
   priorityId: Priority;
   typeId: TaskType;
   points: number;
+  projectSprintId: number;
   projectUser: UserShortView;
 }
