@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 import express from 'express';
+import path from 'path';
 import cors from 'cors';
 import http from 'http';
 import projectRouter from './controllers/project';
@@ -34,6 +35,7 @@ server
 app.use(express.json());
 app.use(handleError);
 app.use(cors());
+app.use(express.static(path.resolve(__dirname, 'files')));
 app.use('/user', userRouter);
 app.use('/project', projectRouter);
 app.use('/task', taskRouter);

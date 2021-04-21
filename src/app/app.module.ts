@@ -54,6 +54,7 @@ import { AuthSocket } from './services/auth-socket';
 import { DailyService } from './services/daily.service';
 import { TaskPriorityDirective } from './project/directives/task-priority.directive';
 import { TaskTypeDirective } from './project/directives/task-type.directive';
+import { FileUploaderComponent } from './shared/file-uploader/file-uploader.component';
 
 @NgModule({
   declarations: [
@@ -88,6 +89,7 @@ import { TaskTypeDirective } from './project/directives/task-type.directive';
     DailyComponent,
     TaskPriorityDirective,
     TaskTypeDirective,
+    FileUploaderComponent,
   ],
   imports: [
     BrowserModule,
@@ -116,7 +118,7 @@ import { TaskTypeDirective } from './project/directives/task-type.directive';
     AuthSocket,
     DailyService,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: ContentTypeInterceptor, multi: true },
+    // { provide: HTTP_INTERCEPTORS, useClass: ContentTypeInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],
 })

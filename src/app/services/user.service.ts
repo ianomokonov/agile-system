@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CreateUserRequest } from 'back/src/models/requests/create-user.request';
-import { UserInfo } from 'back/src/models/user-info';
 import { environment } from 'src/environments/environment';
 import { tap } from 'rxjs/operators';
 import { TokensResponse } from 'back/src/models/responses/tokens.response';
@@ -16,7 +15,7 @@ export class UserService {
   constructor(private http: HttpClient, private tokenService: TokenService) {}
 
   public signUp(user: CreateUserRequest): Observable<TokensResponse> {
-    return this.http.post<TokensResponse>(`${this.baseUrl}/sign-up`, JSON.stringify(user)).pipe(
+    return this.http.post<TokensResponse>(`${this.baseUrl}/sign-up`, user).pipe(
       tap((tokens) => {
         this.tokenService.storeTokens(tokens);
       }),
@@ -53,8 +52,8 @@ export class UserService {
     );
   }
 
-  public editProfile(user: UserInfo) {
-    return this.http.put(`${this.baseUrl}/profile`, JSON.stringify(user));
+  public editProfile(user: FormData) {
+    return this.http.put(`${this.baseUrl}/profile`, user);
   }
 
   public logout() {

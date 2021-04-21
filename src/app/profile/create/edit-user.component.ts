@@ -12,7 +12,13 @@ import { UserService } from 'src/app/services/user.service';
 export class EditUserComponent {
   public userForm: FormGroup;
   public set user(user: GetProfileInfoResponse) {
-    this.userForm?.patchValue(user);
+    this.userForm?.patchValue({
+      name: user.name,
+      surname: user.surname,
+      vk: user.vk,
+      gitHub: user.gitHub,
+      image: { file: null, path: user.image },
+    });
   }
   constructor(
     private fb: FormBuilder,
@@ -20,6 +26,7 @@ export class EditUserComponent {
     private userService: UserService,
   ) {
     this.userForm = fb.group({
+      image: null,
       name: [null, Validators.required],
       surname: [null, Validators.required],
       vk: [null],
@@ -33,7 +40,16 @@ export class EditUserComponent {
       return;
     }
     const formValue = this.userForm.getRawValue();
-    this.userService.editProfile(formValue).subscribe(() => {
+    const formData = new FormData();
+    formData.append('name', formValue.name);
+    formData.append('surname', formValue.surname);
+    formData.append('vk', formValue.vk);
+    formData.append('gitHub', formValue.gitHub);
+    if (formValue.image?.file || formValue.image?.path) {
+      formData.append('image', formValue.image?.file || formValue.image?.path);
+    }
+
+    this.userService.editProfile(formData).subscribe(() => {
       this.activeModal.close(formValue);
     });
   }

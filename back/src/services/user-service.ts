@@ -19,8 +19,8 @@ class UserService {
     return userRepository.getUserByEmail(email);
   }
 
-  public async getUserById(userId: number) {
-    return userRepository.getUserById(userId);
+  public async getUserById(userId: number, withProjects?) {
+    return userRepository.getUserById(userId, withProjects);
   }
 
   public async getUsers(searchString?: string) {

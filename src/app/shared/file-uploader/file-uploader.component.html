@@ -1,0 +1,18 @@
+<div class="d-flex align-items-center mb-3">
+  <div *ngIf="value?.path; else placeholder">
+    <img [src]="value?.path" class="{{ imgClass }}" />
+  </div>
+
+  <ng-template #placeholder>
+    <ng-content></ng-content>
+  </ng-template>
+
+  <span class="text text-muted ml-3" *ngIf="!value?.path" (click)="onUploadFileClick($event)"
+    >Добавить изображение</span
+  >
+  <span class="text text-muted ml-3" *ngIf="value?.path" (click)="onRemoveFileClick($event)"
+    >Удалить изображение</span
+  >
+</div>
+
+<div class="file-inputs" #inputFileContainer></div>

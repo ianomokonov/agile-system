@@ -10,7 +10,11 @@
         <h6 class="m-0">{{ user.name }} {{ user.surname }}</h6>
         <small>{{ user.email }}</small>
       </div>
-      <img src="../../assets/images/default_ava.png" class="h-100" alt="" />
+      <img
+        [src]="user.image || '../../assets/images/default_ava.jpg'"
+        class="profile-img placeholder"
+        alt=""
+      />
     </div>
   </div>
   <div class="board">

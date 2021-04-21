@@ -22,7 +22,7 @@ class UserRepository {
     return result[0] as CheckUserResponse;
   }
 
-  public async getUserById(userId: number): Promise<GetProfileInfoResponse> {
+  public async getUserById(userId: number, withProjects = true): Promise<GetProfileInfoResponse> {
     const query = sql
       .select('user', ['name', 'surname', 'email', 'vk', 'github', 'image'])
       .where({ id: userId });
@@ -33,7 +33,9 @@ class UserRepository {
     if (!user) {
       return null;
     }
-    user.projects = await projectRepository.getUserProjects(userId);
+    if (withProjects) {
+      user.projects = await projectRepository.getUserProjects(userId);
+    }
 
     return (user as unknown) as GetProfileInfoResponse;
   }
@@ -66,7 +68,13 @@ class UserRepository {
 
   public async editUser(userId: number, user: UserInfo) {
     const query = sql
-      .update('user', { name: user.name, surname: user.surname, vk: user.vk, gitHub: user.gitHub })
+      .update('user', {
+        name: user.name,
+        surname: user.surname,
+        vk: user.vk,
+        gitHub: user.gitHub,
+        image: user.image,
+      })
       .where({ id: userId });
     await dbConnection.query(getQueryText(query.text), query.values);
   }

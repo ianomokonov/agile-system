@@ -9,8 +9,8 @@ export class ProfileService {
   private user: GetProfileInfoResponse | undefined;
   constructor(private userService: UserService) {}
 
-  public getUser(): Observable<GetProfileInfoResponse> {
-    if (this.user) {
+  public getUser(force?: boolean): Observable<GetProfileInfoResponse> {
+    if (!force && this.user) {
       return of(this.user);
     }
 

@@ -35,15 +35,15 @@ export class ProfileComponent implements OnInit {
   ) {}
 
   public ngOnInit(): void {
-    this.profileService.getUser().subscribe((info) => {
+    this.profileService.getUser(true).subscribe((info) => {
       this.userInfo = info;
     });
   }
   public onEditUserClick() {
     const modal = this.modalService.open(EditUserComponent);
     modal.componentInstance.user = this.userInfo;
-    modal.closed.subscribe((result) => {
-      this.userInfo = { ...this.userInfo, ...result };
+    modal.closed.subscribe(() => {
+      this.ngOnInit();
     });
   }
 
