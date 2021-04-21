@@ -20,6 +20,7 @@ import { CreateTaskComponent } from './create-task/create-task.component';
 })
 export class ProjectBoardComponent implements OnInit {
   public project: ProjectResponse;
+  public delay: number;
   private users: UserShortView[];
   public tasks: TaskShortView[][] = [];
   constructor(
@@ -53,7 +54,15 @@ export class ProjectBoardComponent implements OnInit {
       return null;
     }
     const finishDate = new Date(startDate);
+    const today = new Date();
+    today.setHours(0);
+    today.setMinutes(0);
+    today.setSeconds(0);
     finishDate.setDate(finishDate.getDate() + 14);
+    if (today.getTime() > finishDate.getTime()) {
+      this.delay = new Date(today.getTime() - finishDate.getTime()).getUTCDate() - 1;
+      return today;
+    }
     return finishDate;
   }
   private setTasks(tasks: TaskShortView[]) {
