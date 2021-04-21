@@ -464,12 +464,12 @@ ADD
 ALTER TABLE
   `projectTask`
 ADD
-  FOREIGN KEY (parentId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
+  FOREIGN KEY (parentId) REFERENCES `projectTask` (`id`) ON DELETE SET NULL;
 
 ALTER TABLE
   `projectTask`
 ADD
-  FOREIGN KEY (projectUserId) REFERENCES `projectUser` (`id`) ON DELETE NO ACTION;
+  FOREIGN KEY (projectUserId) REFERENCES `projectUser` (`id`) ON DELETE SET NULL;
 
 ALTER TABLE
   `projectTask`
@@ -484,7 +484,9 @@ ADD
 ALTER TABLE
   `projectTask`
 ADD
-  FOREIGN KEY (projectSprintId) REFERENCES `projectSprint` (`id`) ON DELETE CASCADE;
+  FOREIGN KEY (projectSprintId) REFERENCES `projectSprint` (`id`) ON DELETE
+SET
+  NULL;
 
 ALTER TABLE
   `projectTaskLink`

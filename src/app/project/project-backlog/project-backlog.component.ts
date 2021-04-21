@@ -76,12 +76,10 @@ export class ProjectBacklogComponent implements OnInit {
   public onCreateSprint() {
     const modal = this.modalService.open(CreateSprintComponent, { centered: true });
     modal.result
-      .then(({ startSprint, sprint }) => {
-        this.projectService
-          .addSprint(this.projectDataService.project.id, { ...sprint, start: startSprint })
-          .subscribe(() => {
-            this.getBackLog(this.projectDataService.project.id);
-          });
+      .then((sprint) => {
+        this.projectService.addSprint(this.projectDataService.project.id, sprint).subscribe(() => {
+          this.getBackLog(this.projectDataService.project.id);
+        });
       })
       .catch(() => {});
   }

@@ -20,12 +20,12 @@ export class CreateSprintComponent {
     this.modal.dismiss();
   }
 
-  public close(startSprint = false) {
+  public close() {
     if (this.sprintForm.invalid) {
       this.sprintForm.markAllAsTouched();
       return;
     }
 
-    this.modal.close({ startSprint, sprint: this.sprintForm.getRawValue() });
+    this.modal.close(this.sprintForm.getRawValue());
   }
 }
