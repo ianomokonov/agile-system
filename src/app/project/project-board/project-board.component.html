@@ -37,8 +37,15 @@
         Создать задачу
       </div>
       <div class="task rounded" *ngFor="let task of tasksStatus" cdkDrag>
-        <small class="text-muted">#{{ task.id }}</small>
+        <div class="d-flex justify-content-between mb-1">
+          <small class="text-muted">#{{ task.id }}</small>
+          <div class="badge bg-secondary" *ngIf="task.points">{{ task.points }}</div>
+        </div>
         <h6 [routerLink]="['/task', task.id]">{{ task.name }}</h6>
+        <div class="d-flex">
+          <div class="mr-1" [taskType]="task.typeId">{{ task.typeId | taskType }}</div>
+          <div [taskPriority]="task.priorityId">{{ task.priorityId | priority }}</div>
+        </div>
         <small class="text-muted"
           >{{ task.projectUser?.name }} {{ task.projectUser?.surname }}</small
         >

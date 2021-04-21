@@ -111,12 +111,16 @@
 
 <ng-template #taskTemp let-task let-show="showBtn">
   <div
-    class="task rounded w-100 d-flex flex-wrap align-items-center"
+    class="task rounded w-100 d-flex flex-column justify-content-center"
     [ngClass]="{ active: activeTask?.id === task.id }"
     (click)="onTaskClick(task.id)"
   >
     <small class="text-muted mr-3">#{{ task.task.id }}</small>
-    <h6 class="d-inline text-dark mb-0">{{ task.task.name }}</h6>
+    <h6 class="d-inline text-dark">{{ task.task.name }}</h6>
+    <div class="d-flex">
+      <div class="mr-1" [taskType]="task.task.typeId">{{ task.task.typeId | taskType }}</div>
+      <div [taskPriority]="task.task.priorityId">{{ task.task.priorityId | priority }}</div>
+    </div>
   </div>
 </ng-template>
 

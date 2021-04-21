@@ -52,6 +52,8 @@ import { DailyComponent } from './project/daily/daily.component';
 import { SocketService } from './services/socket.service';
 import { AuthSocket } from './services/auth-socket';
 import { DailyService } from './services/daily.service';
+import { TaskPriorityDirective } from './project/directives/task-priority.directive';
+import { TaskTypeDirective } from './project/directives/task-type.directive';
 
 @NgModule({
   declarations: [
@@ -84,6 +86,8 @@ import { DailyService } from './services/daily.service';
     DemoComponent,
     RetroComponent,
     DailyComponent,
+    TaskPriorityDirective,
+    TaskTypeDirective,
   ],
   imports: [
     BrowserModule,

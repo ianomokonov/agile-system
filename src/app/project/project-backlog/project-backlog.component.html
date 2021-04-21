@@ -35,7 +35,7 @@
         </button>
         <ng-container *ngIf="sprint.isActive">
           <button
-            *ngIf="!sprint.demo?.isFinished"
+            *ngIf="canStartDemo(sprint)"
             class="btn btn-outline-info"
             [routerLink]="['../planning', sprint.planningId]"
           >
@@ -96,7 +96,11 @@
       >
     </div>
     <div class="col-4 pr-0 d-flex align-items-center justify-content-end">
-      <small class="text-muted">{{ task.projectUser?.name }} {{ task.projectUser?.surname }}</small>
+      <small class="text-muted mr-1"
+        >{{ task.projectUser?.name }} {{ task.projectUser?.surname }}</small
+      >
+      <div class="mr-1" [taskType]="task.typeId">{{ task.typeId | taskType }}</div>
+      <div class="mr-1" [taskPriority]="task.priorityId">{{ task.priorityId | priority }}</div>
       <button
         *ngIf="show"
         class="btn icon-btn ml-3"

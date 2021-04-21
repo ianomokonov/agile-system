@@ -84,6 +84,14 @@ export class ProjectBacklogComponent implements OnInit {
       .catch(() => {});
   }
 
+  public canStartDemo(sprint): boolean {
+    if (sprint.demo) {
+      return false;
+    }
+
+    return !!sprint.tasks.find((t) => t.statusId === 7);
+  }
+
   public onStartPlanning(sprintId) {
     this.projectService
       .startPlanning(

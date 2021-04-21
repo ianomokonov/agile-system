@@ -398,6 +398,7 @@ class ProjectRepository {
       'priorityId',
       'createDate',
       'projectUserId',
+      'points',
     ]);
 
     if (projectSprintId) {
