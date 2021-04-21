@@ -7,6 +7,7 @@ import { TaskShortView } from '../models/responses/task-short-view';
 import { TaskResponse } from '../models/responses/task.response';
 import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
+// eslint-disable-next-line import/no-cycle
 import projectRepository from './project.repository';
 
 sql.use('mysql');

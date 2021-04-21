@@ -22,7 +22,7 @@
   </div>
   <div class="poker w-50">
     <div
-      class="w-100 h-75 d-flex justify-content-center align-items-center"
+      class="w-100 h-75 d-flex align-items-center"
       *ngIf="showResultValue"
     >
       <div class="card main">
@@ -55,20 +55,16 @@
       </div>
     </ng-container>
     <div class="d-flex" *ngIf="session.cards?.length">
-      <ng-container *ngIf="!showResultValue"
-        ><button
-          *ngIf="session.showCards"
-          class="btn btn-outline-primary mr-1"
-          (click)="resetCards()"
-        >
-          Сбросить
-        </button>
+      <button *ngIf="session.showCards" class="btn btn-outline-primary mr-1" (click)="resetCards()">
+        Сбросить
+      </button>
+      <ng-container *ngIf="!showResultValue">
         <button *ngIf="!session.showCards" class="btn btn-primary" (click)="openCards()">
           Показать
         </button>
       </ng-container>
       <button *ngIf="showResultValue" class="btn btn-primary" [routerLink]="['../../']">
-        Продолжить
+        К задачам
       </button>
     </div>
   </div>

@@ -220,7 +220,7 @@ io.use(authSocketJWT).on('connection', (socket) => {
   });
 
   socket.on('takePlanningTask', async ({ taskId, sprintId }) => {
-    if (!socket.planningId) {
+    if (!sprintId) {
       return;
     }
     tasksHandler.update({ id: taskId, projectSprintId: sprintId });
@@ -267,12 +267,13 @@ io.use(authSocketJWT).on('connection', (socket) => {
     io.sockets.in(socket.planningRoom).emit('updatePlanningSession');
   });
 
-  socket.on('resetPlanningCards', async (sessionId) => {
+  socket.on('resetPlanningCards', async ({ sessionId, taskId }) => {
     if (!sessionId) {
       return;
     }
-    await planningHandler.reset(sessionId);
+    await planningHandler.reset(sessionId, taskId);
     io.sockets.in(socket.planningRoom).emit('updatePlanningSession');
+    io.sockets.in(socket.planningRoom).emit('updatePlanning');
   });
 
   socket.on('startPlanningSprint', async ({ sprintId, projectId }) => {

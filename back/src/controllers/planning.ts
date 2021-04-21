@@ -27,7 +27,6 @@ planningRouter.get(`/:planningId`, async (req, res) => {
 planningRouter.get(`/:planningId/task/:taskId`, async (req, res) => {
   try {
     const planning = await planningHandler.getPlanningTaskSession(
-      +req.params.planningId,
       +req.params.taskId,
       res.locals.userId,
     );
@@ -45,21 +44,6 @@ planningRouter.put(`/:planningId/update`, async (req, res) => {
 planningRouter.put(`/:sessionId/set-card`, async (req, res) => {
   await planningHandler.setCard(+req.params.sessionId, res.locals.userId, req.body.value);
   res.status(StatusCodes.OK).json('Карточка сохранена');
-});
-
-planningRouter.post(`/:sessionId/close`, async (req, res) => {
-  await planningHandler.closeSession(+req.params.sessionId, req.body.value, req.body.taskId);
-  res.status(StatusCodes.OK).json('Сессия закрыта');
-});
-
-planningRouter.post(`/:sessionId/set-show-cards`, async (req, res) => {
-  await planningHandler.setShowCards(+req.params.sessionId, req.body.showCards);
-  res.status(StatusCodes.OK).json('Карточки открыты');
-});
-
-planningRouter.delete(`/:sessionId/reset`, async (req, res) => {
-  await planningHandler.reset(+req.params.sessionId);
-  res.status(StatusCodes.OK).json('Оценки сюрошены');
 });
 
 export default planningRouter;

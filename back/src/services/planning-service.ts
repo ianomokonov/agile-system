@@ -42,8 +42,8 @@ class PlanningService {
     return update;
   }
 
-  public async getSession(planningId: number, taskId: number, userId: number) {
-    const session = await planningRepository.getSession(planningId, taskId, userId);
+  public async getSession(taskId: number, userId: number) {
+    const session = await planningRepository.getSession(taskId, true, userId);
     if (!session) {
       throw new WebError(StatusCodes.NOT_FOUND, 'Сессия не найдена');
     }
@@ -57,9 +57,9 @@ class PlanningService {
     return planningRepository.setSessionCard(sessionId, userId, value, card?.id);
   }
 
-  public async reset(sessionId: number) {
+  public async reset(sessionId: number, taskId: number) {
     planningRepository.setShowCards(sessionId, false);
-    return planningRepository.resetSessionCards(sessionId);
+    return planningRepository.resetSessionCards(sessionId, taskId);
   }
 
   public async setShowCards(sessionId: number, showCards: boolean) {

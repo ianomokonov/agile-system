@@ -1,34 +1,37 @@
-<div class="tasks-list content p-2 rounded mb-2" *ngIf="planning?.notMarkedTasks?.length">
+<div class="tasks-list content p-2 rounded mb-2">
   <div class="header mb-3">Задачи для оценки</div>
-  <div
-    class="task rounded d-flex justify-content-between align-items-center"
-    *ngFor="let task of planning?.notMarkedTasks"
-  >
-    <div class="d-flex align-items-center">
-      <small class="text-muted mr-3">#{{ task.id }}</small>
-      <a [routerLink]="task.activeSessionId ? ['task', task.id] : ['/task', task.id]"
-        ><h6 class="d-inline text-dark mb-0">{{ task.name }}</h6></a
-      >
-    </div>
-    <div>
-      <div class="badge btn-outline-primary mr-2" (click)="onRemoveFromSprintClick(task.id)">
-        Убрать из спринта
+
+  <ng-container *ngIf="planning?.notMarkedTasks?.length; else noData">
+    <div
+      class="task rounded d-flex justify-content-between align-items-center"
+      *ngFor="let task of planning?.notMarkedTasks"
+    >
+      <div class="d-flex align-items-center">
+        <small class="text-muted mr-3">#{{ task.id }}</small>
+        <a [routerLink]="task.activeSessionId ? ['task', task.id] : ['/task', task.id]"
+          ><h6 class="d-inline text-dark mb-0">{{ task.name }}</h6></a
+        >
       </div>
-      <div
-        class="badge"
-        [ngClass]="{
-          'badge-primary': !task.activeSessionId,
-          'badge-success': task.activeSessionId
-        }"
-        (click)="onStartPokerClick(task)"
-      >
-        {{ task.activeSessionId ? 'Оценивается' : 'Начать оценку' }}
+      <div>
+        <div class="badge btn-outline-primary mr-2" (click)="onRemoveFromSprintClick(task.id)">
+          Убрать из спринта
+        </div>
+        <div
+          class="badge"
+          [ngClass]="{
+            'badge-primary': !task.activeSessionId,
+            'badge-success': task.activeSessionId
+          }"
+          (click)="onStartPokerClick(task)"
+        >
+          {{ task.activeSessionId ? 'Оценивается' : 'Начать оценку' }}
+        </div>
       </div>
     </div>
-  </div>
+  </ng-container>
 </div>
 
-<div class="tasks-list content p-2 rounded" *ngIf="planning?.completedSessions?.length">
+<div class="tasks-list content p-2 rounded">
   <div class="header mb-3 d-flex justify-content-between align-items-center">
     <span>Оцененные задачи</span>
     <button
@@ -39,17 +42,24 @@
       Начать спринт
     </button>
   </div>
-  <div
-    class="task rounded d-flex justify-content-between align-items-center"
-    *ngFor="let session of planning?.completedSessions"
-  >
-    <div class="d-flex align-items-center">
-      <small class="text-muted mr-3">#{{ session.task.id }}</small>
-      <a [routerLink]="['task', session.task.id]"
-        ><h6 class="d-inline text-dark mb-0">{{ session.task.name }}</h6></a
-      >
+  <ng-container *ngIf="planning?.completedSessions?.length; else noData">
+    <div
+      class="task rounded d-flex justify-content-between align-items-center"
+      *ngFor="let session of planning?.completedSessions"
+    >
+      <div class="d-flex align-items-center">
+        <small class="text-muted mr-3">#{{ session.task.id }}</small>
+        <a [routerLink]="['task', session.task.id]"
+          ><h6 class="d-inline text-dark mb-0">{{ session.task.name }}</h6></a
+        >
+      </div>
+      <div class="badge badge-success" *ngIf="session.task.points">{{ session.task.points }}</div>
+      <div class="badge badge-secondary" *ngIf="session.isCanceled">Отменена</div>
     </div>
-    <div class="badge badge-success" *ngIf="session.task.points">{{ session.task.points }}</div>
-    <div class="badge badge-secondary" *ngIf="session.isCanceled">Отменена</div>
-  </div>
+  </ng-container>
 </div>
+<ng-template #noData>
+  <div class="d-flex justify-content-center align-items-center text-muted p-4">
+    Задачи отсутствуют
+  </div>
+</ng-template>

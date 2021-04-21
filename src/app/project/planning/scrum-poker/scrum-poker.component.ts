@@ -71,7 +71,7 @@ export class ScrumPokerComponent {
   }
 
   public resetCards() {
-    this.socketService.resetPlanningCards(this.session.id);
+    this.socketService.resetPlanningCards(this.session.id, this.session.task.id);
   }
 
   private getMantionedCards(cards) {

@@ -160,8 +160,8 @@ export class SocketService {
     this.socket.emit('showPlanningCards', sessionId);
   }
 
-  public resetPlanningCards(sessionId) {
-    this.socket.emit('resetPlanningCards', sessionId);
+  public resetPlanningCards(sessionId, taskId) {
+    this.socket.emit('resetPlanningCards', { sessionId, taskId });
   }
 
   public setPlanningPoints(sessionId, taskId, points) {

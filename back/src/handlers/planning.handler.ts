@@ -11,16 +11,16 @@ export class PlanningHandler {
     return planningService.read(projectId);
   }
 
-  public async getPlanningTaskSession(planningId: number, taskId: number, userId: number) {
-    return planningService.getSession(planningId, taskId, userId);
+  public async getPlanningTaskSession(taskId: number, userId: number) {
+    return planningService.getSession(taskId, userId);
   }
 
   public async update(planningId: number, request: PlanningUpdateRequest) {
     return planningService.update(planningId, request);
   }
 
-  public async reset(sessionId: number) {
-    return planningService.reset(sessionId);
+  public async reset(sessionId: number, taskId: number) {
+    return planningService.reset(sessionId, taskId);
   }
 
   public async setShowCards(sessionId: number, showCards: boolean) {

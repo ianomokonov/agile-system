@@ -51,13 +51,13 @@ class PlanningRepository {
     if (!planning) {
       return null;
     }
-    planning.activeSessions = await this.getPlanningSessions(planning.id, true);
-    planning.completedSessions = await this.getPlanningSessions(planning.id, false);
+    planning.activeSessions = await this.getPlanningSessions(planning.sprintId, true);
+    planning.completedSessions = await this.getPlanningSessions(planning.sprintId, false);
     return planning as PlanningFullView;
   }
 
-  public async getSession(planningId: number, taskId: number, userId: number) {
-    const query = sql.select('projectPlanningTaskSession', '*').where({ planningId, taskId });
+  public async getSession(taskId: number, withCards = true, userId?: number) {
+    const query = sql.select('projectPlanningTaskSession', '*').where({ taskId });
     const [[session]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
@@ -65,13 +65,25 @@ class PlanningRepository {
     if (!session) {
       return null;
     }
-    session.cards = await this.getSessionCards(session.id, userId);
+    if (withCards) {
+      session.cards = await this.getSessionCards(session.id, userId);
+    }
 
-    return session;
+    return session as any;
   }
 
-  public async getPlanningSessions(planningId: number, active) {
-    let query = sql.select('projectPlanningTaskSession', '*').where({ planningId });
+  public async getPlanningSessions(sprintId: number, active) {
+    let query = sql
+      .select('projectPlanningTaskSession', [
+        'projectPlanningTaskSession.id',
+        'projectPlanningTaskSession.createDate',
+        'projectPlanningTaskSession.taskId',
+        'projectPlanningTaskSession.planningId',
+        'projectPlanningTaskSession.showCards',
+        'projectPlanningTaskSession.isCanceled',
+      ])
+      .join('projecttask', { 'projectPlanningTaskSession.taskId': 'projecttask.id' })
+      .where({ 'projecttask.projectSprintId': sprintId });
 
     if (active) {
       query = query.and({ resultValue: null }, 'IS').and({ isCanceled: false });
@@ -79,6 +91,7 @@ class PlanningRepository {
     if (!active && active !== undefined) {
       query = query.and({ resultValue: null }, 'IS NOT').or({ isCanceled: true });
     }
+
     let [sessions] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
@@ -121,11 +134,18 @@ class PlanningRepository {
     });
   }
 
-  public async resetSessionCards(sessionId: number) {
-    console.log(sessionId);
+  public async resetSessionCards(sessionId: number, taskId: number) {
+    let query = sql.deletes('planningTaskSessionCard').where({ sessionId });
+    dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
+    query = sql
+      .update('projectPlanningTaskSession', { resultValue: null })
+      .where({ id: sessionId });
 
-    const query = sql.deletes('planningTaskSessionCard').where({ sessionId });
-    await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
+    dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
+
+    query = sql.update('projectTask', { points: null }).where({ id: taskId });
+
+    await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
   }
 
   public async setShowCards(sessionId: number, showCards: boolean) {

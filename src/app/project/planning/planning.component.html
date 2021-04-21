@@ -31,7 +31,7 @@
         >
           <span class="bs-stepper-circle"
             ><span *ngIf="planning.activeStep === planningStep.MarkTasks; else stepDone"
-              >1</span
+              >2</span
             ></span
           >
           <span class="bs-stepper-label text-dark">Оценка новых задач</span>
@@ -44,6 +44,7 @@
   <app-discuss-new-tasks
     *ngSwitchCase="planningStep.NewTasks"
     [tasks]="planning.newTasks"
+    [newSprintId]="planning.sprintId"
   ></app-discuss-new-tasks>
   <router-outlet *ngSwitchCase="planningStep.MarkTasks"></router-outlet>
 </ng-container>
