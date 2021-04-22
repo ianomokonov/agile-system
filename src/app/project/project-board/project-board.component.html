@@ -15,7 +15,7 @@
       <button class="btn btn-outline-info ml-2" (click)="onStartDemo()" *ngIf="canStartDemo()">
         Начать демо
       </button>
-      <button class="btn btn-outline-primary ml-2" *ngIf="!project.retro" (click)="onStartRetro()">
+      <button class="btn btn-outline-primary ml-2" *ngIf="!project.retro && project.demo?.isFinished" (click)="onStartRetro()">
         Начать ретроспективу
       </button>
     </div>

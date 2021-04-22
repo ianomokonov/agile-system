@@ -29,8 +29,8 @@ export class EditUserComponent {
       image: null,
       name: [null, Validators.required],
       surname: [null, Validators.required],
-      vk: [null],
-      gitHub: [null],
+      vk: null,
+      gitHub: null,
     });
   }
 

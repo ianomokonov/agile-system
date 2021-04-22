@@ -44,7 +44,7 @@
             </button>
             <button
               class="btn btn-outline-primary ml-2"
-              *ngIf="!sprint.retro?.isFinished"
+              *ngIf="!sprint.retro && sprint.demo?.isFinished"
               [routerLink]="['../planning', sprint.planningId]"
             >
               Начать ретроспективу
@@ -102,14 +102,14 @@
 </ng-template>
 
 <ng-template #taskTemp let-task let-show="showBtn">
-  <div class="task rounded d-flex">
-    <div class="col-8 d-flex align-items-center">
+  <div class="task rounded d-flex align-items-start">
+    <div class="col-8 d-flex align-items-center pl-0">
       <small class="text-muted mr-3">#{{ task.id }}</small>
       <a [routerLink]="['/task', task.id]"
         ><h6 class="d-inline text-dark mb-0">{{ task.name }}</h6></a
       >
     </div>
-    <div class="col-4 pr-0 d-flex align-items-center justify-content-end">
+    <div class="col-4 pr-0 d-flex align-items-center justify-content-end task-info">
       <small class="text-muted mr-1"
         >{{ task.projectUser?.name }} {{ task.projectUser?.surname }}</small
       >

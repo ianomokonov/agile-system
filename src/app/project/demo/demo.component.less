@@ -2,7 +2,7 @@
 @import '../../../styles/variables.less';
 
 .task {
-  small{
+  small {
     display: block;
   }
   h6 {
@@ -10,7 +10,8 @@
   }
   &.active {
     background-color: @primary-color;
-    * {
+    small,
+    h6 {
       color: white !important;
     }
   }

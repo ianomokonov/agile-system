@@ -62,7 +62,7 @@
           ></i>
         </h5>
         <div class="section-body">
-          <p [innerHTML]="task.description" *ngIf="!editingDescription"></p>
+          <p class="description" [innerHTML]="task.description" *ngIf="!editingDescription"></p>
           <ckeditor
             [editor]="editor"
             [formControl]="descriptionControl"
