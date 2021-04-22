@@ -50,6 +50,7 @@ class TaskRepository {
     task.projectUser = user;
     task.creator = creator;
     task.sprint = task.projectSprintId ? sprints[0] : null;
+    task.files = await this.getFiles(taskId);
     return task as TaskResponse;
   }
 
@@ -120,6 +121,44 @@ class TaskRepository {
     );
 
     return insertId;
+  }
+
+  public async uploadFiles(taskId: number, files: { name: string; url: string }[]) {
+    const query = `${`INSERT INTO projecttaskfiles (taskId, name, url) VALUES ${files
+      .map((file) => `(${taskId}, '${file.name}', '${file.url}'), `)
+      .join('')}`.replace(/,\s$/, '')};`;
+
+    await dbConnection.query<ResultSetHeader>(query);
+  }
+
+  public async getFiles(taskId: number) {
+    const query = sql.select('projectTaskFiles', '*').where({ taskId });
+
+    const [files] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    return files;
+  }
+
+  public async getFile(fileId) {
+    const query = sql.select('projecttaskfiles', '*').where({ id: fileId });
+
+    const [[file]] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    return file;
+  }
+
+  public async removeFile(fileId: number) {
+    const { url } = await this.getFile(fileId);
+    const query = sql.deletes('projecttaskfiles').where({ id: fileId });
+
+    await dbConnection.query(getQueryText(query.text), query.values);
+    return url;
   }
 
   // eslint-disable-next-line complexity

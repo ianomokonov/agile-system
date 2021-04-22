@@ -9,6 +9,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SocketIoModule } from 'ngx-socket-io';
+import { FileSaverModule } from 'ngx-filesaver';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SingUpComponent } from './security/sing-up/sing-up.component';
@@ -21,7 +22,6 @@ import { EditUserComponent } from './profile/create/edit-user.component';
 import { AuthInterceptor } from './utils/auth.interceptor';
 import { UserService } from './services/user.service';
 import { TokenService } from './services/token.service';
-import { ContentTypeInterceptor } from './utils/content-type.interceptor';
 import { TagsInputComponent } from './shared/tags-input/tags-input.component';
 import { ProjectService } from './services/project.service';
 import { ProjectComponent } from './project/project.component';
@@ -103,6 +103,7 @@ import { FileUploaderComponent } from './shared/file-uploader/file-uploader.comp
     CKEditorModule,
     DragDropModule,
     SocketIoModule,
+    FileSaverModule,
   ],
   providers: [
     FormBuilder,

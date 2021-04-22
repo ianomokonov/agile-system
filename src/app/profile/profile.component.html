@@ -16,8 +16,10 @@
       </div>
     </div>
     <div class="links d-flex">
-      <a [href]="userInfo.vk"><i class="fab fa-vk"></i></a>
-      <a class="ml-3" [href]="userInfo.gitHub"><i class="fab fa-github"></i></a>
+      <a [href]="userInfo.vk" *ngIf="userInfo.vk"><i class="fab fa-vk"></i></a>
+      <a class="ml-3" [href]="userInfo.gitHub" *ngIf="userInfo.gitHub"
+        ><i class="fab fa-github"></i
+      ></a>
     </div>
   </div>
   <div class="projects py-4">

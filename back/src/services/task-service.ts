@@ -42,6 +42,17 @@ class TaskService {
   public async getNewSprintTasks(sprintId: number) {
     return taskRepository.getNewSprintTasks(sprintId);
   }
+
+  public async uploadFiles(taskId: number, files) {
+    return taskRepository.uploadFiles(taskId, files);
+  }
+  public async getFile(fileId) {
+    return taskRepository.getFile(fileId);
+  }
+
+  public async removeFile(fileId: number) {
+    return taskRepository.removeFile(fileId);
+  }
 }
 
 export default new TaskService();

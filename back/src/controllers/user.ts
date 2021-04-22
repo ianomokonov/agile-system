@@ -16,7 +16,7 @@ import { getFileExtension } from '../utils';
 const storageConfig = multer.diskStorage({
   destination: 'src/files/userimages/',
   filename: (req, file, callback) => {
-    callback(null, `${file.originalname}-${Date.now()}${getFileExtension(file.mimetype)}`);
+    callback(null, `${file.originalname}-${Date.now()}${getFileExtension(file.originalname)}`);
   },
 });
 const fileFilter = (req, file, cb) => {

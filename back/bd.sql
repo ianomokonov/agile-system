@@ -144,6 +144,16 @@ CREATE TABLE `projectTask` (
   PRIMARY KEY (`id`)
 ) COMMENT 'Задачи';
 
+DROP TABLE IF EXISTS `projectTaskFiles`;
+
+CREATE TABLE `projectTaskFiles` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `taskId` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `url` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) COMMENT 'Файлы задач';
+
 -- ---
 -- Table 'epics'
 -- Таблица для эпиков
@@ -458,6 +468,11 @@ ADD
   FOREIGN KEY (statusId) REFERENCES `projectTaskStatus` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE
+  `projectTaskFiles`
+ADD
+  FOREIGN KEY (taskId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE
   `projectTask`
 ADD
   FOREIGN KEY (epicId) REFERENCES `epics` (`id`) ON DELETE NO ACTION;
@@ -465,12 +480,16 @@ ADD
 ALTER TABLE
   `projectTask`
 ADD
-  FOREIGN KEY (parentId) REFERENCES `projectTask` (`id`) ON DELETE SET NULL;
+  FOREIGN KEY (parentId) REFERENCES `projectTask` (`id`) ON DELETE
+SET
+  NULL;
 
 ALTER TABLE
   `projectTask`
 ADD
-  FOREIGN KEY (projectUserId) REFERENCES `projectUser` (`id`) ON DELETE SET NULL;
+  FOREIGN KEY (projectUserId) REFERENCES `projectUser` (`id`) ON DELETE
+SET
+  NULL;
 
 ALTER TABLE
   `projectTask`

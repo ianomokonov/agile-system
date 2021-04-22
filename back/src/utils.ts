@@ -17,18 +17,14 @@ export enum Permissions {
   CanReadProject = 'CanReadProject',
 }
 
-export const getFileExtension = (mimeType) => {
-  switch (mimeType) {
-    case 'image/png': {
-      return '.png';
-    }
-    case 'image/jpg': {
-      return '.jpg';
-    }
-    default: {
-      return '.jpeg';
-    }
+export const getFileExtension = (fileName: string) => {
+  const result = fileName.match(/\.\w+$/);
+
+  if (result) {
+    return result[0];
   }
+
+  return '';
 };
 
 export const removeFile = (fileName) => {
@@ -36,7 +32,11 @@ export const removeFile = (fileName) => {
     if (fileName.indexOf('userimages') > -1) {
       const file = fileName.split('/userimages/')[1];
       fs.unlinkSync(path.resolve(`./src/files/userimages/${file}`));
+      return;
     }
+
+    const file = fileName.split('/taskfiles/')[1];
+    fs.unlinkSync(path.resolve(`./src/files/taskfiles/${file}`));
   } catch (err) {
     logger.error('File not found');
   }

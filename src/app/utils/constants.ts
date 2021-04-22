@@ -37,3 +37,14 @@ export const taskTypes = [
     name: 'Bug',
   },
 ];
+
+export const extensions = {
+  word: ['.doc', '.docx'],
+  excel: ['.xls', '.xlsx'],
+  image: ['.bmp', '.gif', '.tif'],
+  pdf: ['.pdf'],
+  archive: ['.zip', '.rar', '.7z', '.gzip'],
+  video: ['.mp4', '.avi', '.mkv', '.wmv', '.flv', '.mpeg'],
+  audio: ['.mp3', '.wav', '.midi', '.aac'],
+  powerpoint: ['.ppt', '.pptx'],
+};

@@ -14,12 +14,26 @@ export class TaskService {
     return this.http.get<TaskResponse>(`${this.baseUrl}/${taskId}`);
   }
 
+  public downloadFile(taskId: number, fileId: number) {
+    return this.http.get(`${this.baseUrl}/${taskId}/download-file/${fileId}`, {
+      responseType: 'blob',
+    });
+  }
+
+  public uploadFiles(taskId: number, data: FormData): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${taskId}/upload-files`, data);
+  }
+
   public editTask(taskId: number, task: Partial<UpdateTaskRequest>): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/${taskId}/edit`, task);
   }
 
   public removeTask(taskId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${taskId}/remove`);
+  }
+
+  public removeFile(taskId: number, fileId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${taskId}/remove-file/${fileId}`);
   }
 
   public updateTaskStatus(taskId: number, statusId: number): Observable<void> {
