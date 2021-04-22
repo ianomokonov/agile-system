@@ -15,6 +15,7 @@ i {
 
 .board {
   flex: 1;
+  height: calc(100% - 3rem - 61px);
   display: flex;
   .board-menu {
     flex-grow: 0;
@@ -25,12 +26,14 @@ i {
       height: 50px;
       margin-bottom: 0.5rem;
 
-      i{
+      i {
         font-size: 24px;
       }
     }
   }
-  .content{
+  .content {
+    width: calc(100% - 50px - 1rem);
+    height: 100%;
     flex-grow: 1;
   }
 }

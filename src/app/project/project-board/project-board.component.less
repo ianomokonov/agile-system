@@ -22,12 +22,11 @@
 
   .board {
     display: inline-flex;
-    height: calc(100% - 40px);
+    align-items: stretch;
+    min-height: calc(100% - 40px);
     .collumn {
-      overflow: hidden;
       min-width: @collumn-width;
       max-width: @collumn-width;
-      min-height: 100%;
       background-color: @bg-light;
       padding: 0.5rem;
       .create-task {
