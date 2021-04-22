@@ -6,80 +6,94 @@
       <div class="btn btn-primary ml-2" (click)="onCreateSprint()">Создать спринт</div>
     </div>
   </div>
-  <div class="content rounded p-2 mb-2" *ngFor="let sprint of backlog.sprints">
-    <div
-      [ngClass]="{ 'mb-3': sprint.isOpened }"
-      class="header d-flex justify-content-between align-items-center"
-    >
-      <div class="name" (click)="toggleSprint(sprint)">
-        <span class="d-block mr-2"
-          ><i class="fas fa-chevron-right mr-2" [ngClass]="{ opened: sprint.isOpened }"></i
-          >{{ sprint.name }}</span
-        ><span class="badge badge-success" *ngIf="sprint.isActive">Активный</span>
-      </div>
+  <ng-container *ngIf="backlog.sprints?.length || backlog.tasks?.length; else backlogPlaceholder">
+    <div class="content rounded p-2 mb-2" *ngFor="let sprint of backlog.sprints">
+      <div
+        [ngClass]="{ 'mb-3': sprint.isOpened }"
+        class="header d-flex justify-content-between align-items-center"
+      >
+        <div class="name" (click)="toggleSprint(sprint)">
+          <span class="d-block mr-2"
+            ><i class="fas fa-chevron-right mr-2" [ngClass]="{ opened: sprint.isOpened }"></i
+            >{{ sprint.name }}</span
+          ><span class="badge badge-success" *ngIf="sprint.isActive">Активный</span>
+        </div>
 
-      <ng-container *ngIf="!sprint.isFinished">
-        <button
-          class="btn btn-success"
-          *ngIf="!sprint.planningId && !sprint.isActive && sprint.tasks?.length"
-          (click)="onStartPlanning(sprint.id)"
-        >
-          Оценить задачи
-        </button>
-        <button
-          class="btn btn-outline-success"
-          *ngIf="!sprint.isActive && !sprint.isFinished && sprint.planningId"
-          [routerLink]="['../planning', sprint.planningId]"
-        >
-          Перейти к планированию
-        </button>
-        <ng-container *ngIf="sprint.isActive">
+        <ng-container *ngIf="!sprint.isFinished">
           <button
-            *ngIf="canStartDemo(sprint)"
-            class="btn btn-outline-info"
-            [routerLink]="['../planning', sprint.planningId]"
+            class="btn btn-success"
+            *ngIf="!sprint.planningId && !sprint.isActive && sprint.tasks?.length"
+            (click)="onStartPlanning(sprint.id)"
           >
-            Начать демо
+            Оценить задачи
           </button>
           <button
-            class="btn btn-outline-primary ml-2"
-            *ngIf="!sprint.retro?.isFinished"
+            class="btn btn-outline-success"
+            *ngIf="!sprint.isActive && !sprint.isFinished && sprint.planningId"
             [routerLink]="['../planning', sprint.planningId]"
           >
-            Начать ретроспективу
-          </button></ng-container
-        >
-      </ng-container>
+            Перейти к планированию
+          </button>
+          <ng-container *ngIf="sprint.isActive">
+            <button
+              *ngIf="canStartDemo(sprint)"
+              class="btn btn-outline-info"
+              [routerLink]="['../planning', sprint.planningId]"
+            >
+              Начать демо
+            </button>
+            <button
+              class="btn btn-outline-primary ml-2"
+              *ngIf="!sprint.retro?.isFinished"
+              [routerLink]="['../planning', sprint.planningId]"
+            >
+              Начать ретроспективу
+            </button></ng-container
+          >
+        </ng-container>
+      </div>
+      <ng-container *ngIf="sprint.isOpened"
+        ><ng-container *ngIf="sprint.tasks?.length; else noData">
+          <ng-container *ngFor="let task of sprint.tasks">
+            <ng-container
+              *ngTemplateOutlet="
+                taskTemp;
+                context: {
+                  $implicit: task,
+                  showBtn: !sprint.isActive && !!projectDataService.project?.sprint
+                }
+              "
+            ></ng-container>
+          </ng-container> </ng-container
+      ></ng-container>
     </div>
-    <ng-container *ngIf="sprint.isOpened"
-      ><ng-container *ngIf="sprint.tasks?.length; else noData">
-        <ng-container *ngFor="let task of sprint.tasks">
+    <div class="content rounded p-2" *ngIf="backlog.tasks?.length">
+      <div class="header mb-3">Задачи без спринта</div>
+      <ng-container *ngIf="backlog.tasks?.length; else noData">
+        <ng-container *ngFor="let task of backlog.tasks">
           <ng-container
             *ngTemplateOutlet="
               taskTemp;
-              context: {
-                $implicit: task,
-                showBtn: !sprint.isActive && !!projectDataService.project?.sprint
-              }
+              context: { $implicit: task, showBtn: !!projectDataService.project?.sprint }
             "
           ></ng-container>
-        </ng-container> </ng-container
-    ></ng-container>
-  </div>
-  <div class="content rounded p-2" *ngIf="backlog.tasks?.length">
-    <div class="header mb-3">Задачи без спринта</div>
-    <ng-container *ngIf="backlog.tasks?.length; else noData">
-      <ng-container *ngFor="let task of backlog.tasks">
-        <ng-container
-          *ngTemplateOutlet="
-            taskTemp;
-            context: { $implicit: task, showBtn: !!projectDataService.project?.sprint }
-          "
-        ></ng-container>
+        </ng-container>
       </ng-container>
-    </ng-container>
-  </div>
+    </div>
+  </ng-container>
 </div>
+
+<ng-template #backlogPlaceholder>
+  <div class="backlog-placeholder">
+    <div class="backlog-placeholder__text text-center text-muted">
+      Вы еще не создали ни одного спринта или задачи. <br />
+      Создайте <a href="javascript:;" (click)="onCreatTask()">задачу</a> или
+      <a href="javascript:;" (click)="onCreateSprint()">спринт</a> кнопкой в правом верхнем углу
+    </div>
+    <img class="backlog-placeholder__arrow" src="../../../assets/images/strelka.svg" />
+    <img src="../../../assets/images/no-tasks-icon.png" alt="" class="backlog-placeholder__image" />
+  </div>
+</ng-template>
 
 <ng-template #noData>
   <div class="d-flex justify-content-center align-items-center text-muted p-4">

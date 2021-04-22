@@ -28,7 +28,7 @@ export class EditProjectFormComponent implements OnInit {
   ) {
     this.formGroup = fb.group({
       name: [null, Validators.required],
-      repository: null,
+      repository: ['some-link', Validators.required],
       description: [null, Validators.required],
       users: null,
     });
@@ -39,7 +39,9 @@ export class EditProjectFormComponent implements OnInit {
 
   public ngOnInit() {
     this.activatedRoute.parent?.params.subscribe((params) => {
-      this.getProjectInfo(params.id);
+      if (params.id) {
+        this.getProjectInfo(params.id);
+      }
     });
     this.search$.next('');
   }
@@ -84,7 +86,7 @@ export class EditProjectFormComponent implements OnInit {
       name: formValue.name,
       description: formValue.description,
       repository: formValue.repository,
-      usersIds: formValue.users.map((user: UserShortView & Tag) => user.id),
+      usersIds: formValue.users?.map((user: UserShortView & Tag) => user.id),
       links: [],
     };
 

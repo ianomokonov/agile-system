@@ -21,7 +21,7 @@ class ProjectService {
     await Promise.all([
       projectRepository.createProjectUsers(
         projectId,
-        project.usersIds.filter((id) => id !== userId),
+        project.usersIds?.filter((id) => id !== userId),
       ),
       projectRepository.createProjectLinks(projectId, project.links),
     ]);

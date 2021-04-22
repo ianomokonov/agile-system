@@ -6,19 +6,23 @@
       *ngIf="hidable"
       [ngClass]="{ 'fa-angle-down': !isOpened, ' fa-angle-up': isOpened }"
     ></i></span
-  ><a routerLink="/create-project" *ngIf="canCreateProject" class="fas fa-plus"></a>
+  ><a
+    routerLink="/create-project"
+    *ngIf="canCreateProject"
+    class="fas fa-plus creat-btn"
+    [ngClass]="{ active: !items?.length }"
+  ></a>
 </h5>
 <ng-container *ngIf="!hidable || isOpened">
   <div class="items pb-4">
     <ng-container *ngIf="items?.length; else noData">
-      <div class="item mb-3 mr-3" *ngFor="let project of items" [routerLink]="['/project', project.id]">
+      <div
+        class="item mb-3 mr-3"
+        *ngFor="let project of items"
+        [routerLink]="['/project', project.id]"
+      >
         <div class="mb-3">
           <h6 class="name m-0">{{ project.name }}</h6>
-          <!-- <small
-            ><ng-container *ngFor="let role of project.roles; let last = last"
-              >{{ role }}<ng-container *ngIf="!last">, </ng-container></ng-container
-            ></small
-          > -->
         </div>
         <span class="date">{{ project.lastEditDate | date: 'dd.MM.yyyy' }}</span>
       </div>
@@ -26,5 +30,17 @@
   </div>
 </ng-container>
 <ng-template #noData>
-  <small class="d-flex w-100 justify-content-center text-muted py-5">Проекты отсутствуют</small>
+  <div class="text-center w-100 h-100 mt-5 text-muted py-5 projects-placeholder">
+    <p>
+      У Вас еще нет проектов. <br />
+      <a routerLink="/create-project" class="ml-1">Cоздайте</a> свой первый проект прямо сейчас!
+    </p>
+
+    <img class="projects-placeholder__arrow" src="../../../assets/images/arrow.jpg" alt="" />
+    <img
+      class="projects-placeholder__image"
+      src="../../../assets/images/project-management.png"
+      alt=""
+    />
+  </div>
 </ng-template>

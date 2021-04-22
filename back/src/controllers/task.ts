@@ -37,8 +37,6 @@ taskRouter.get(
   async (req, res) => {
     try {
       const url = await tasksHandler.getFileUrl(+req.params.fileId);
-      console.log(url);
-
       res.download(url);
     } catch (error) {
       res.status(error.statusCode).json(error.error);
@@ -92,8 +90,6 @@ taskRouter.post(
       await tasksHandler.uploadFiles(+req.params.id, files);
       res.status(StatusCodes.OK).json('Файлы добавлены');
     } catch (error) {
-      console.log(error);
-
       res.status(error.statusCode || 500).json(error.error);
     }
   },
