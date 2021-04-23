@@ -48,3 +48,12 @@ export const extensions = {
   audio: ['.mp3', '.wav', '.midi', '.aac'],
   powerpoint: ['.ppt', '.pptx'],
 };
+
+export const userSearchFn = (event, user) => {
+  const term = event.toUpperCase();
+  return (
+    user.name.toUpperCase().indexOf(term) > -1 ||
+    user.surname.toUpperCase().indexOf(term) > -1 ||
+    user.email.toUpperCase().indexOf(term) > -1
+  );
+};

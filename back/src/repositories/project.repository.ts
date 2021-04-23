@@ -1,9 +1,9 @@
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import * as sql from 'sql-query-generator';
+import { StatusCodes } from 'http-status-codes';
 import { AddProjectUserRequest } from '../models/requests/add-project-user-request';
 import { CreateProjectRequest } from '../models/requests/create-project-request';
 import { EditProjectUserRequest } from '../models/requests/edit-project-user-request';
-import { Link } from '../models/link';
 import {
   CreateProjectRoleRequest,
   UpdateProjectRoleRequest,
@@ -23,6 +23,7 @@ import { IdNameResponse } from '../models/responses/id-name.response';
 // eslint-disable-next-line import/no-cycle
 import demoRepository from './demo.repository';
 import retroRepository from './retro.repository';
+import { WebError } from '../models/error';
 
 sql.use('mysql');
 
@@ -53,7 +54,6 @@ class ProjectRepository {
       name: project.name,
       description: project.description,
       ownerId: userId,
-      repository: project.repository,
     });
     const result = await dbConnection.query(getQueryText(query.text), query.values);
     return (result[0] as ResultSetHeader).insertId;
@@ -64,11 +64,18 @@ class ProjectRepository {
       projectId: request.projectId,
       userId: request.userId,
     });
-    const result = await dbConnection.query(getQueryText(query.text), query.values);
-    const projectUserId = (result[0] as ResultSetHeader).insertId;
+    try {
+      const result = await dbConnection.query(getQueryText(query.text), query.values);
+      const projectUserId = (result[0] as ResultSetHeader).insertId;
 
-    await this.addProjectUserRoles(projectUserId, request.roleIds);
-    return projectUserId;
+      await this.addProjectUserRoles(projectUserId, request.roleIds);
+      return projectUserId;
+    } catch (e) {
+      throw new WebError(
+        StatusCodes.CONFLICT,
+        'Пользователь уже в проекте или является создателем проекта',
+      );
+    }
   }
 
   public async editProjectUser(request: EditProjectUserRequest) {
@@ -87,12 +94,26 @@ class ProjectRepository {
     await dbConnection.query(getQueryText(query.text), query.values);
   }
 
-  public async getFullProjectUsers(projectId: number) {
-    let [users] = await dbConnection.query<
-      RowDataPacket[]
-    >(`SELECT pu.id, u.name, u.surname, u.image, u.email 
-        FROM projectuser pu JOIN user u ON pu.userId = u.id 
-        WHERE pu.projectId=${projectId}`);
+  public async getFullProjectUsers(projectId: number, userId: number, all = false) {
+    let query = sql
+      .select('projectuser', [
+        'projectuser.id',
+        'user.name',
+        'user.surname',
+        'user.image',
+        'user.email',
+        `(user.id = ${userId}) as isMy`,
+        `(user.id = project.ownerId) as isOwner`,
+      ])
+      .join('user', { 'projectuser.userId': 'user.id' })
+      .join('project', { 'projectuser.projectId': 'project.id' })
+      .where({ projectId });
+
+    if (!all) {
+      query = query.and({ 'user.id': userId }, '!=').and({ 'user.id': 'project.ownerId' }, '!=');
+    }
+
+    let [users] = await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
 
     users = await Promise.all(
       users.map(async (userTemp) => {
@@ -166,14 +187,10 @@ class ProjectRepository {
     const query = sql
       .update('project', {
         name: request.name,
-        repository: request.repository,
         description: request.description,
       })
       .where({ id: projectId });
     dbConnection.query(getQueryText(query.text), query.values);
-    await Promise.all([this.removeProjectUsers(projectId), this.removeProjectLinks(projectId)]);
-    this.createProjectUsers(projectId, request.usersIds);
-    this.createProjectLinks(projectId, request.links);
   }
 
   public async removeProjectRole(projectRoleId: number) {
@@ -185,17 +202,6 @@ class ProjectRepository {
     const query = sql.deletes('projectroles').where({ id: projectRoleId });
 
     await dbConnection.query(getQueryText(query.text), query.values);
-  }
-
-  public async createProjectUsers(projectId: number, userIds: number[]) {
-    if (!userIds?.length) {
-      return;
-    }
-
-    const query = `${`INSERT INTO projectuser (projectId, userId) VALUES ${userIds
-      .map(() => `(${projectId}, ?), `)
-      .join('')}`.replace(/,\s$/, '')};`;
-    await dbConnection.query(query, userIds);
   }
 
   public async getProjectRoles(projectId: number) {
@@ -316,40 +322,6 @@ class ProjectRepository {
     const query = sql.deletes('projectrolepermission').where({ projectRoleId });
 
     await dbConnection.query(getQueryText(query.text), query.values);
-  }
-
-  private async removeProjectUsers(projectId: number) {
-    if (!projectId) {
-      console.error('Укажите id проекта');
-      return;
-    }
-
-    const query = sql.deletes('projectuser').where({ projectId });
-
-    await dbConnection.query(getQueryText(query.text), query.values);
-  }
-
-  private async removeProjectLinks(projectId: number) {
-    if (!projectId) {
-      console.error('Укажите id проекта');
-      return;
-    }
-
-    const query = sql.deletes('projectlinks').where({ projectId });
-
-    await dbConnection.query(getQueryText(query.text), query.values);
-  }
-
-  public async createProjectLinks(projectId: number, links: Link[]) {
-    if (!links?.length) {
-      return;
-    }
-
-    const query = `INSERT INTO projectlinks (projectId, name, url) VALUES ${links
-      .map((link) => `(${projectId}, '${link.name}', '${link.url}'), `)
-      .join('')}`.replace(/,\s$/, '');
-
-    await dbConnection.query(query);
   }
 
   public async getProject(projectId: number): Promise<ProjectResponse> {

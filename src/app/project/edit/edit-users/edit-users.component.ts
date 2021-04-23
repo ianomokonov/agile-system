@@ -86,10 +86,15 @@ export class EditUsersComponent {
     }
 
     const formValue = this.userForm.getRawValue();
-    this.getRequest(formValue).subscribe(() => {
-      this.onUserClick();
-      this.getProjectInfo();
-    });
+    this.getRequest(formValue).subscribe(
+      () => {
+        this.onUserClick();
+        this.getProjectInfo();
+      },
+      () => {
+        this.onUserClick();
+      },
+    );
   }
 
   private getRequest(formValue: any) {

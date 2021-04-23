@@ -27,6 +27,7 @@
       formControlName="projectUserId"
       bindValue="id"
       [closeOnSelect]="true"
+      [searchFn]="userSearchFn"
     >
       <ng-template ng-label-tmp let-item="item">
         {{ item.name }} {{ item.surname }} ({{ item.email }})
@@ -36,6 +37,7 @@
         <small class="text-muted">{{ item.email }}</small>
       </ng-template>
     </ng-select>
+    <small class="btn btn-link p-0 assign-to-me" (click)="assignToMe()">Взять на себя</small>
   </div>
   <div class="form-group">
     <label>Тип задачи</label>
