@@ -4,6 +4,8 @@ export interface UserShortView {
   surname: string;
   email: string;
   image: string;
+  isMy: boolean;
+  isOwner: boolean;
 
   roleIds?: number[];
 }

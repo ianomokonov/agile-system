@@ -35,17 +35,14 @@ export class ProjectBoardComponent implements OnInit {
   ) {}
   public ngOnInit() {
     this.activatedRoute.parent?.params.subscribe((params) => {
-      forkJoin([
-        this.projectDataService.getProject(params.id, true),
-        this.projectService.getProjectUsers(params.id),
-      ]).subscribe(([project, users]) => {
+      this.projectDataService.getProject(params.id, true).subscribe((project) => {
         if (!project.sprint) {
           this.router.navigate(['../backlog'], { relativeTo: this.activatedRoute });
           return;
         }
         this.project = project;
         this.setTasks(project.sprint?.tasks);
-        this.users = users;
+        this.users = this.project.users;
       });
     });
   }

@@ -27,7 +27,7 @@ projectRouter.get(`/permissions`, async (req, res) => {
   res.status(StatusCodes.OK).json(permissions);
 });
 projectRouter.get(`/:projectId`, checkPermissions(Permissions.CanReadProject), async (req, res) => {
-  const project = await getProjectHandler(res.locals.projectId);
+  const project = await getProjectHandler(res.locals.projectId, res.locals.userId);
 
   if (!project) {
     res.status(StatusCodes.NOT_FOUND).json('Проект не найден');
@@ -89,8 +89,12 @@ projectRouter.post(
   `/:projectId/add-user`,
   checkPermissions(Permissions.CanEditProject),
   async (req, res) => {
-    await projectUsersHandler.create(req.body);
-    res.status(StatusCodes.CREATED).json('Пользователь добавлен');
+    try {
+      await projectUsersHandler.create(req.body);
+      res.status(StatusCodes.CREATED).json('Пользователь добавлен');
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
   },
 );
 
@@ -116,7 +120,7 @@ projectRouter.get(
   `/:projectId/users`,
   checkPermissions(Permissions.CanReadProject),
   async (req, res) => {
-    const users = await projectUsersHandler.read(res.locals.projectId);
+    const users = await projectUsersHandler.read(res.locals.projectId, res.locals.userId);
     res.status(StatusCodes.OK).json(users);
   },
 );

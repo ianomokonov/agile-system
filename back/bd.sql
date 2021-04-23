@@ -32,7 +32,6 @@ DROP TABLE IF EXISTS `project`;
 CREATE TABLE `project` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
-  `repository` varchar(255) NOT NULL,
   `description` MEDIUMTEXT NOT NULL,
   `ownerId` int(11) NOT NULL,
   `lastEditDate` DATETIME DEFAULT CURRENT_TIMESTAMP,

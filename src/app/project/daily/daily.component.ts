@@ -1,7 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DailyService } from 'src/app/services/daily.service';
 import { SocketService } from 'src/app/services/socket.service';
+import { FinishDailyModalComponent } from './finish-daily-modal/finish-daily-modal.component';
 
 @Component({
   selector: 'app-daily',
@@ -21,7 +23,9 @@ export class DailyComponent implements OnInit, OnDestroy {
   constructor(
     private socketService: SocketService,
     private activatedRoute: ActivatedRoute,
+    private router: Router,
     private dailyService: DailyService,
+    private modalService: NgbModal,
   ) {
     activatedRoute.params.subscribe((params) => {
       if (params.id) {
@@ -69,13 +73,27 @@ export class DailyComponent implements OnInit, OnDestroy {
     this.socketService.participantExit().subscribe((id: number) => {
       this.daily.participants = this.daily.participants.filter((p) => p.id !== id);
     });
-    this.socketService.onStopDaily().subscribe(() => {
+    this.socketService.onStopDaily().subscribe((participantsCount) => {
       this.getDaily();
+      this.openStopModal(participantsCount);
     });
 
     this.socketService.dailyTime().subscribe(([time, activeTime]) => {
       this.dailyTime = time;
       this.time = activeTime;
+    });
+  }
+
+  private openStopModal(participantsCount) {
+    const modal = this.modalService.open(FinishDailyModalComponent, { centered: true });
+    modal.componentInstance.time = this.dailyTime;
+    modal.componentInstance.participantsCount = participantsCount;
+    modal.closed.subscribe((path) => {
+      this.router.navigate([path], { relativeTo: this.activatedRoute });
+    });
+    modal.dismissed.subscribe(() => {
+      this.time = '00:00';
+      this.dailyTime = '00:00';
     });
   }
 

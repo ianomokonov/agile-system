@@ -11,7 +11,7 @@ import { ProjectResponse } from 'back/src/models/responses/project.response';
 import { IdNameResponse } from 'back/src/models/responses/id-name.response';
 import { forkJoin } from 'rxjs';
 import { ProjectService } from 'src/app/services/project.service';
-import { extensions } from 'src/app/utils/constants';
+import { extensions, userSearchFn } from 'src/app/utils/constants';
 import { FileSaverService } from 'ngx-filesaver';
 import { EditTaskComponent } from './edit-task/edit-task.component';
 
@@ -26,6 +26,7 @@ export class TaskComponent {
   public editingDescription = false;
   public editingName = false;
   public sprints: IdNameResponse[] = [];
+  public userSerachFn = userSearchFn;
   public project: ProjectResponse;
   public descriptionControl: FormControl = new FormControl();
   public userControl: FormControl = new FormControl();

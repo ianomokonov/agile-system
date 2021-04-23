@@ -18,13 +18,6 @@ import planningService from './planning-service';
 class ProjectService {
   public async create(userId: number, project: CreateProjectRequest) {
     const projectId = await projectRepository.create(userId, project);
-    await Promise.all([
-      projectRepository.createProjectUsers(
-        projectId,
-        project.usersIds?.filter((id) => id !== userId),
-      ),
-      projectRepository.createProjectLinks(projectId, project.links),
-    ]);
     return projectId;
   }
 
@@ -56,16 +49,16 @@ class ProjectService {
     return projectRepository.getProjectRoles(projectId);
   }
 
-  public async getProjectUsers(projectId: number) {
-    return projectRepository.getFullProjectUsers(projectId);
+  public async getProjectUsers(projectId: number, userId: number) {
+    return projectRepository.getFullProjectUsers(projectId, userId, false);
   }
 
-  public async read(projectId: number): Promise<ProjectResponse> {
+  public async read(projectId: number, userId: number): Promise<ProjectResponse> {
     const [project, sprint, statuses, users, planning] = await Promise.all([
       projectRepository.getProject(projectId),
       projectRepository.getProjectActiveSprint(projectId),
       projectRepository.getProjectStatuses(),
-      projectRepository.getFullProjectUsers(projectId),
+      projectRepository.getFullProjectUsers(projectId, userId, true),
       planningService.read(projectId, true),
     ]);
 

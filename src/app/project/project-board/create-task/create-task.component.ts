@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import { priorities, taskTypes } from 'src/app/utils/constants';
+import { priorities, taskTypes, userSearchFn } from 'src/app/utils/constants';
 import { ProjectDataService } from 'src/app/services/project-data.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { IdNameResponse } from 'back/src/models/responses/id-name.response';
@@ -20,6 +20,7 @@ export class CreateTaskComponent implements OnInit {
   public editor = ClassicEditor;
   public createForm: FormGroup;
   public taskTypes = taskTypes;
+  public userSearchFn = userSearchFn;
   public priorities = priorities;
   public sprints: IdNameResponse[] = [];
   constructor(
@@ -44,6 +45,12 @@ export class CreateTaskComponent implements OnInit {
       .subscribe((sprints) => {
         this.sprints = sprints;
       });
+  }
+
+  public assignToMe() {
+    this.createForm.patchValue({
+      projectUserId: this.users.find((u) => u.isMy)?.id,
+    });
   }
 
   public dismiss() {
