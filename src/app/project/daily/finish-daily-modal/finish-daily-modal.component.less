@@ -1,0 +1,50 @@
+.finish-daily {
+  text-align: center;
+  padding-top: 0;
+
+  .finish-daily__image {
+    height: 200px;
+  }
+  .finish-daily__time {
+    text-transform: uppercase;
+    font-size: 6rem;
+    line-height: 5.6rem;
+    margin-top: 2rem;
+    height: 5.6rem;
+    font-weight: bold;
+    color: rgba(199, 199, 199, 0.705);
+    margin-bottom: 0;
+  }
+  .finish-daily__avg-time {
+    display: block;
+    margin-bottom: 1rem;
+  }
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: center;
+  height: 150px;
+  align-items: center;
+  padding-bottom: 40px;
+  position: relative;
+
+  .modal-footer__separator {
+    margin: 0 2rem;
+    width: 4px;
+    border-radius: 2px;
+    height: 100%;
+    background-color: #dd636e;
+  }
+
+  .btn {
+    position: absolute;
+    min-width: 142px;
+    &:first-of-type {
+      right: calc(50% + 2rem + 4px);
+    }
+    &:nth-of-type(2) {
+      left: calc(50% + 2rem + 4px);
+    }
+  }
+}

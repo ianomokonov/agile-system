@@ -64,6 +64,7 @@ io.use(authSocketJWT).on('connection', (socket) => {
         time: new Time(0, 0, 0),
         activeTime: new Time(0, 0, 0),
         interval: null,
+        participantsCount: 1,
       };
       timer.interval = setInterval(() => {
         timer.time.updateSecond(timer.time.second + 1);
@@ -80,7 +81,9 @@ io.use(authSocketJWT).on('connection', (socket) => {
   socket.on('stopDaily', async (dailyId) => {
     dailyRepository.stop(dailyId);
     const timerIndex = activeDailyTimers.findIndex((t) => t.id === dailyId);
-    io.sockets.in(socket.dailyRoom).emit('stopDaily');
+    io.sockets
+      .in(socket.dailyRoom)
+      .emit('stopDaily', activeDailyTimers[timerIndex].participantsCount);
     if (timerIndex < 0) {
       return;
     }
@@ -112,6 +115,8 @@ io.use(authSocketJWT).on('connection', (socket) => {
     timer.activeTime.updateSecond(0);
     timer.activeTime.updateMinute(0);
     timer.activeTime.updateHour(0);
+    timer.participantsCount += 1;
+
     io.sockets.in(socket.dailyRoom).emit('nextDailyParticipant', participants);
   });
 

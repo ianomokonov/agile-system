@@ -1,0 +1,24 @@
+<div class="modal-header border-0">
+  <button
+    type="button"
+    class="close"
+    aria-label="Close button"
+    aria-describedby="modal-title"
+    (click)="dismiss()"
+  >
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="modal-body finish-daily">
+  <img class="finish-daily__image" src="../../../../assets/images/coffee-break.png" alt="" />
+  <p class="finish-daily__time">{{ time || '00:00' }}</p>
+  <small class="finish-daily__avg-time text-muted">Среднее время: {{ getAvgTime() }}</small>
+</div>
+<div class="modal-footer border-0">
+  <a type="button" class="btn btn-outline-primary" (click)="redirect('../backlog')">В бэклог</a>
+  <div class="modal-footer__separator"></div>
+  <a type="button" ngbAutofocus class="btn btn-outline-primary" (click)="redirect('../board')"
+    >На доску задач</a
+  >
+</div>
