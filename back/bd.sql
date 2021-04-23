@@ -315,8 +315,8 @@ CREATE TABLE `projectDaily` (
   `createDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `projectId` int(11) NOT NULL,
   `isActive` bit NOT NULL DEFAULT 0,
-  'minutes' int(3) NOT NULL DEFAULT 0,
-  'seconds' int(3) NOT NULL DEFAULT 0,
+  `minutes` int(3) NOT NULL DEFAULT 0,
+  `seconds` int(3) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) COMMENT 'дейли проекта';
 
@@ -325,9 +325,9 @@ DROP TABLE IF EXISTS `projectDailyParticipant`;
 CREATE TABLE `projectDailyParticipant` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `dailyId` int(11) NOT NULL,
-  `projectUserId` int(11) NOT NULL,
-  'minutes' int(3) NOT NULL DEFAULT 0,
-  'seconds' int(3) NOT NULL DEFAULT 0,
+  `userId` int(11) NOT NULL,
+  `minutes` int(3) NOT NULL DEFAULT 0,
+  `seconds` int(3) NOT NULL DEFAULT 0,
   `isDone` bit NOT NULL DEFAULT 0,
   `isActive` bit NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
@@ -647,16 +647,23 @@ ADD
   FOREIGN KEY (userId) REFERENCES `user` (`id`) ON DELETE CASCADE;
 
 INSERT INTO
-  `projectTaskStatus` (`name`)
+  `projectTaskStatus` (`name`, `id`)
 VALUES
-  ('to do'),
-  ('dev in progress'),
-  ('under review'),
-  ('dev completed'),
-  ('testing'),
-  ('test completed');
+  ('to do', 1),
+  ('dev in progress', 2),
+  ('under review', 3),
+  ('dev completed', 4),
+  ('testing', 5),
+  ('test completed', 6),
+  ('done', 7);
 
-DELIMITER $ $ CREATE TRIGGER create_project_user
+INSERT INTO
+  `permission` (`name`, `id`)
+VALUES
+  ('CanEditProject', 1),
+  ('CanReadProject', 2);
+
+DELIMITER $$ CREATE TRIGGER create_project_user
 AFTER
 INSERT
   ON project FOR EACH ROW BEGIN
@@ -665,68 +672,9 @@ INSERT INTO
 VALUES
   (new.id, new.ownerId);
 
-END $ $ DELIMITER;
-
-alter table
-  projectplanning
-ADD
-  `activeStep` int(1) NOT NULL DEFAULT 1;
-
-alter table
-  projectplanning
-ADD
-  `activeTaskId` int(11) NULL;
+END $$ DELIMITER ;
 
 ALTER TABLE
   `projectplanning`
 ADD
   FOREIGN KEY (activeTaskId) REFERENCES `projectTask` (`id`) ON DELETE NO ACTION;
-
--- ---
--- Table Properties
--- ---
--- ALTER TABLE `user` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `project` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `projectUser` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `projectRoles` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `projectUserRole` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `projectLinks` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `projectTask` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `epics` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `projectTaskStatus` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `projectTaskLink` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `linkType` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `comment` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `taskHistoryOperations` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `projectSprint` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ---
--- Test Data
--- ---
--- INSERT INTO `user` (`id`,`name`,`surname`,`vkId`,`gitHubId`,`vk`,`gitHub`,`image`) VALUES
--- ('','','','','','','','');
--- INSERT INTO `project` (`id`,`name`,`repository`,`description`,`ownerId`,`lastEditDate`) VALUES
--- ('','','','','','');
--- INSERT INTO `projectUser` (`id`,`projectId`,`userId`) VALUES
--- ('','','');
--- INSERT INTO `projectRoles` (`id`,`name`) VALUES
--- ('','');
--- INSERT INTO `projectUserRole` (`id`,`projectRoleId`,`projectUserId`) VALUES
--- ('','','');
--- INSERT INTO `projectLinks` (`id`,`name`,`url`,`projectId`) VALUES
--- ('','','','');
--- INSERT INTO `projectTask` (`id`,`name`,`description`,`statusId`,`typeId`,`epicId`,`parentId`,`projectUserId`,`points`,`projectId`,`lastEditDate`,`createDate`,`projectSprintId`) VALUES
--- ('','','','','','','','','','','','','');
--- INSERT INTO `epics` (`id`,`name`,`description`,`color`,`createDate`,`lastEditDate`) VALUES
--- ('','','','','','');
--- INSERT INTO `projectTaskStatus` (`id`,`name`) VALUES
--- ('','');
--- INSERT INTO `projectTaskLink` (`id`,`linkTypeId`,`fromTaskId`,`toTaskId`) VALUES
--- ('','','','');
--- INSERT INTO `linkType` (`id`,`name`) VALUES
--- ('','');
--- INSERT INTO `comment` (`id`,`userId`,`text`,`createDate`,`lastEditDate`,`projectTaskId`) VALUES
--- ('','','','','','');
--- INSERT INTO `taskHistoryOperations` (`id`,`operationName`,`createDate`,`projectUserId`,`projectTaskId`) VALUES
--- ('','','','','');
--- INSERT INTO `projectSprint` (`id`,`startDate`,`endDate`,`name`,`projectId`) VALUES
--- ('','','','','');

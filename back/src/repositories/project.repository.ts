@@ -118,7 +118,7 @@ class ProjectRepository {
         'projectplanning.id as planningId',
       ])
       .join('projectplanning', { 'projectsprint.id': 'sprintId' }, 'LEFT')
-      .where({ 'projectsprint.projectId': projectId })
+      .where({ 'projectsprint.projectId': projectId, 'projectsprint.isFinished': false })
       .orderby(['isFinished', 'isActive DESC', 'projectsprint.createDate DESC']);
 
     let [sprints] = await dbConnection.query<RowDataPacket[]>(
