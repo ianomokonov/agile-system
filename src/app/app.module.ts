@@ -56,6 +56,7 @@ import { TaskPriorityDirective } from './project/directives/task-priority.direct
 import { TaskTypeDirective } from './project/directives/task-type.directive';
 import { FileUploaderComponent } from './shared/file-uploader/file-uploader.component';
 import { FinishDailyModalComponent } from './project/daily/finish-daily-modal/finish-daily-modal.component';
+import { MultipleFileUploaderComponent } from './shared/multiple-file-uploader/multiple-file-uploader.component';
 
 @NgModule({
   declarations: [
@@ -92,6 +93,7 @@ import { FinishDailyModalComponent } from './project/daily/finish-daily-modal/fi
     TaskTypeDirective,
     FileUploaderComponent,
     FinishDailyModalComponent,
+    MultipleFileUploaderComponent,
   ],
   imports: [
     BrowserModule,

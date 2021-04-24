@@ -1,0 +1,30 @@
+<div class="upload-area" #inputFileContainer>
+  <ng-container *ngIf="files?.length; else noFiles">
+    <div class="upload-area__file" *ngFor="let file of files; let index = index">
+      <i
+        *ngIf="!isImage(file.name)"
+        class="upload-area__file-icon"
+        [ngClass]="getFileIconClass(file.name)"
+        (click)="downloadFile(file)"
+      ></i>
+      <ng-container *ngIf="isImage(file.name)"
+        ><a target="_blank" *ngIf="!file.file; else img" [href]="file.url"
+          ><img class="upload-area__file-image" [src]="file.url"
+        /></a>
+        <ng-template #img><img class="upload-area__file-image" [src]="file.url" /></ng-template
+      ></ng-container>
+
+      <span class="upload-area__file-name">{{ file.name }}</span>
+      <i
+        class="upload-area__file-remove fas fa-times-circle text-danger"
+        (click)="removeFile(index)"
+      ></i>
+    </div>
+  </ng-container>
+</div>
+
+<ng-template #noFiles>
+  <span class="text-muted text-center p-4 btn btn-link w-100" (click)="uploadFiles($event)"
+    >Загрузить файлы</span
+  >
+</ng-template>

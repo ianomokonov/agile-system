@@ -106,8 +106,16 @@
         </div>
       </div>
       <div class="ml-2">
-        <p class="mb-1">Замечания:</p>
-        <ckeditor [editor]="editor" [formControl]="commentControl"></ckeditor>
+        <div class="form-group">
+          <p class="mb-1">Замечания:</p>
+          <ckeditor [editor]="editor" [formControl]="commentControl"></ckeditor>
+        </div>
+
+        <p class="mb-1">
+          Вложения
+          <i class="fas fa-link ml-1 cursor-pointer" (click)="uploader.uploadFiles($event)"></i>
+        </p>
+        <app-multiple-file-uploader #uploader></app-multiple-file-uploader>
       </div>
     </div>
   </div>
