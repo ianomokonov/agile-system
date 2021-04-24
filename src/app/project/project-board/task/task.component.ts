@@ -161,7 +161,7 @@ export class TaskComponent {
       .catch(() => {});
   }
 
-  public removeFile({ id: fileId }) {
+  public removeFile({ id: fileId }: UploadFile) {
     this.taskService.removeFile(this.task.id, fileId).subscribe(() => {
       this.getTaskInfo(this.task.id);
     });

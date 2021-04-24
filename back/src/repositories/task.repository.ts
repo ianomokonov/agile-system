@@ -9,6 +9,7 @@ import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
 // eslint-disable-next-line import/no-cycle
 import projectRepository from './project.repository';
+import retroRepository from './retro.repository';
 
 sql.use('mysql');
 
@@ -109,6 +110,8 @@ class TaskRepository {
   }
 
   public async create(projectId: number, request: CreateTaskRequest) {
+    const { retroCardId } = request;
+    delete request.retroCardId;
     const { id: creatorId } = await projectRepository.getProjectUserByUserId(
       request.creatorId,
       projectId,
@@ -119,7 +122,9 @@ class TaskRepository {
       getQueryText(query.text),
       query.values,
     );
-
+    if (retroCardId) {
+      retroRepository.updateRetroCard(retroCardId, { taskId: insertId });
+    }
     return insertId;
   }
 

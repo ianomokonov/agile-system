@@ -48,6 +48,10 @@ export class CreateTaskComponent implements OnInit {
       });
   }
 
+  public patchValue(value) {
+    this.createForm.patchValue(value);
+  }
+
   public assignToMe() {
     this.createForm.patchValue({
       projectUserId: this.users.find((u) => u.isMy)?.id,

@@ -203,11 +203,6 @@ io.use(authSocketJWT).on('connection', (socket) => {
     }
     demoHandler.finishDemo(socket.demoId);
     io.sockets.in(socket.demoRoom).emit('finishDemo');
-    io.sockets.clients(socket.demoRoom).forEach((s) => {
-      s.leave(s.demoRoom);
-      s.demoId = undefined;
-      s.demoRoom = undefined;
-    });
   });
 
   // --------------------------- DEMO ------------------------------------

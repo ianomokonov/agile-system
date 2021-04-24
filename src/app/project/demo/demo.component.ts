@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DemoService } from 'src/app/services/demo.service';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
@@ -9,7 +9,6 @@ import { TaskType } from 'back/src/models/task-type';
 import { Priority } from 'back/src/models/priority';
 import { forkJoin } from 'rxjs';
 import { SocketService } from 'src/app/services/socket.service';
-import { TaskService } from 'src/app/services/task.service';
 
 @Component({
   selector: 'app-demo',
@@ -25,6 +24,9 @@ export class DemoComponent implements OnInit {
   public get commentControl(): FormControl {
     return this.demoTaskForm.get('comment') as FormControl;
   }
+  public get filesControl(): FormControl {
+    return this.demoTaskForm.get('files') as FormControl;
+  }
   private readonly commentKey = 'DemoCommentKey';
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -34,7 +36,7 @@ export class DemoComponent implements OnInit {
     private fb: FormBuilder,
     private projectService: ProjectService,
     private socketService: SocketService,
-    private taskService: TaskService,
+    private cdRef: ChangeDetectorRef,
   ) {
     this.demoTaskForm = this.fb.group({
       name: [null, Validators.required],
@@ -95,12 +97,15 @@ export class DemoComponent implements OnInit {
     this.socketService.acceptDemoTask(demoTaskId);
   }
 
+  // eslint-disable-next-line complexity
   public finishDemo(createTask = false, template?) {
-    if (!createTask && this.commentControl.value && template) {
+    if (!createTask && (this.commentControl.value || this.filesControl.value) && template) {
       this.commentControl.setValidators(Validators.required);
       this.demoTaskForm.patchValue({
         name: `Замечания с демо от ${new Date().toLocaleDateString()}`,
       });
+      this.demoTaskForm.updateValueAndValidity();
+      this.cdRef.detectChanges();
       this.modalService.open(template);
       return;
     }
@@ -108,6 +113,10 @@ export class DemoComponent implements OnInit {
     const subscriptions: any[] = [];
 
     if (createTask) {
+      if (this.demoTaskForm.invalid) {
+        this.demoTaskForm.markAllAsTouched();
+        return;
+      }
       const formValue = this.demoTaskForm.getRawValue();
       subscriptions.push(
         this.projectService.addTask(this.projectId, {

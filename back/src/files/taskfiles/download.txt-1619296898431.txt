@@ -1,0 +1,12 @@
+обновление форка
+git remote add parent https://github.com/dosandk/js-20200324
+git pull parent master
+
+удаление ветки
+git branch -D feature/experiment
+
+imgur
+
+f5590531453b003
+
+fa441c8ce5a0555c3a6b79a06a447d034dddeafd

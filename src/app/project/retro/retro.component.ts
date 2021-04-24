@@ -1,10 +1,15 @@
 /* eslint-disable no-param-reassign */
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { UserShortView } from 'back/src/models/responses/user-short-view';
 import { RetroCardCategory } from 'back/src/models/retro-card-category';
 import { Subject } from 'rxjs';
+import { ProjectDataService } from 'src/app/services/project-data.service';
+import { ProjectService } from 'src/app/services/project.service';
 import { RetroService } from 'src/app/services/retro.service';
 import { SocketService } from 'src/app/services/socket.service';
+import { CreateTaskComponent } from '../project-board/create-task/create-task.component';
 
 @Component({
   selector: 'app-retro',
@@ -16,6 +21,7 @@ export class RetroComponent implements OnInit {
   public retro;
   public cardCategory = RetroCardCategory;
   private cardInput$: Subject<any> = new Subject();
+  private users: UserShortView[] = [];
 
   public get goodCards() {
     return this.retro?.cards.filter((c) => c.category === RetroCardCategory.Good);
@@ -33,6 +39,9 @@ export class RetroComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private retroService: RetroService,
     private socketService: SocketService,
+    private modalService: NgbModal,
+    private projectDataService: ProjectDataService,
+    private projectService: ProjectService,
     private router: Router,
   ) {
     this.socketService.onAddRetroCard().subscribe((card) => {
@@ -54,9 +63,34 @@ export class RetroComponent implements OnInit {
         });
       }
     });
+    this.activatedRoute.params.subscribe((params) => {
+      if (params.id) {
+        this.projectService.getProject(params.id).subscribe((project) => {
+          this.users = project.users;
+        });
+      }
+    });
     this.socketService.onFinishRetro().subscribe(() => {
       this.router.navigate(['../../', 'board'], { relativeTo: this.activatedRoute });
     });
+  }
+
+  public onCreateTask(card) {
+    const modal = this.modalService.open(CreateTaskComponent);
+    modal.componentInstance.users = this.users;
+    modal.componentInstance.patchValue({
+      description: card.text,
+      projectSprintId: this.retro.sprintId,
+    });
+    modal.result
+      .then((task) => {
+        this.projectService
+          .addTask(this.projectDataService.project.id, task)
+          .subscribe((taskId) => {
+            card.taskId = taskId;
+          });
+      })
+      .catch(() => {});
   }
 
   public ngOnInit(): void {
@@ -86,12 +120,12 @@ export class RetroComponent implements OnInit {
   }
 
   // eslint-disable-next-line complexity
-  public scale(block, event, card) {
+  public scale(block, event, card, taskId) {
     const step = 0.1;
     const minfs = 9;
     const maxfs = 15;
     const sch = block.offsetHeight;
-    const h = block.parentElement.offsetHeight;
+    const h = taskId ? block.parentElement.offsetHeight - 18 : block.parentElement.offsetHeight;
 
     if (event.inputType === 'deleteContentBackward') {
       if (sch + 15 <= h) {
@@ -101,7 +135,7 @@ export class RetroComponent implements OnInit {
           block.style.fontSize = `${fontsize}px`;
           card.fontSize = fontsize;
 
-          this.scale(block, event, card);
+          this.scale(block, event, card, taskId);
           card.text = block.innerText;
           this.cardInput$.next(card);
           return;
@@ -121,7 +155,7 @@ export class RetroComponent implements OnInit {
         card.fontSize = fontsize;
         block.style.fontSize = `${fontsize}px`;
 
-        this.scale(block, event, card);
+        this.scale(block, event, card, taskId);
         card.text = block.innerText;
         this.cardInput$.next(card);
         return;

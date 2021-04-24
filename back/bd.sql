@@ -248,7 +248,7 @@ CREATE TABLE `projectRetroCard` (
   `fontSize` DECIMAL(10, 2) NULL,
   `completeRetroId` int(11) NULL,
   `isCompleted` bit NOT NULL DEFAULT 0,
-  `executorId` int(11) NULL,
+  `taskId` int(11) NULL,
   PRIMARY KEY (`id`)
 ) COMMENT 'карты ретро проекта';
 
@@ -541,7 +541,7 @@ ADD
 ALTER TABLE
   `projectRetroCard`
 ADD
-  FOREIGN KEY (executorId) REFERENCES `projectUser` (`id`) ON DELETE
+  FOREIGN KEY (taskId) REFERENCES `projectTask` (`id`) ON DELETE
 SET
   NULL;
 

@@ -115,7 +115,7 @@
           Вложения
           <i class="fas fa-link ml-1 cursor-pointer" (click)="uploader.uploadFiles($event)"></i>
         </p>
-        <app-multiple-file-uploader formControlName="files" #uploader></app-multiple-file-uploader>
+        <app-multiple-file-uploader [formControl]="filesControl" #uploader></app-multiple-file-uploader>
       </div>
     </div>
   </div>

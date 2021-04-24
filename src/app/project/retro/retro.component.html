@@ -32,7 +32,10 @@
     <div class="actions m-1">
       <span class="placeholder">Дальнейшие действия</span>
       <ng-container *ngFor="let card of actionCards">
-        <ng-container *ngTemplateOutlet="cardTemp; context: { $implicit: card }"> </ng-container>
+        <ng-container
+          *ngTemplateOutlet="cardTemp; context: { $implicit: card, canCreateTask: true }"
+        >
+        </ng-container>
       </ng-container>
       <button class="btn btn-success create-btn complete-retro" (click)="complete()">
         <i class="fas fa-check"></i>
@@ -63,18 +66,32 @@
   </div>
 </div>
 
-<ng-template #cardTemp let-card>
-  <div class="retro-card" [ngClass]="{ isMy: card.isMy }" (click)="onCardClick($event)">
-    <i class="fas fa-times" *ngIf="card.isMy" (click)="onRemoveCard(card.id)"></i>
+<ng-template #cardTemp let-card let-canCreateTask="canCreateTask">
+  <div
+    class="retro-card"
+    [ngClass]="{ isMy: card.isMy, hasTask: card.taskId }"
+    (click)="onCardClick($event)"
+  >
+    <div class="actions" [ngClass]="{ 'can-create': canCreateTask && !card.taskId }">
+      <ng-container *ngIf="canCreateTask">
+        <i class="fas fa-plus-circle" *ngIf="!card.taskId" (click)="onCreateTask(card)"></i>
+      </ng-container>
+
+      <i class="fas fa-times-circle" *ngIf="card.isMy" (click)="onRemoveCard(card.id)"></i>
+    </div>
+
     <span
       *ngIf="card.isMy; else disabled"
       contenteditable
       [style.fontSize]="(card.fontSize || 16) + 'px'"
       [textContent]="card.text"
-      (input)="scale($event.target, $event, card)"
+      (input)="scale($event.target, $event, card, card.taskId)"
     ></span>
     <ng-template #disabled>
       <span [style.fontSize]="(card.fontSize || 16) + 'px'" [textContent]="card.text"></span>
     </ng-template>
+    <a [routerLink]="['/task', card.taskId]" class="description-link" *ngIf="card.taskId"
+      ><i class="fas fa-align-left"></i
+    ></a>
   </div>
 </ng-template>
