@@ -57,3 +57,21 @@ export const userSearchFn = (event, user) => {
     user.email.toUpperCase().indexOf(term) > -1
   );
 };
+
+export const editorConfig = {
+  toolbar: [
+    'heading',
+    '|',
+    'bold',
+    'italic',
+    'link',
+    'numberedList',
+    'bulletedList',
+    'insertTable',
+    'tableColumn',
+    'tableRow',
+    'mergeTableCells',
+    'undo',
+    'redo',
+  ],
+};
