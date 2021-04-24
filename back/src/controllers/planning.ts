@@ -16,7 +16,7 @@ planningRouter.post(`/start`, async (req, res) => {
 
 planningRouter.get(`/:planningId`, async (req, res) => {
   try {
-    const planning = await planningHandler.read(res.locals.projectId);
+    const planning = await planningHandler.read(+req.params.planningId);
     res.status(StatusCodes.OK).json(planning);
   } catch (error) {
     logger.error(error);

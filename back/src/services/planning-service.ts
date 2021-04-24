@@ -11,21 +11,28 @@ class PlanningService {
     return planningRepository.start(projectId, sprintId, activeSprintId);
   }
 
-  public async read(projectId: number, shortView = false) {
-    const planning = await planningRepository.read(projectId);
+  // eslint-disable-next-line complexity
+  public async read(planningId: number, shortView = false) {
+    const planning = await planningRepository.read(planningId);
     if (!planning) {
       return null;
     }
     if (!shortView) {
-      const [newTasks, notMarkedTasks] = await Promise.all([
-        taskService.getNewSprintTasks(planning?.activeSprintId),
-        taskService.getNotMarkedSprintTasks(planning?.sprintId),
-      ]);
+      if (planning.sprintId) {
+        const [newTasks, notMarkedTasks] = await Promise.all([
+          taskService.getNewSprintTasks(planning?.activeSprintId),
+          taskService.getNotMarkedSprintTasks(planning?.sprintId || planning?.activeSprintId),
+        ]);
 
-      planning.newTasks = newTasks;
-      planning.notMarkedTasks = notMarkedTasks;
+        planning.newTasks = newTasks;
+        planning.notMarkedTasks = notMarkedTasks;
+      } else {
+        const notMarkedTasks = await taskService.getNotMarkedSprintTasks(planning?.activeSprintId);
+        planning.notMarkedTasks = notMarkedTasks;
+      }
+
       planning.activeStep = PlanningStep.MarkTasks;
-      if (newTasks?.length) {
+      if (planning.newTasks?.length) {
         planning.activeStep = PlanningStep.NewTasks;
       }
     }

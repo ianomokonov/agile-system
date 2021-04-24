@@ -93,20 +93,33 @@ export class ProjectBacklogComponent implements OnInit {
   }
 
   public onStartPlanning(sprintId) {
+    if (this.projectDataService.project.activePlanningId) {
+      this.projectService
+        .updatePlanning(
+          this.projectDataService.project.id,
+          this.projectDataService.project.activePlanningId,
+          { sprintId },
+        )
+        .subscribe(() => {
+          this.projectDataService.getProject(this.projectDataService.project.id, true);
+          this.router.navigate(['planning', this.projectDataService.project.activePlanningId], {
+            relativeTo: this.activatedRoute.parent,
+          });
+        });
+      return;
+    }
+
     this.projectService
       .startPlanning(
-        this.projectDataService.project?.id,
+        this.projectDataService.project.id,
         sprintId,
-        this.projectDataService.project?.sprint?.id,
+        this.projectDataService.project.sprint?.id,
       )
-      .subscribe((planningId: number) => {
-        this.projectDataService
-          .getProject(this.projectDataService.project?.id, true)
-          .subscribe(() => {
-            this.router.navigate(['planning', planningId], {
-              relativeTo: this.activatedRoute.parent,
-            });
-          });
+      .subscribe((planningId) => {
+        this.projectDataService.getProject(this.projectDataService.project.id, true);
+        this.router.navigate(['planning', planningId], {
+          relativeTo: this.activatedRoute.parent,
+        });
       });
   }
 

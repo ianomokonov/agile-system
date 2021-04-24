@@ -24,6 +24,8 @@ import { IdNameResponse } from '../models/responses/id-name.response';
 import demoRepository from './demo.repository';
 import retroRepository from './retro.repository';
 import { WebError } from '../models/error';
+// eslint-disable-next-line import/no-cycle
+import planningRepository from './planning.repository';
 
 sql.use('mysql');
 
@@ -464,13 +466,7 @@ class ProjectRepository {
       getQueryText(query.text),
       query.values,
     );
-    query = sql
-      .update('projectplanning', {
-        isActive: false,
-        isFinished: true,
-      })
-      .where({ sprintId, projectId });
-    await dbConnection.query(getQueryText(query.text), query.values);
+    await planningRepository.start(projectId, null, sprintId);
 
     query = sql
       .update('projectsprint', {

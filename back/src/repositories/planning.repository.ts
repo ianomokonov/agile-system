@@ -4,6 +4,7 @@ import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
 import { PlanningFullView } from '../models/responses/planning';
 import { PlanningUpdateRequest } from '../models/requests/planning-update.request';
+// eslint-disable-next-line import/no-cycle
 import taskRepository from './task.repository';
 
 sql.use('mysql');
@@ -14,7 +15,6 @@ class PlanningRepository {
       projectId,
       sprintId,
       activeSprintId,
-      isActive: true,
     });
 
     const [result] = await dbConnection.query<ResultSetHeader>(
@@ -31,7 +31,7 @@ class PlanningRepository {
     await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
   }
 
-  public async read(projectId: number) {
+  public async read(planningId: number) {
     const query = sql
       .select('projectplanning', [
         'projectplanning.id',
@@ -43,7 +43,7 @@ class PlanningRepository {
         'projectSprint.name as sprintName',
       ])
       .join('projectSprint', { sprintId: 'projectSprint.id' }, 'LEFT')
-      .where({ 'projectplanning.projectId': projectId, 'projectplanning.isActive': true });
+      .where({ 'projectplanning.id': planningId });
     const [[planning]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,

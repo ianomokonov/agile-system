@@ -7,8 +7,8 @@ export class PlanningHandler {
     return planningService.start(projectId, sprintId, activeSprintId);
   }
 
-  public async read(projectId: number) {
-    return planningService.read(projectId);
+  public async read(planningId: number) {
+    return planningService.read(planningId);
   }
 
   public async getPlanningTaskSession(taskId: number, userId: number) {

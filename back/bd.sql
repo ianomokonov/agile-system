@@ -324,10 +324,8 @@ DROP TABLE IF EXISTS `projectPlanning`;
 CREATE TABLE `projectPlanning` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `createDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  `sprintId` int(11) NOT NULL,
+  `sprintId` int(11) NULL,
   `activeSprintId` int(11) NULL,
-  `isActive` bit DEFAULT 0,
-  `isFinished` bit DEFAULT 0,
   `projectId` int(11) NOT NULL,
   `activeTaskId` int(11) NULL,
   PRIMARY KEY (`id`)
@@ -578,7 +576,7 @@ VALUES
   ('нужно сделать', 1),
   ('в работе', 2),
   ('на проверке', 3),
-  ('сделано', 4),
+  ('сделано', 4);
 
 INSERT INTO
   `permission` (`name`, `id`)
