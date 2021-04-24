@@ -17,6 +17,7 @@
           Убрать из спринта
         </div>
         <div
+          *ngIf="task.activeSessionId || canStartPocker()"
           class="badge"
           [ngClass]="{
             'badge-primary': !task.activeSessionId,

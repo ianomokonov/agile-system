@@ -41,6 +41,10 @@ export class MarkTasksComponent implements OnInit {
     });
   }
 
+  public canStartPocker() {
+    return !this.planning?.notMarkedTasks.some((task) => task.activeSessionId);
+  }
+
   public onRemoveFromSprintClick(taskId: number) {
     this.socketService.removePlanningTask(taskId);
   }
