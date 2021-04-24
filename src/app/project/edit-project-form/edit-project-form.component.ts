@@ -5,6 +5,8 @@ import { UserShortView } from 'back/src/models/responses/user-short-view';
 import { ProjectService } from 'src/app/services/project.service';
 import { UserService } from 'src/app/services/user.service';
 import { Tag } from 'src/app/shared/tags-input/tags-input.component';
+import { editorConfig } from 'src/app/utils/constants';
+import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 @Component({
   selector: 'app-edit-project-form',
@@ -15,6 +17,8 @@ export class EditProjectFormComponent implements OnInit {
   public formGroup: FormGroup;
   public users: (UserShortView & Tag)[] = [];
   public projectId: number;
+  public editor = ClassicEditor;
+  public editorConfig = editorConfig;
 
   constructor(
     private fb: FormBuilder,

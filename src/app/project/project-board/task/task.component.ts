@@ -23,11 +23,12 @@ import { EditTaskComponent } from './edit-task/edit-task.component';
 export class TaskComponent {
   public task: TaskResponse;
   public editor = ClassicEditor;
+  public editorConfig = editorConfig;
   public editingDescription = false;
   public editingName = false;
   public sprints: IdNameResponse[] = [];
   public userSerachFn = userSearchFn;
-  public editorConfig = editorConfig;
+
   public project: ProjectResponse;
   public descriptionControl: FormControl = new FormControl();
   public userControl: FormControl = new FormControl();

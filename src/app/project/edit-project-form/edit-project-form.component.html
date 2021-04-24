@@ -5,7 +5,7 @@
   </div>
   <div class="form-group">
     <h6>Описание проетка</h6>
-    <textarea rows="4" class="form-control" formControlName="description"></textarea>
+    <ckeditor [editor]="editor" [config]="editorConfig" formControlName="description"></ckeditor>
   </div>
   <div class="d-flex justify-content-end">
     <button class="btn btn-primary" (click)="createProject()">

@@ -29,6 +29,6 @@ export class FinishDailyModalComponent {
     const timeNumber = parseInt(minutes, 10) * 60000 + parseInt(seconds, 10) * 1000;
     const avgTime = timeNumber / this.participantsCount;
 
-    return new Time(0, Math.floor(avgTime / 60000), (avgTime % 60000) / 1000);
+    return new Time(0, Math.floor(avgTime / 60000), Math.ceil((avgTime % 60000) / 1000));
   }
 }

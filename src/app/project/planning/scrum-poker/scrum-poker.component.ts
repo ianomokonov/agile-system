@@ -44,7 +44,7 @@ export class ScrumPokerComponent {
     this.projectService.getPlanningSession(id, planningId, taskId).subscribe(
       (session) => {
         this.session = session;
-        if (this.session.resultValue) {
+        if (this.session.resultValue || this.session.resultValue === 0) {
           this.showResultValue = true;
         }
         this.activeMark = session.cards.find((c) => c.isMy)?.value;
