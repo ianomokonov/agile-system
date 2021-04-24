@@ -1,42 +1,54 @@
 @import '../../../styles/variables.less';
 
-@collumn-width: 250px;
+@collumn-width: 25%;
 .info {
   display: flex;
   justify-content: space-between;
 }
-.scrollable {
+.headers {
+  display: flex;
   padding-bottom: 0.5rem;
-  height: calc(100% - 100px);
-  max-width: calc(100vw - 82px);
-  overflow: auto;
-  .headers {
-    display: flex;
-    padding-bottom: 0.5rem;
-    height: 40px;
-    .header {
-      min-width: @collumn-width;
-      text-align: center;
-    }
+  height: 40px;
+  .header {
+    width: calc(@collumn-width - 0.5rem);
+    max-width: 350px;
+    text-align: center;
   }
+}
 
-  .board {
-    display: inline-flex;
-    align-items: stretch;
-    min-height: calc(100% - 40px);
-    .collumn {
-      min-width: @collumn-width;
-      max-width: @collumn-width;
-      background-color: @bg-light;
+.board {
+  display: inline-flex;
+  align-items: stretch;
+  height: calc(100% - 134px);
+  overflow: hidden;
+  width: 100%;
+  .collumn {
+    width: @collumn-width;
+    background-color: @bg-light;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    max-width: 350px;
+
+    .content {
+      overflow: auto;
+      height: 100%;
       padding: 0.5rem;
-      .create-task {
-        padding: 0.5rem 0;
-        margin-bottom: 0.5rem;
-        cursor: pointer;
-        &:hover {
-          background-color: @bg-info-hover;
-          color: white;
-        }
+    }
+    .create-task {
+      padding: 0.5rem 0;
+      margin-bottom: 0.5rem;
+      margin-top: 0.5rem;
+      cursor: pointer;
+      &:hover {
+        background-color: @bg-info-hover;
+        color: white;
+      }
+    }
+
+    &:first-of-type {
+      .content {
+        height: calc(100% - 40px - 1rem);
       }
     }
   }

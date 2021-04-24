@@ -19,7 +19,7 @@ class DemoRepository {
       query.values,
     );
     await dbConnection.query<ResultSetHeader>(
-      `INSERT INTO projectDemoTask (taskId, demoId) SELECT pt.id, ${demoId} FROM projecttask pt WHERE pt.statusId=7 AND pt.projectSprintId=${sprintId}`,
+      `INSERT INTO projectDemoTask (taskId, demoId) SELECT pt.id, ${demoId} FROM projecttask pt WHERE pt.statusId=4 AND pt.projectSprintId=${sprintId}`,
     );
     return demoId;
   }

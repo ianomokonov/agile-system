@@ -494,7 +494,7 @@ class ProjectRepository {
       query = sql
         .update('projectTask', { projectSprintId: sprintId })
         .where({ projectSprintId: sprint.id })
-        .and({ statusId: 7 }, '!=');
+        .and({ statusId: 4 }, '!=');
       await dbConnection.query(getQueryText(query.text), query.values);
     }
   }

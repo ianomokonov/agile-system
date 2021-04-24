@@ -192,7 +192,7 @@ class TaskRepository {
 
       await dbConnection.query(getQueryText(query.text), query.values);
 
-      if ('statusId' in request && request.statusId === 7) {
+      if ('statusId' in request && request.statusId === 4) {
         const task = await this.getShortTaskView(request.id);
 
         if (!task.projectSprintId) {

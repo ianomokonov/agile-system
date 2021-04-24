@@ -575,13 +575,10 @@ ADD
 INSERT INTO
   `projectTaskStatus` (`name`, `id`)
 VALUES
-  ('to do', 1),
-  ('dev in progress', 2),
-  ('under review', 3),
-  ('dev completed', 4),
-  ('testing', 5),
-  ('test completed', 6),
-  ('done', 7);
+  ('нужно сделать', 1),
+  ('в работе', 2),
+  ('на проверке', 3),
+  ('сделано', 4),
 
 INSERT INTO
   `permission` (`name`, `id`)
