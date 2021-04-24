@@ -9,6 +9,7 @@ import { TaskType } from 'back/src/models/task-type';
 import { Priority } from 'back/src/models/priority';
 import { forkJoin } from 'rxjs';
 import { SocketService } from 'src/app/services/socket.service';
+import { TaskService } from 'src/app/services/task.service';
 
 @Component({
   selector: 'app-demo',
@@ -33,10 +34,12 @@ export class DemoComponent implements OnInit {
     private fb: FormBuilder,
     private projectService: ProjectService,
     private socketService: SocketService,
+    private taskService: TaskService,
   ) {
     this.demoTaskForm = this.fb.group({
       name: [null, Validators.required],
       comment: [null],
+      files: null,
     });
     this.commentControl.valueChanges.subscribe((value) => {
       sessionStorage.setItem(this.commentKey, value);
@@ -113,6 +116,7 @@ export class DemoComponent implements OnInit {
           projectSprintId: this.demo.sprintId,
           typeId: TaskType.Bug,
           priorityId: Priority.Critical,
+          files: formValue.files,
         }),
       );
     }

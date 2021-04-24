@@ -72,6 +72,12 @@
     >
     </ng-select>
   </div>
+  <div class="form-group">
+    <label
+      >Вложения<i class="fas fa-link ml-2 cursor-pointer" (click)="upload.uploadFiles($event)"></i
+    ></label>
+    <app-multiple-file-uploader formControlName="files" #upload></app-multiple-file-uploader>
+  </div>
 </div>
 <div class="modal-footer">
   <button type="button" class="btn btn-outline-primary" (click)="dismiss()">Отмена</button>

@@ -36,6 +36,7 @@ export class CreateTaskComponent implements OnInit {
       typeId: [TaskType.Feature, Validators.required],
       projectSprintId: [null],
       priorityId: [Priority.Low, Validators.required],
+      files: null,
     });
   }
 

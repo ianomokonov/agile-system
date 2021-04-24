@@ -9,6 +9,7 @@ export interface CreateTaskRequest {
   priorityId: Priority;
   typeId: TaskType;
   projectSprintId?: number;
+  files?: any[];
 }
 
 export interface UpdateTaskRequest {

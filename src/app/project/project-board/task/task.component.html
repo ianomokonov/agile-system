@@ -62,7 +62,11 @@
           ></i>
         </h5>
         <div class="section-body">
-          <p class="description formatted-text ck-content" [innerHTML]="task.description" *ngIf="!editingDescription"></p>
+          <p
+            class="description formatted-text ck-content"
+            [innerHTML]="task.description"
+            *ngIf="!editingDescription"
+          ></p>
           <ckeditor
             [editor]="editor"
             [config]="editorConfig"
@@ -90,28 +94,14 @@
       <section class="border-top pt-3">
         <h5 class="section-header">
           Вложения
-          <i class="fas fa-link ml-2 cursor-pointer" (click)="onUploadFileClick($event)"></i>
+          <i class="fas fa-link ml-2 cursor-pointer" (click)="upload.uploadFiles($event)"></i>
         </h5>
-        <div class="upload-area" #inputFileContainer>
-          <ng-container *ngIf="task.files?.length; else noFiles">
-            <div class="upload-area__file" *ngFor="let file of task.files">
-              <i
-                *ngIf="!isImage(file.url)"
-                class="upload-area__file-icon"
-                [ngClass]="getFileIconClass(file.name)"
-                (click)="downloadFile(file)"
-              ></i>
-              <a target="_blank" *ngIf="isImage(file.url)" [href]="file.url"
-                ><img class="upload-area__file-image" [src]="file.url"
-              /></a>
-              <span class="upload-area__file-name">{{ file.name }}</span>
-              <i
-                class="upload-area__file-remove fas fa-times-circle text-danger"
-                (click)="removeFile(file.id)"
-              ></i>
-            </div>
-          </ng-container>
-        </div>
+        <app-multiple-file-uploader
+          [formControl]="filesControl"
+          (download)="downloadFile($event)"
+          (remove)="removeFile($event)"
+          #upload
+        ></app-multiple-file-uploader>
       </section>
     </div>
     <div class="col border-left">
@@ -151,9 +141,3 @@
     </div>
   </div>
 </div>
-
-<ng-template #noFiles>
-  <span class="text-muted text-center p-4 btn btn-link w-100" (click)="onUploadFileClick($event)"
-    >Загрузить файлы</span
-  >
-</ng-template>

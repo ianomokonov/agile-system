@@ -1,12 +1,21 @@
-import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, forwardRef, Output, ViewChild } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { extensions } from 'src/app/utils/constants';
 
 @Component({
   selector: 'app-multiple-file-uploader',
   templateUrl: './multiple-file-uploader.component.html',
   styleUrls: ['./multiple-file-uploader.component.less'],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      useExisting: forwardRef(() => MultipleFileUploaderComponent),
+      multi: true,
+    },
+  ],
 })
-export class MultipleFileUploaderComponent {
+export class MultipleFileUploaderComponent implements ControlValueAccessor {
   public files: UploadFile[] | null | undefined;
   @ViewChild('inputFileContainer') private inputFileContainer: ElementRef<HTMLDivElement>;
   @Output() public download: EventEmitter<any> = new EventEmitter();
@@ -51,6 +60,9 @@ export class MultipleFileUploaderComponent {
     return !!fileUrl.match(/\.png|\.jpg|\.jpeg$/);
   }
   public removeFile(index) {
+    if (this.disabled) {
+      return;
+    }
     if (!this.files) {
       return;
     }
@@ -59,6 +71,9 @@ export class MultipleFileUploaderComponent {
   }
   public uploadFiles(event: MouseEvent): void {
     event.preventDefault();
+    if (this.disabled) {
+      return;
+    }
     const fileInput = this.createUploadFileInput();
     this.inputFileContainer.nativeElement.append(fileInput);
 
@@ -140,6 +155,9 @@ export class MultipleFileUploaderComponent {
   }
 
   public updateValue(value: UploadFile[] | null | undefined) {
+    if (this.disabled) {
+      return;
+    }
     this.files = value;
     if (this.onChange) {
       this.onChange(value);
@@ -152,6 +170,7 @@ export class MultipleFileUploaderComponent {
 }
 
 export interface UploadFile {
+  [name: string]: any;
   name: string;
   url: string;
   file?: File;

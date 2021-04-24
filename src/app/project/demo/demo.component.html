@@ -115,7 +115,7 @@
           Вложения
           <i class="fas fa-link ml-1 cursor-pointer" (click)="uploader.uploadFiles($event)"></i>
         </p>
-        <app-multiple-file-uploader #uploader></app-multiple-file-uploader>
+        <app-multiple-file-uploader formControlName="files" #uploader></app-multiple-file-uploader>
       </div>
     </div>
   </div>
@@ -158,6 +158,7 @@
 
   <div class="modal-body" [formGroup]="demoTaskForm">
     <div class="form-group">
+      <label>Название задачи</label>
       <input
         type="text"
         class="form-control"
@@ -167,11 +168,20 @@
       />
     </div>
     <div class="form-group">
-      <ckeditor
-        [editor]="editor"
-        formControlName="comment"
-        [config]="{ placeholder: 'Описание' }"
-      ></ckeditor>
+      <label>Описание</label>
+      <ckeditor [editor]="editor" formControlName="comment"></ckeditor>
+    </div>
+    <div class="form-group">
+      <label
+        >Вложения<i
+          class="fas fa-link ml-1 cursor-pointer"
+          (click)="formUploader.uploadFiles($event)"
+        ></i
+      ></label>
+      <app-multiple-file-uploader
+        formControlName="files"
+        #formUploader
+      ></app-multiple-file-uploader>
     </div>
   </div>
   <div class="modal-footer">

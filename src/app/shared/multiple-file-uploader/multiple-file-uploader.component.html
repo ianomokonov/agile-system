@@ -24,7 +24,11 @@
 </div>
 
 <ng-template #noFiles>
-  <span class="text-muted text-center p-4 btn btn-link w-100" (click)="uploadFiles($event)"
-    >Загрузить файлы</span
+  <button
+    [disabled]="disabled"
+    class="text-muted text-center p-4 btn btn-link w-100"
+    (click)="uploadFiles($event)"
   >
+    Загрузить файлы
+  </button>
 </ng-template>
