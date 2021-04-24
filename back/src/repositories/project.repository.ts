@@ -278,11 +278,16 @@ class ProjectRepository {
       return;
     }
 
+    const values = [];
+
     const query = `INSERT INTO projectuserrole (projectRoleId, projectUserId) VALUES ${roleIds
-      .map((id) => `(${id}, '${projectUserId}'), `)
+      .map((id) => {
+        values.push(id, projectUserId);
+        return `(?, ?), `;
+      })
       .join('')}`.replace(/,\s$/, '');
 
-    await dbConnection.query(query);
+    await dbConnection.query(query, values);
   }
 
   private async addProjectRolePermissions(projectRoleId: number, permissionIds: number[]) {
@@ -294,12 +299,15 @@ class ProjectRepository {
       console.error('Список разрешений не может быть пустым');
       return;
     }
-
+    const values = [];
     const query = `INSERT INTO projectrolepermission (projectRoleId, permissionId) VALUES ${permissionIds
-      .map((id) => `(${projectRoleId}, '${id}'), `)
+      .map((id) => {
+        values.push(projectRoleId, id);
+        return `(?, ?), `;
+      })
       .join('')}`.replace(/,\s$/, '');
 
-    await dbConnection.query(query);
+    await dbConnection.query(query, values);
   }
 
   private async removeProjectUserRoles(projectUserId: number) {

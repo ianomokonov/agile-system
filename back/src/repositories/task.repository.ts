@@ -124,11 +124,15 @@ class TaskRepository {
   }
 
   public async uploadFiles(taskId: number, files: { name: string; url: string }[]) {
+    const values = [];
     const query = `${`INSERT INTO projecttaskfiles (taskId, name, url) VALUES ${files
-      .map((file) => `(${taskId}, '${file.name}', '${file.url}'), `)
+      .map((file) => {
+        values.push(taskId, file.name, file.url);
+        return `(?, ?, ?), `;
+      })
       .join('')}`.replace(/,\s$/, '')};`;
 
-    await dbConnection.query<ResultSetHeader>(query);
+    await dbConnection.query<ResultSetHeader>(query, values);
   }
 
   public async getFiles(taskId: number) {
