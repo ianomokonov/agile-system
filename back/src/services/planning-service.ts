@@ -64,19 +64,19 @@ class PlanningService {
     return planningRepository.setSessionCard(sessionId, userId, value, card?.id);
   }
 
-  public async reset(sessionId: number, taskId: number) {
+  public async reset(sessionId: number, taskId: number, userId) {
     planningRepository.setShowCards(sessionId, false);
-    return planningRepository.resetSessionCards(sessionId, taskId);
+    return planningRepository.resetSessionCards(sessionId, taskId, userId);
   }
 
   public async setShowCards(sessionId: number, showCards: boolean) {
     return planningRepository.setShowCards(sessionId, showCards);
   }
 
-  public async closeSession(sessionId: number, value: number, taskId: number) {
+  public async closeSession(sessionId: number, value: number, taskId: number, userId: number) {
     await Promise.all([
       planningRepository.closeSession(sessionId, value),
-      taskRepository.update({ id: taskId, points: value }),
+      taskRepository.update({ id: taskId, points: value }, userId),
     ]);
   }
 }

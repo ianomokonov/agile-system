@@ -228,7 +228,7 @@ io.use(authSocketJWT).on('connection', (socket) => {
     if (!sprintId) {
       return;
     }
-    tasksHandler.update({ id: taskId, projectSprintId: sprintId });
+    tasksHandler.update({ id: taskId, projectSprintId: sprintId }, socket.userId);
     io.sockets.in(socket.planningRoom).emit('updatePlanning');
   });
 
@@ -236,7 +236,7 @@ io.use(authSocketJWT).on('connection', (socket) => {
     if (!socket.planningId) {
       return;
     }
-    tasksHandler.update({ id: taskId, projectSprintId: null });
+    tasksHandler.update({ id: taskId, projectSprintId: null }, socket.userId);
     io.sockets.in(socket.planningRoom).emit('updatePlanning');
   });
 
@@ -262,7 +262,7 @@ io.use(authSocketJWT).on('connection', (socket) => {
     if (!socket.planningId) {
       return;
     }
-    await planningHandler.closeSession(sessionId, points, taskId);
+    await planningHandler.closeSession(sessionId, points, taskId, socket.userId);
     io.sockets.in(socket.planningRoom).emit('updatePlanningSession');
   });
 
@@ -278,7 +278,7 @@ io.use(authSocketJWT).on('connection', (socket) => {
     if (!sessionId) {
       return;
     }
-    await planningHandler.reset(sessionId, taskId);
+    await planningHandler.reset(sessionId, taskId, socket.userId);
     io.sockets.in(socket.planningRoom).emit('updatePlanningSession');
     io.sockets.in(socket.planningRoom).emit('updatePlanning');
   });
@@ -287,7 +287,7 @@ io.use(authSocketJWT).on('connection', (socket) => {
     if (!sprintId) {
       return;
     }
-    await projectSprintHandler.start(sprintId, projectId);
+    await projectSprintHandler.start(sprintId, projectId, socket.userId);
     io.sockets.in(socket.planningRoom).emit('startPlanningSprint');
   });
 

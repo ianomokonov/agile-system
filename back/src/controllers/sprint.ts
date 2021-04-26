@@ -13,7 +13,7 @@ sprintRouter.post(`/create`, async (req, res) => {
 });
 
 sprintRouter.post(`/start`, async (req, res) => {
-  await projectSprintHandler.start(req.body.id, res.locals.projectId);
+  await projectSprintHandler.start(req.body.id, res.locals.projectId, res.locals.userId);
   res.status(StatusCodes.OK).json('Спринт стартовал');
 });
 

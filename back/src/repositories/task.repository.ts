@@ -171,7 +171,7 @@ class TaskRepository {
   }
 
   // eslint-disable-next-line complexity
-  public async update(request: Partial<UpdateTaskRequest>) {
+  public async update(request: Partial<UpdateTaskRequest>, userId: number, sprintId?: number) {
     try {
       if ('projectSprintId' in request) {
         const query = sql
@@ -180,7 +180,7 @@ class TaskRepository {
           .and({ resultValue: null }, 'IS');
         dbConnection.query(getQueryText(query.text), query.values);
       }
-      const model = {} as any;
+      const model = { lastEditUserId: userId } as any;
       const specialKeys = ['id'];
       Object.keys(request)
         .filter((key) => specialKeys.indexOf(key) < 0)
@@ -188,7 +188,13 @@ class TaskRepository {
           model[key] = request[key];
         });
 
-      let query = sql.update('projecttask', model).where({ id: request.id });
+      let query = sql.update('projecttask', model);
+
+      if (sprintId) {
+        query = query.where({ projectSprintId: sprintId });
+      } else {
+        query = query.where({ id: request.id });
+      }
 
       await dbConnection.query(getQueryText(query.text), query.values);
 
@@ -216,8 +222,8 @@ class TaskRepository {
     }
   }
 
-  public async updateTaskStatus(taskId: number, statusId: number) {
-    this.update({ id: taskId, statusId });
+  public async updateTaskStatus(taskId: number, statusId: number, userId: number) {
+    this.update({ id: taskId, statusId }, userId);
   }
 
   public async delete(taskId: number) {

@@ -116,8 +116,8 @@ class ProjectService {
     return projectRepository.getProjectSprintNames(projectId);
   }
 
-  public async startSprint(sprintId: number, projectId: number) {
-    return projectRepository.startSprint(sprintId, projectId);
+  public async startSprint(sprintId: number, projectId: number, userId: number) {
+    return projectRepository.startSprint(sprintId, projectId, userId);
   }
 
   public async finishSprint(sprintId: number) {

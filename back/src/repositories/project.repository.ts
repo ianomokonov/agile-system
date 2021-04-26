@@ -453,7 +453,7 @@ class ProjectRepository {
     return sprints as IdNameResponse[];
   }
 
-  public async startSprint(sprintId: number, projectId: number) {
+  public async startSprint(sprintId: number, projectId: number, userId: number) {
     let query = sql.select('projectsprint', ['id']).where({ isActive: true, projectId });
     const [[sprint]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -481,7 +481,7 @@ class ProjectRepository {
 
     if (sprint) {
       query = sql
-        .update('projectTask', { projectSprintId: sprintId })
+        .update('projectTask', { projectSprintId: sprintId, lastEditUserId: userId })
         .where({ projectSprintId: sprint.id })
         .and({ statusId: 4 }, '!=');
       await dbConnection.query(getQueryText(query.text), query.values);

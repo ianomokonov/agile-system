@@ -64,7 +64,7 @@ taskRouter.put(
   checkTaskPermissions(Permissions.CanEditProject),
   async (req, res) => {
     try {
-      await tasksHandler.update({ id: +req.params.id, ...req.body });
+      await tasksHandler.update({ id: +req.params.id, ...req.body }, res.locals.userId);
       res.status(StatusCodes.OK).json('Задача обновлена');
     } catch (error) {
       res.status(error.statusCode).json(error.error);
@@ -115,7 +115,7 @@ taskRouter.put(
   checkTaskPermissions(Permissions.CanEditProject),
   async (req, res) => {
     try {
-      await updateTaskStatusHandler(+req.params.id, req.body.statusId);
+      await updateTaskStatusHandler(+req.params.id, req.body.statusId, res.locals.userId);
       res.status(StatusCodes.OK).json('Статус задачи обновлен');
     } catch (error) {
       res.status(error.statusCode).json(error.error);

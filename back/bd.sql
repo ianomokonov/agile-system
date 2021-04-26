@@ -178,7 +178,8 @@ DROP TABLE IF EXISTS `taskHistoryOperations`;
 
 CREATE TABLE `taskHistoryOperations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `operationName` varchar(255) NOT NULL,
+  `fieldName` varchar(255) NOT NULL,
+  `newValue` MEDIUMTEXT NOT NULL,
   `createDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `projectUserId` int(11) NOT NULL,
   `projectTaskId` int(11) NOT NULL,

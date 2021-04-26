@@ -19,8 +19,8 @@ export class PlanningHandler {
     return planningService.update(planningId, request);
   }
 
-  public async reset(sessionId: number, taskId: number) {
-    return planningService.reset(sessionId, taskId);
+  public async reset(sessionId: number, taskId: number, userId: number) {
+    return planningService.reset(sessionId, taskId, userId);
   }
 
   public async setShowCards(sessionId: number, showCards: boolean) {
@@ -35,8 +35,8 @@ export class PlanningHandler {
     return planningService.setCard(sessionId, userId, value);
   }
 
-  public async closeSession(sessionId: number, value: number, taskId: number) {
-    return planningService.closeSession(sessionId, value, taskId);
+  public async closeSession(sessionId: number, value: number, taskId: number, userId: number) {
+    return planningService.closeSession(sessionId, value, taskId, userId);
   }
 }
 

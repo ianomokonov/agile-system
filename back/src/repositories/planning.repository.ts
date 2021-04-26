@@ -154,7 +154,7 @@ class PlanningRepository {
     });
   }
 
-  public async resetSessionCards(sessionId: number, taskId: number) {
+  public async resetSessionCards(sessionId: number, taskId: number, userId: number) {
     let query = sql.deletes('planningTaskSessionCard').where({ sessionId });
     dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
     query = sql
@@ -163,9 +163,7 @@ class PlanningRepository {
 
     dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
 
-    query = sql.update('projectTask', { points: null }).where({ id: taskId });
-
-    await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
+    await taskRepository.update({ id: taskId, points: null }, userId);
   }
 
   public async setShowCards(sessionId: number, showCards: boolean) {
