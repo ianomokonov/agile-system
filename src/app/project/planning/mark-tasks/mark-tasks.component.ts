@@ -27,10 +27,14 @@ export class MarkTasksComponent implements OnInit {
       this.getPlanning(this.projectId, this.planning?.id);
     });
     this.socketService.of('startPocker').subscribe(({ taskId, sessionId }) => {
-      const task = this.planning?.notMarkedTasks.find((t) => t.id === taskId);
+      const task =
+        this.planning?.notMarkedTasks.find((t) => t.id === taskId) ||
+        this.planning?.completedSessions.find((s) => s.task.id === taskId);
       if (task) {
         task.activeSessionId = sessionId;
-        this.onStartPokerClick(task);
+        if (task.activeSessionId) {
+          this.router.navigate(['task', task.id], { relativeTo: this.activatedRoute });
+        }
       }
     });
     this.activatedRoute.params.subscribe((params) => {
@@ -67,10 +71,6 @@ export class MarkTasksComponent implements OnInit {
 
   public onStartPokerClick(task: TaskResponse) {
     if (!this.planning) {
-      return;
-    }
-    if (task.activeSessionId) {
-      this.router.navigate(['task', task.id], { relativeTo: this.activatedRoute });
       return;
     }
     this.socketService.startPocker(task.id);

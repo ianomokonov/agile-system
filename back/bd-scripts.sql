@@ -1,0 +1,1 @@
+ALTER TABLE projectPlanningTaskSession ADD CONSTRAINT uniqTaskSeccion UNIQUE (taskId)

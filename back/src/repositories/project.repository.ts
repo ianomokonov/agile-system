@@ -32,12 +32,7 @@ sql.use('mysql');
 class ProjectRepository {
   public async getUserProjects(userId: number) {
     const query = sql
-      .select('project', [
-        'project.id',
-        'project.name',
-        'project.repository',
-        'project.lastEditDate',
-      ])
+      .select('project', ['project.id', 'project.name', 'project.lastEditDate'])
       .join('projectUser', { projectId: 'project.id' }, 'RIGHT OUTER')
       .where({ ownerId: userId })
       .or({ 'projectUser.userId': userId })
@@ -340,9 +335,7 @@ class ProjectRepository {
       return null;
     }
 
-    const query = sql
-      .select('project', ['id', 'name', 'repository', 'description'])
-      .where({ id: projectId });
+    const query = sql.select('project', ['id', 'name', 'description']).where({ id: projectId });
 
     const [[project]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -401,7 +394,7 @@ class ProjectRepository {
   }
 
   public async getProjectStatuses() {
-    const query = sql.select('projecttaskstatus', '*');
+    const query = sql.select('projecttaskstatus', '*').orderby('id');
 
     const [statuses] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),

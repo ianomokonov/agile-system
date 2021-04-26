@@ -134,6 +134,6 @@ export class ProjectBoardComponent implements OnInit {
       return false;
     }
 
-    return !!this.project.sprint?.tasks.find((t) => t.statusId === 7);
+    return !!this.project.sprint?.tasks.find((t) => t.statusId === 4);
   }
 }

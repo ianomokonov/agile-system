@@ -140,6 +140,10 @@ export class SocketService {
     this.socket.emit('enterPlanning', planningId);
   }
 
+  public leavePlanningRoom() {
+    this.socket.emit('leavePlanning');
+  }
+
   public takePlanningTask(taskId, sprintId) {
     this.socket.emit('takePlanningTask', { taskId, sprintId });
   }

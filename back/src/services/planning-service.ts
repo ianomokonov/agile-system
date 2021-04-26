@@ -21,7 +21,7 @@ class PlanningService {
       if (planning.sprintId) {
         const [newTasks, notMarkedTasks] = await Promise.all([
           taskService.getNewSprintTasks(planning?.activeSprintId),
-          taskService.getNotMarkedSprintTasks(planning?.sprintId || planning?.activeSprintId),
+          taskService.getNotMarkedSprintTasks(planning?.sprintId),
         ]);
 
         planning.newTasks = newTasks;

@@ -89,7 +89,7 @@ export class ProjectBacklogComponent implements OnInit {
       return false;
     }
 
-    return !!sprint.tasks.find((t) => t.statusId === 7);
+    return !!sprint.tasks.find((t) => t.statusId === 4);
   }
 
   public onStartPlanning(sprintId) {

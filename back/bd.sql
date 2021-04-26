@@ -424,11 +424,6 @@ ADD
 ALTER TABLE
   `projectTask`
 ADD
-  FOREIGN KEY (epicId) REFERENCES `epics` (`id`) ON DELETE NO ACTION;
-
-ALTER TABLE
-  `projectTask`
-ADD
   FOREIGN KEY (parentId) REFERENCES `projectTask` (`id`) ON DELETE
 SET
   NULL;

@@ -210,6 +210,9 @@ io.use(authSocketJWT).on('connection', (socket) => {
   // --------------------------- PLANNING ------------------------------------
 
   socket.on('enterPlanning', async (planningId) => {
+    if (socket.planningRoom) {
+      return;
+    }
     socket.planningRoom = `planning${planningId}`;
     socket.planningId = planningId;
     socket.join(socket.planningRoom);
@@ -241,7 +244,9 @@ io.use(authSocketJWT).on('connection', (socket) => {
     if (!socket.planningId) {
       return;
     }
+
     const sessionId = await planningHandler.update(socket.planningId, { activeTaskId: taskId });
+
     io.sockets.in(socket.planningRoom).emit('startPocker', { taskId, sessionId });
   });
 
