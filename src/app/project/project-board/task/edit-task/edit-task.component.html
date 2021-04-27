@@ -19,6 +19,7 @@
       formControlName="typeId"
       bindValue="id"
       bindLabel="name"
+      [clearable]="false"
       [closeOnSelect]="true"
       ngbAutofocus
     >
@@ -31,6 +32,7 @@
       formControlName="priorityId"
       bindValue="id"
       bindLabel="name"
+      [clearable]="false"
       [closeOnSelect]="true"
     >
     </ng-select>
@@ -51,6 +53,7 @@
     <ng-select
       [items]="statuses"
       formControlName="statusId"
+      [clearable]="false"
       bindValue="id"
       bindLabel="name"
       [closeOnSelect]="true"

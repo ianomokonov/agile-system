@@ -38,6 +38,18 @@ export const taskTypes = [
   },
 ];
 
+export const taskFields = {
+  description: 'Описание',
+  projectUserId: 'Исполнитель',
+  statusId: 'Статус',
+  sprintId: 'Спринт',
+  typeId: 'Тип задачи',
+  priorityId: 'Приоритет',
+  projectSprintId: 'Спринт',
+  points: 'Оценка',
+  name: 'Название',
+};
+
 export const extensions = {
   word: ['.doc', '.docx'],
   excel: ['.xls', '.xlsx'],

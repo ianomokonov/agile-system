@@ -91,7 +91,7 @@
           </div>
         </div>
       </section>
-      <section class="border-top pt-3">
+      <section class="border-top pt-3 mb-3">
         <h5 class="section-header">
           Вложения
           <i class="fas fa-link ml-2 cursor-pointer" (click)="upload.uploadFiles($event)"></i>
@@ -102,6 +102,40 @@
           (remove)="removeFile($event)"
           #upload
         ></app-multiple-file-uploader>
+      </section>
+      <section class="border-top pt-3" *ngIf="task.history?.length">
+        <h5 class="section-header">
+          История изменений
+        </h5>
+        <div class="history">
+          <div class="row m-0 history__header border-bottom">
+            <div class="col-3 pl-0">
+              Пользователь
+            </div>
+            <div class="col-3">
+              Измененное поле
+            </div>
+            <div class="col-4">
+              Новое значение
+            </div>
+            <div class="col-2 pr-0 text-right">
+              Дата и время
+            </div>
+          </div>
+          <div class="row m-0 history__item border-bottom" *ngFor="let item of task.history">
+            <div class="col-3 pl-0">
+              {{item.userName}} {{item.userSurname}}
+            </div>
+            <div class="col-3">
+              {{getHistoryField(item)}}
+            </div>
+            <div class="col-4" [innerHTML]="getHistoryValue(item) || '—'">
+            </div>
+            <div class="col-2 pr-0 text-right">
+              <small class="text-muted">{{item.createDate | date: 'dd.MM.yyyy HH.mm'}}</small>
+            </div>
+          </div>
+        </div>
       </section>
     </div>
     <div class="col border-left">

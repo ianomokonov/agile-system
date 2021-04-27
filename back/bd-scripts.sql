@@ -32,6 +32,8 @@ ALTER TABLE
 ADD
   FOREIGN KEY (lastEditUserId) REFERENCES `user` (`id`);
 
+DROP TRIGGER IF EXISTS `update_task`;
+
 DELIMITER $$ CREATE TRIGGER update_task
 AFTER
 UPDATE
@@ -68,7 +70,9 @@ UPDATE
             VALUES
                 ('projectUserId', NEW.projectUserId, NEW.lastEditUserId, NEW.id);
     END IF;
-    IF OLD.projectSprintId != NEW.projectSprintId THEN
+    IF OLD.projectSprintId != NEW.projectSprintId 
+    OR OLD.projectSprintId IS NULL AND NEW.projectSprintId IS NOT NULL
+    OR NEW.projectSprintId IS NULL AND OLD.projectSprintId IS NOT NULL THEN
         INSERT INTO taskHistoryOperations (fieldName, newValue, userId, projectTaskId)
             VALUES
                 ('projectSprintId', NEW.projectSprintId, NEW.lastEditUserId, NEW.id);

@@ -122,6 +122,8 @@ import { MultipleFileUploaderComponent } from './shared/multiple-file-uploader/m
     SocketService,
     AuthSocket,
     DailyService,
+    TaskTypePipe,
+    PriorityPipe,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     // { provide: HTTP_INTERCEPTORS, useClass: ContentTypeInterceptor, multi: true },
   ],

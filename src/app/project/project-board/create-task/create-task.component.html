@@ -45,6 +45,7 @@
       [items]="taskTypes"
       formControlName="typeId"
       bindValue="id"
+      [clearable]="false"
       bindLabel="name"
       [closeOnSelect]="true"
     >
@@ -57,6 +58,7 @@
       formControlName="priorityId"
       bindValue="id"
       bindLabel="name"
+      [clearable]="false"
       [closeOnSelect]="true"
     >
     </ng-select>

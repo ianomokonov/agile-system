@@ -40,16 +40,18 @@ class TaskRepository {
     const [[task]] = await dbConnection.query<RowDataPacket[]>(`SELECT *
         FROM projecttask 
         WHERE id=${taskId}`);
-    const [status, user, creator, sprints] = await Promise.all([
-      await this.getStatus(task.statusId),
+    const [status, user, creator, sprints, history] = await Promise.all([
+      this.getStatus(task.statusId),
       projectRepository.getProjectUser(task.projectUserId),
       projectRepository.getProjectUser(task.creatorId),
       projectRepository.getProjectSprintNames(task.projectId, task.projectSprintId),
+      this.getTaskHistory(taskId),
     ]);
 
     task.status = status;
     task.projectUser = user;
     task.creator = creator;
+    task.history = history;
     task.sprint = task.projectSprintId ? sprints[0] : null;
     task.files = await this.getFiles(taskId);
     return task as TaskResponse;
@@ -107,6 +109,46 @@ class TaskRepository {
     );
 
     return tasks as TaskResponse[];
+  }
+
+  public async getTaskHistory(taskId: number) {
+    if (!taskId) {
+      return [];
+    }
+    const query = sql
+      .select('taskHistoryOperations', [
+        'taskHistoryOperations.id',
+        'taskHistoryOperations.fieldName',
+        'taskHistoryOperations.newValue',
+        'taskHistoryOperations.createDate',
+        'user.name as userName',
+        'user.surname as userSurname',
+      ])
+      .join('user', { 'user.id': 'userId' })
+      .where({ projectTaskId: taskId })
+      .orderby('taskHistoryOperations.createDate DESC');
+    let [historyItems] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    historyItems = await Promise.all(
+      historyItems.map(async (itemTemp) => {
+        const item = itemTemp;
+        if (item.fieldName === 'projectUserId') {
+          item.user = await projectRepository.getProjectUser(item.newValue);
+        }
+        if (item.fieldName === 'projecSprintId') {
+          item.sprint = await projectRepository.getProjectSprintNames(null, item.newValue);
+        }
+        if (item.fieldName === 'statusId') {
+          item.status = await this.getStatus(item.newValue);
+        }
+        return item;
+      }),
+    );
+
+    return historyItems;
   }
 
   public async create(projectId: number, request: CreateTaskRequest) {

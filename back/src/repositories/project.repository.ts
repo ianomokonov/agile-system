@@ -438,10 +438,10 @@ class ProjectRepository {
     return sprintId;
   }
 
-  public async getProjectSprintNames(projectId: number, sprintId?: number) {
+  public async getProjectSprintNames(projectId?: number, sprintId?: number) {
     const query = sql.select('projectsprint', ['id', 'name']);
     if (sprintId) {
-      query.where({ projectId, isFinished: false, id: sprintId });
+      query.where({ isFinished: false, id: sprintId });
     } else {
       query.where({ projectId, isFinished: false });
     }
