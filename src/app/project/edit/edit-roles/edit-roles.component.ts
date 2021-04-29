@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { Permissions } from 'back/src/models/permissions';
 import { ProjectRoleResponse } from 'back/src/models/responses/project-role.response';
 import { ProjectService } from 'src/app/services/project.service';
 
@@ -36,7 +37,8 @@ export class EditRolesComponent implements OnInit {
 
   public ngOnInit(): void {
     // eslint-disable-next-line no-restricted-globals
-    this.permissions = Object.values(Permissions).filter((v) => isNaN(parseInt(v as string, 10)));
+    this.permissions = Object.keys(Permissions).filter((v) => isNaN(parseInt(v as string, 10)));
+
     const permissionsArray = this.createRoleForm.get('permissions') as FormArray;
     permissionsArray.clear();
 

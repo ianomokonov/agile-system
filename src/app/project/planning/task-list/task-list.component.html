@@ -1,8 +1,0 @@
-<div class="tasks-list content p-2 rounded">
-  <div class="task rounded" *ngFor="let task of tasks" (click)="onTaskClick(task.id)">
-    <div class="d-flex">
-      <small class="text-muted mr-3">#{{ task.id }}</small>
-      <h6 class="d-inline text-dark mb-0">{{ task.name }}</h6>
-    </div>
-  </div>
-</div>

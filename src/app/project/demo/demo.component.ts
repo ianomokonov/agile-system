@@ -10,6 +10,8 @@ import { Priority } from 'back/src/models/priority';
 import { forkJoin } from 'rxjs';
 import { SocketService } from 'src/app/services/socket.service';
 import { TaskService } from 'src/app/services/task.service';
+import { ProjectDataService } from 'src/app/services/project-data.service';
+import { Permissions } from 'back/src/models/permissions';
 
 @Component({
   selector: 'app-demo',
@@ -21,6 +23,7 @@ export class DemoComponent implements OnInit {
   public demo;
   public activeTask: any;
   public editor = ClassicEditor;
+  public permissions = Permissions;
   public demoTaskForm: FormGroup;
   public get commentControl(): FormControl {
     return this.demoTaskForm.get('comment') as FormControl;
@@ -36,6 +39,7 @@ export class DemoComponent implements OnInit {
     public modalService: NgbModal,
     private fb: FormBuilder,
     private projectService: ProjectService,
+    public projectDataService: ProjectDataService,
     private socketService: SocketService,
     private cdRef: ChangeDetectorRef,
     private taskService: TaskService,

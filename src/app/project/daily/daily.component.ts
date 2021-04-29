@@ -1,7 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Permissions } from 'back/src/models/permissions';
 import { DailyService } from 'src/app/services/daily.service';
+import { ProjectDataService } from 'src/app/services/project-data.service';
 import { SocketService } from 'src/app/services/socket.service';
 import { FinishDailyModalComponent } from './finish-daily-modal/finish-daily-modal.component';
 
@@ -14,6 +16,7 @@ export class DailyComponent implements OnInit, OnDestroy {
   public time = '00:00';
   public dailyTime = '00:00';
   public lastParticipant = false;
+  public permissions = Permissions;
   public isPaused = false;
   public get nextParticipants() {
     return this.daily?.participants?.filter((p) => !p.isActive && !p.isDone);
@@ -23,6 +26,7 @@ export class DailyComponent implements OnInit, OnDestroy {
   constructor(
     private socketService: SocketService,
     private activatedRoute: ActivatedRoute,
+    public projectDataService: ProjectDataService,
     private router: Router,
     private dailyService: DailyService,
     private modalService: NgbModal,

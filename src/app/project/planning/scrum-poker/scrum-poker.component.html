@@ -1,6 +1,8 @@
 <div class="d-flex align-items-stretch" *ngIf="session?.task">
   <div class="w-50 task border-right mr-4 pr-3 mb-0">
-    <a class="btn btn-link pl-0 mb-2" routerLink="../../"><i class="fas fa-arrow-left"></i> к задачам</a>
+    <a class="btn btn-link pl-0 mb-2" routerLink="../../"
+      ><i class="fas fa-arrow-left"></i> к задачам</a
+    >
     <h4>{{ session.task.name }}</h4>
     <div class="form-group">
       <small class="text-muted">Описание</small>
@@ -22,10 +24,7 @@
     </div>
   </div>
   <div class="poker w-50">
-    <div
-      class="w-100 h-75 d-flex align-items-center"
-      *ngIf="showResultValue"
-    >
+    <div class="w-100 h-75 d-flex align-items-center" *ngIf="showResultValue">
       <div class="card main">
         {{ session.resultValue }}
       </div>
@@ -56,11 +55,19 @@
       </div>
     </ng-container>
     <div class="d-flex" *ngIf="session.cards?.length">
-      <button *ngIf="session.showCards" class="btn btn-outline-primary mr-1" (click)="resetCards()">
+      <button
+        *ngIf="projectDataService.PID[permissions.CanResetScrumPocker] && session.showCards"
+        class="btn btn-outline-primary mr-1"
+        (click)="resetCards()"
+      >
         Сбросить
       </button>
       <ng-container *ngIf="!showResultValue">
-        <button *ngIf="!session.showCards" class="btn btn-primary" (click)="openCards()">
+        <button
+          *ngIf="projectDataService.PID[permissions.CanStartScrumPocker] && !session.showCards"
+          class="btn btn-primary"
+          (click)="openCards()"
+        >
           Показать
         </button>
       </ng-container>
@@ -72,7 +79,11 @@
 </div>
 
 <ng-template #selectResult>
-  <div class="card main" (click)="closeSession(card.value)" *ngFor="let card of mantionedCards">
+  <div
+    class="card main"
+    (click)="projectDataService.PID[permissions.CanSetTaskPoints] && closeSession(card.value)"
+    *ngFor="let card of mantionedCards"
+  >
     <span class="d-block">{{ card.value }}</span>
     <small class="text-wigth">({{ card.count }})</small>
   </div>

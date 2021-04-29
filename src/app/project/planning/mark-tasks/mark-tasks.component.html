@@ -13,11 +13,15 @@
         >
       </div>
       <div>
-        <div class="badge btn-outline-primary mr-2" (click)="onRemoveFromSprintClick(task.id)">
+        <div
+          class="badge btn-outline-primary mr-2"
+          *ngIf="projectDataService.PID[permissions.CanEditTask]"
+          (click)="onRemoveFromSprintClick(task.id)"
+        >
           Убрать из спринта
         </div>
         <div
-          *ngIf="task.activeSessionId || canStartPocker()"
+          *ngIf="task.activeSessionId || (projectDataService.PID[permissions.CanStartScrumPocker] && canStartPocker())"
           class="badge"
           [ngClass]="{
             'badge-primary': !task.activeSessionId,
@@ -37,7 +41,7 @@
     <span>Оцененные задачи</span>
     <button
       class="btn btn-primary"
-      *ngIf="planning?.sprintId && !planning?.notMarkedTasks?.length"
+      *ngIf="projectDataService.PID[permissions.CanStartScrumPocker] && planning?.sprintId && !planning?.notMarkedTasks?.length"
       (click)="onStartSprintClick()"
     >
       Начать спринт
@@ -57,7 +61,7 @@
       <div>
         <div class="badge badge-success" *ngIf="session.task.points">{{ session.task.points }}</div>
         <div
-          *ngIf="session.isCanceled && canStartPocker()"
+          *ngIf="projectDataService.PID[permissions.CanStartScrumPocker] && session.isCanceled && canStartPocker()"
           class="badge btn-outline-primary ml-2"
           (click)="onStartPokerClick(session.task)"
         >

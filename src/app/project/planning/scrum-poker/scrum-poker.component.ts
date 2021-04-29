@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Permissions } from 'back/src/models/permissions';
+import { ProjectDataService } from 'src/app/services/project-data.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { SocketService } from 'src/app/services/socket.service';
 
@@ -13,6 +15,7 @@ export class ScrumPokerComponent {
   public activeMark;
   public showCards = false;
   public session;
+  public permissions = Permissions;
   public showResultValue: boolean;
   public mantionedCards: { value: number; count: number }[] = [];
   private projectId: number;
@@ -22,6 +25,7 @@ export class ScrumPokerComponent {
   constructor(
     private projectService: ProjectService,
     private activatedRoute: ActivatedRoute,
+    public projectDataService: ProjectDataService,
     private socketService: SocketService,
     private router: Router,
   ) {

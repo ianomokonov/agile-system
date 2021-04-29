@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Permissions } from 'back/src/models/permissions';
 import { PlanningFullView } from 'back/src/models/responses/planning';
 import { TaskResponse } from 'back/src/models/responses/task.response';
+import { ProjectDataService } from 'src/app/services/project-data.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { SocketService } from 'src/app/services/socket.service';
 
@@ -13,10 +15,12 @@ import { SocketService } from 'src/app/services/socket.service';
 export class MarkTasksComponent implements OnInit {
   public planning: PlanningFullView | undefined;
   private projectId: number;
+  public permissions = Permissions;
   constructor(
     private activatedRoute: ActivatedRoute,
     private projectService: ProjectService,
     private socketService: SocketService,
+    public projectDataService: ProjectDataService,
     private router: Router,
   ) {}
   public ngOnInit(): void {

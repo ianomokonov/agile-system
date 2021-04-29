@@ -9,7 +9,7 @@
           'btn-primary': !demo.taskToShow?.length
         }"
         (click)="finishDemo(false, createDemoTask)"
-        *ngIf="!demo.isFinished"
+        *ngIf="this.projectDataService.PID[this.permissions.CanStartDemo] && !demo.isFinished"
       >
         Завершить демо
       </div>
@@ -79,7 +79,10 @@
             <button
               class="btn btn-primary"
               (click)="acceptTask(activeTask.id)"
-              *ngIf="!activeTask.isFinished"
+              *ngIf="
+                this.projectDataService.PID[this.permissions.CanStartDemo] &&
+                !activeTask.isFinished
+              "
             >
               Принять
             </button>
@@ -105,7 +108,7 @@
           </div>
         </div>
       </div>
-      <div class="ml-2">
+      <div class="ml-2" *ngIf="this.projectDataService.PID[this.permissions.CanCreateDemoNotes]">
         <div class="form-group">
           <p class="mb-1">Замечания:</p>
           <ckeditor [editor]="editor" [formControl]="commentControl"></ckeditor>
@@ -115,7 +118,10 @@
           Вложения
           <i class="fas fa-link ml-1 cursor-pointer" (click)="uploader.uploadFiles($event)"></i>
         </p>
-        <app-multiple-file-uploader [formControl]="filesControl" #uploader></app-multiple-file-uploader>
+        <app-multiple-file-uploader
+          [formControl]="filesControl"
+          #uploader
+        ></app-multiple-file-uploader>
       </div>
     </div>
   </div>
@@ -167,6 +173,7 @@
         ngbAutofocus
       />
     </div>
+
     <div class="form-group">
       <label>Описание</label>
       <ckeditor [editor]="editor" formControlName="comment"></ckeditor>

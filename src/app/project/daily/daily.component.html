@@ -10,11 +10,17 @@
 
   <h1>{{ daily?.isActive ? getTime() : 'Stand Up!' }}</h1>
   <div class="d-flex">
-    <button class="btn btn-primary start-btn" (click)="daily?.isActive && !isPaused ? pause() : start()">
-      {{ !isPaused && daily?.isActive ? 'Пауза' : 'Начать' }}<i class="fas fa-caret-right" *ngIf="!daily?.isActive"></i>
+    <button
+      [disabled]="!daily?.isActive && !this.projectDataService.PID[this.permissions.CanStartDaily]"
+      class="btn btn-primary start-btn"
+      (click)="daily?.isActive && !isPaused ? pause() : start()"
+    >
+      {{ !isPaused && daily?.isActive ? 'Пауза' : 'Начать'
+      }}<i class="fas fa-caret-right" *ngIf="!daily?.isActive"></i>
     </button>
     <button
       *ngIf="daily?.isActive"
+      [disabled]="!this.projectDataService.PID[this.permissions.CanStartDaily]"
       class="btn btn-primary start-btn next-btn"
       (click)="lastParticipant ? stop() : next()"
     >

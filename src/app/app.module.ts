@@ -42,7 +42,6 @@ import { TaskTypePipe } from './shared/pipes/task-type.pipe';
 import { RetroService } from './services/retro.service';
 import { PlanningComponent } from './project/planning/planning.component';
 import { DiscussNewTasksComponent } from './project/planning/discuss-new-tasks/discuss-new-tasks.component';
-import { TaskListComponent } from './project/planning/task-list/task-list.component';
 import { ScrumPokerComponent } from './project/planning/scrum-poker/scrum-poker.component';
 import { MarkTasksComponent } from './project/planning/mark-tasks/mark-tasks.component';
 import { DemoComponent } from './project/demo/demo.component';
@@ -83,7 +82,6 @@ import { MultipleFileUploaderComponent } from './shared/multiple-file-uploader/m
     TaskTypePipe,
     PlanningComponent,
     DiscussNewTasksComponent,
-    TaskListComponent,
     ScrumPokerComponent,
     MarkTasksComponent,
     DemoComponent,
