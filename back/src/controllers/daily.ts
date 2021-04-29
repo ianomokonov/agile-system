@@ -6,7 +6,7 @@ import checkProjectPermissions from '../middleware/check-project-permissions';
 import { Permissions } from '../utils';
 
 const dailyRouter = Router({ mergeParams: true });
-dailyRouter.use(checkProjectPermissions(Permissions.CanEditProject));
+dailyRouter.use(checkProjectPermissions(Permissions.CanReadProject));
 dailyRouter.get(``, async (req, res) => {
   try {
     const daily = await dailyHandler.read(res.locals.projectId);

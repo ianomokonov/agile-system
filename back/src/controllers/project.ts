@@ -18,6 +18,7 @@ import demoRouter from './demo';
 import planningRouter from './planning';
 import retroRouter from './retro';
 import sprintRouter from './sprint';
+import taskRouter from './task';
 
 const projectRouter = Router();
 projectRouter.use(authJWT);
@@ -201,5 +202,6 @@ projectRouter.use('/:projectId/planning', planningRouter);
 projectRouter.use('/:projectId/demo', demoRouter);
 projectRouter.use('/:projectId/retro', retroRouter);
 projectRouter.use('/:projectId/daily', dailyRouter);
+projectRouter.use('/:projectId/task', taskRouter);
 
 export default projectRouter;

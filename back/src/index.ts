@@ -16,6 +16,9 @@ import demoHandler from './handlers/demo.handler';
 import planningHandler from './handlers/planning.handler';
 import tasksHandler from './handlers/task/tasks.handler';
 import projectSprintHandler from './handlers/project/project-sprint.handler';
+import checkSocketProjectPermissions from './middleware/check-socket-project-permissions';
+import { Permissions } from './utils';
+import { RetroCardCategory } from './models/retro-card-category';
 
 const DEFAULT_PORT = 3000;
 
@@ -46,7 +49,12 @@ const activeDailyTimers = [];
 io.use(authSocketJWT).on('connection', (socket) => {
   // --------------------------- DAILY ------------------------------------
 
-  socket.on('enterDaily', async (dailyId) => {
+  socket.on('enterDaily', async ({ projectId, dailyId }) => {
+    if (
+      !(await checkSocketProjectPermissions(projectId, socket.userId, Permissions.CanReadProject))
+    ) {
+      return;
+    }
     const [id, participants] = await dailyRepository.enter(socket.userId, dailyId);
     const roomName = `daily${dailyId}`;
     socket.dailyParticipantId = id;
@@ -55,7 +63,12 @@ io.use(authSocketJWT).on('connection', (socket) => {
     io.sockets.in(socket.dailyRoom).emit('participantEntered', participants);
   });
 
-  socket.on('startDaily', async (dailyId) => {
+  socket.on('startDaily', async ({ projectId, dailyId }) => {
+    if (
+      !(await checkSocketProjectPermissions(projectId, socket.userId, Permissions.CanStartDaily))
+    ) {
+      return;
+    }
     if (!activeDailyTimers.find((t) => t.id === dailyId)) {
       const participants = await dailyRepository.start(dailyId);
       const timer = {
@@ -78,7 +91,12 @@ io.use(authSocketJWT).on('connection', (socket) => {
     }
   });
 
-  socket.on('stopDaily', async (dailyId) => {
+  socket.on('stopDaily', async ({ projectId, dailyId }) => {
+    if (
+      !(await checkSocketProjectPermissions(projectId, socket.userId, Permissions.CanStartDaily))
+    ) {
+      return;
+    }
     dailyRepository.stop(dailyId);
     const timerIndex = activeDailyTimers.findIndex((t) => t.id === dailyId);
     io.sockets
@@ -109,7 +127,12 @@ io.use(authSocketJWT).on('connection', (socket) => {
     }, 1000);
   });
 
-  socket.on('dailyNext', async (dailyId) => {
+  socket.on('dailyNext', async ({ projectId, dailyId }) => {
+    if (
+      !(await checkSocketProjectPermissions(projectId, socket.userId, Permissions.CanStartDaily))
+    ) {
+      return;
+    }
     const participants = await dailyRepository.next(dailyId);
     const timer = activeDailyTimers.find((t) => t.id === dailyId);
     timer.activeTime.updateSecond(0);
@@ -142,12 +165,27 @@ io.use(authSocketJWT).on('connection', (socket) => {
 
   // --------------------------- RETRO ------------------------------------
 
-  socket.on('enterRetro', async (retroId) => {
+  socket.on('enterRetro', async ({ projectId, retroId }) => {
+    if (
+      !(await checkSocketProjectPermissions(projectId, socket.userId, Permissions.CanReadProject))
+    ) {
+      return;
+    }
     socket.retroRoom = `retro${retroId}`;
     socket.join(socket.retroRoom);
   });
 
-  socket.on('addRetroCard', async (request) => {
+  socket.on('addRetroCard', async ({ projectId, request }) => {
+    if (
+      request.category === RetroCardCategory.Actions &&
+      !(await checkSocketProjectPermissions(
+        projectId,
+        socket.userId,
+        Permissions.CanCreateRetroActions,
+      ))
+    ) {
+      return;
+    }
     const card = await retroHandler.createCard({ ...request, userId: socket.userId });
     socket.broadcast.to(socket.retroRoom).emit('addRetroCard', card);
     card.isMy = true;
@@ -164,7 +202,12 @@ io.use(authSocketJWT).on('connection', (socket) => {
     socket.broadcast.to(socket.retroRoom).emit('updateRetroCard', request);
   });
 
-  socket.on('finishRetro', async (retroId) => {
+  socket.on('finishRetro', async ({ projectId, retroId }) => {
+    if (
+      !(await checkSocketProjectPermissions(projectId, socket.userId, Permissions.CanStartRetro))
+    ) {
+      return;
+    }
     await retroHandler.finish(retroId);
     io.sockets.in(socket.retroRoom).emit('finishRetro');
     io.sockets.clients(socket.retroRoom).forEach((s) => {
@@ -178,7 +221,12 @@ io.use(authSocketJWT).on('connection', (socket) => {
 
   // --------------------------- DEMO ------------------------------------
 
-  socket.on('enterDemo', async (demoId) => {
+  socket.on('enterDemo', async ({ projectId, demoId }) => {
+    if (
+      !(await checkSocketProjectPermissions(projectId, socket.userId, Permissions.CanReadProject))
+    ) {
+      return;
+    }
     socket.demoRoom = `demo${demoId}`;
     socket.demoId = demoId;
     socket.join(socket.demoRoom);
@@ -192,12 +240,22 @@ io.use(authSocketJWT).on('connection', (socket) => {
     io.sockets.in(socket.demoRoom).emit('activeDemoTask', taskId);
   });
 
-  socket.on('acceptDemoTask', async (taskId) => {
+  socket.on('acceptDemoTask', async ({ projectId, taskId }) => {
+    if (
+      !(await checkSocketProjectPermissions(projectId, socket.userId, Permissions.CanStartDemo))
+    ) {
+      return;
+    }
     demoHandler.finishTask(taskId);
     io.sockets.in(socket.demoRoom).emit('acceptDemoTask', taskId);
   });
 
-  socket.on('finishDemo', async () => {
+  socket.on('finishDemo', async (projectId) => {
+    if (
+      !(await checkSocketProjectPermissions(projectId, socket.userId, Permissions.CanStartDemo))
+    ) {
+      return;
+    }
     if (!socket.demoId) {
       return;
     }
@@ -209,7 +267,12 @@ io.use(authSocketJWT).on('connection', (socket) => {
 
   // --------------------------- PLANNING ------------------------------------
 
-  socket.on('enterPlanning', async (planningId) => {
+  socket.on('enterPlanning', async ({ projectId, planningId }) => {
+    if (
+      !(await checkSocketProjectPermissions(projectId, socket.userId, Permissions.CanReadProject))
+    ) {
+      return;
+    }
     if (socket.planningRoom) {
       return;
     }
@@ -224,7 +287,10 @@ io.use(authSocketJWT).on('connection', (socket) => {
     socket.planningId = undefined;
   });
 
-  socket.on('takePlanningTask', async ({ taskId, sprintId }) => {
+  socket.on('takePlanningTask', async ({ projectId, taskId, sprintId }) => {
+    if (!(await checkSocketProjectPermissions(projectId, socket.userId, Permissions.CanEditTask))) {
+      return;
+    }
     if (!sprintId) {
       return;
     }
@@ -232,7 +298,10 @@ io.use(authSocketJWT).on('connection', (socket) => {
     io.sockets.in(socket.planningRoom).emit('updatePlanning');
   });
 
-  socket.on('removePlanningTask', async (taskId) => {
+  socket.on('removePlanningTask', async ({ projectId, taskId }) => {
+    if (!(await checkSocketProjectPermissions(projectId, socket.userId, Permissions.CanEditTask))) {
+      return;
+    }
     if (!socket.planningId) {
       return;
     }
@@ -240,7 +309,16 @@ io.use(authSocketJWT).on('connection', (socket) => {
     io.sockets.in(socket.planningRoom).emit('updatePlanning');
   });
 
-  socket.on('startPocker', async (taskId) => {
+  socket.on('startPocker', async ({ projectId, taskId }) => {
+    if (
+      !(await checkSocketProjectPermissions(
+        projectId,
+        socket.userId,
+        Permissions.CanStartScrumPocker,
+      ))
+    ) {
+      return;
+    }
     if (!socket.planningId) {
       return;
     }
@@ -258,7 +336,12 @@ io.use(authSocketJWT).on('connection', (socket) => {
     io.sockets.in(socket.planningRoom).emit('updatePlanningSession');
   });
 
-  socket.on('setPlanningPoints', async ({ sessionId, taskId, points }) => {
+  socket.on('setPlanningPoints', async ({ projectId, sessionId, taskId, points }) => {
+    if (
+      !(await checkSocketProjectPermissions(projectId, socket.userId, Permissions.CanSetTaskPoints))
+    ) {
+      return;
+    }
     if (!socket.planningId) {
       return;
     }
@@ -266,7 +349,12 @@ io.use(authSocketJWT).on('connection', (socket) => {
     io.sockets.in(socket.planningRoom).emit('updatePlanningSession');
   });
 
-  socket.on('showPlanningCards', async (sessionId) => {
+  socket.on('showPlanningCards', async ({ projectId, sessionId }) => {
+    if (
+      !(await checkSocketProjectPermissions(projectId, socket.userId, Permissions.CanSetTaskPoints))
+    ) {
+      return;
+    }
     if (!socket.planningId) {
       return;
     }
@@ -274,7 +362,16 @@ io.use(authSocketJWT).on('connection', (socket) => {
     io.sockets.in(socket.planningRoom).emit('updatePlanningSession');
   });
 
-  socket.on('resetPlanningCards', async ({ sessionId, taskId }) => {
+  socket.on('resetPlanningCards', async ({ projectId, sessionId, taskId }) => {
+    if (
+      !(await checkSocketProjectPermissions(
+        projectId,
+        socket.userId,
+        Permissions.CanStartScrumPocker,
+      ))
+    ) {
+      return;
+    }
     if (!sessionId) {
       return;
     }
@@ -284,6 +381,11 @@ io.use(authSocketJWT).on('connection', (socket) => {
   });
 
   socket.on('startPlanningSprint', async ({ sprintId, projectId }) => {
+    if (
+      !(await checkSocketProjectPermissions(projectId, socket.userId, Permissions.CanStartSprint))
+    ) {
+      return;
+    }
     if (!sprintId) {
       return;
     }

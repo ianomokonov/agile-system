@@ -13,8 +13,26 @@ export const makeTokens = (tokenData) => {
 export const getQueryText = (text: string) => text.replace(/\$\d+/g, '?');
 
 export enum Permissions {
-  CanEditProject = 'CanEditProject',
-  CanReadProject = 'CanReadProject',
+  CanReadProject = 1,
+  CanEditProject,
+  CanCloseProject,
+  CanCeateProjectRole,
+  CanEditProjectTeam,
+  CanCreateTask,
+  CanEditTask,
+  CanEditTaskStatus,
+  CanCreateSprint,
+  CanStartSprint,
+  CanFinishSprint,
+  CanStartDaily,
+  CanCreateProjectRole,
+  CanStartScrumPocker,
+  CanSetTaskPoints,
+  CanResetScrumPocker,
+  CanStartDemo,
+  CanCreateDemoNotes,
+  CanStartRetro,
+  CanCreateRetroActions,
 }
 
 export const getFileExtension = (fileName: string) => {

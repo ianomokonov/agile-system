@@ -1,9 +1,9 @@
 <div class="d-flex flex-column h-100">
   <div
-    class="container-fluid d-flex align-items-center justify-content-between pt-3 border-bottom pb-3 mb-3"
+    class="container-fluid px-2 d-flex align-items-center justify-content-between border-bottom py-2 mb-2 project-header"
   >
     <h3 class="m-0 d-flex align-items-center">
-      {{ project?.name }} <i class="fas fa-cogs text-muted ml-2" routerLink="edit"></i>
+      {{ project?.name }} <i class="fas fa-cogs ml-2" routerLink="edit"></i>
     </h3>
     <div class="user-info d-flex" *ngIf="user" routerLink="/profile">
       <div>

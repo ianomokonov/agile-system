@@ -84,3 +84,7 @@ UPDATE
     END IF;
 
 END $$ DELIMITER ;
+
+ALTER TABLE projectrolepermission DROP FOREIGN KEY projectrolepermission_ibfk_2;
+
+DROP TABLE IF EXISTS `permission`;
