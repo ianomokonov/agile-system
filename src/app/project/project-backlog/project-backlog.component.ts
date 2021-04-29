@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Permissions } from 'back/src/models/permissions';
 import { Backlog } from 'back/src/models/responses/backlog';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
 import { Sprint } from 'back/src/models/sprint';
@@ -20,6 +21,7 @@ export class ProjectBacklogComponent implements OnInit {
   public backlog: Backlog;
   private users: UserShortView[];
   public showTasks = false;
+  public permissions = Permissions;
   constructor(
     private projectService: ProjectService,
     public projectDataService: ProjectDataService,
@@ -54,7 +56,7 @@ export class ProjectBacklogComponent implements OnInit {
     modal.componentInstance.users = this.users;
     modal.result
       .then((task) => {
-        this.projectService.addTask(this.projectDataService.project.id, task).subscribe(() => {
+        this.taskService.addTask(this.projectDataService.project.id, task).subscribe(() => {
           this.getBackLog(this.projectDataService.project.id);
         });
       })

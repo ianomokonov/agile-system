@@ -5,7 +5,6 @@ import cors from 'cors';
 import http from 'http';
 import projectRouter from './controllers/project';
 import userRouter from './controllers/user';
-import taskRouter from './controllers/task';
 import logger from './logger';
 import handleError from './middleware/handleError';
 import authSocketJWT from './middleware/authSocketJWT';
@@ -17,8 +16,8 @@ import planningHandler from './handlers/planning.handler';
 import tasksHandler from './handlers/task/tasks.handler';
 import projectSprintHandler from './handlers/project/project-sprint.handler';
 import checkSocketProjectPermissions from './middleware/check-socket-project-permissions';
-import { Permissions } from './utils';
 import { RetroCardCategory } from './models/retro-card-category';
+import { Permissions } from './models/permissions';
 
 const DEFAULT_PORT = 3000;
 
@@ -41,7 +40,6 @@ app.use(cors());
 app.use(express.static(path.resolve(__dirname, 'files')));
 app.use('/user', userRouter);
 app.use('/project', projectRouter);
-app.use('/task', taskRouter);
 
 // rooms which are currently available in chat
 const activeDailyTimers = [];

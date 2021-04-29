@@ -30,6 +30,7 @@ export class DiscussNewTasksComponent {
     return this.tasksPrivate;
   }
   public activeTask: TaskResponse | undefined;
+  private projectId: number;
   constructor(
     private activatedRoute: ActivatedRoute,
     private socketService: SocketService,
@@ -37,6 +38,7 @@ export class DiscussNewTasksComponent {
   ) {
     this.activatedRoute.queryParams.subscribe((params) => {
       if (params.taskId && this.tasks?.length) {
+        this.projectId = params.id;
         this.setActiveTask(params.taskId);
       }
     });
@@ -50,11 +52,11 @@ export class DiscussNewTasksComponent {
   }
 
   public takeToSprint(taskId: number) {
-    this.socketService.takePlanningTask(taskId, this.newSprintId);
+    this.socketService.takePlanningTask(this.projectId, taskId, this.newSprintId);
   }
 
   public removeFromSprint(taskId: number) {
-    this.socketService.removePlanningTask(taskId);
+    this.socketService.removePlanningTask(this.projectId, taskId);
   }
 
   private setActiveTask(taskId) {

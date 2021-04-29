@@ -16,6 +16,7 @@
 
       <span class="upload-area__file-name">{{ file.name }}</span>
       <i
+        *ngIf="!disabled"
         class="upload-area__file-remove fas fa-times-circle text-danger"
         (click)="removeFile(index)"
       ></i>

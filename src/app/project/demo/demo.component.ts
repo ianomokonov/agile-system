@@ -9,6 +9,7 @@ import { TaskType } from 'back/src/models/task-type';
 import { Priority } from 'back/src/models/priority';
 import { forkJoin } from 'rxjs';
 import { SocketService } from 'src/app/services/socket.service';
+import { TaskService } from 'src/app/services/task.service';
 
 @Component({
   selector: 'app-demo',
@@ -37,6 +38,7 @@ export class DemoComponent implements OnInit {
     private projectService: ProjectService,
     private socketService: SocketService,
     private cdRef: ChangeDetectorRef,
+    private taskService: TaskService,
   ) {
     this.demoTaskForm = this.fb.group({
       name: [null, Validators.required],
@@ -94,7 +96,7 @@ export class DemoComponent implements OnInit {
     if (this.demo.taskToShow.length !== 1) {
       this.onTaskClick(this.demo.taskToShow.find((t) => t.id !== demoTaskId).id);
     }
-    this.socketService.acceptDemoTask(demoTaskId);
+    this.socketService.acceptDemoTask(this.projectId, demoTaskId);
   }
 
   // eslint-disable-next-line complexity
@@ -119,7 +121,7 @@ export class DemoComponent implements OnInit {
       }
       const formValue = this.demoTaskForm.getRawValue();
       subscriptions.push(
-        this.projectService.addTask(this.projectId, {
+        this.taskService.addTask(this.projectId, {
           name: formValue.name,
           description: formValue.comment,
           projectSprintId: this.demo.sprintId,
@@ -133,11 +135,11 @@ export class DemoComponent implements OnInit {
     if (subscriptions.length) {
       forkJoin(subscriptions).subscribe(() => {
         this.dismiss();
-        this.socketService.finishDemo();
+        this.socketService.finishDemo(this.projectId);
       });
       return;
     }
-    this.socketService.finishDemo();
+    this.socketService.finishDemo(this.projectId);
   }
 
   public dismiss() {
@@ -153,7 +155,7 @@ export class DemoComponent implements OnInit {
         return;
       }
       this.demo = demo;
-      this.socketService.enterDemoRoom(demo.id);
+      this.socketService.enterDemoRoom(this.projectId, demo.id);
 
       if (this.activatedRoute.snapshot.queryParams.demoTaskId) {
         this.setActiveTask(this.activatedRoute.snapshot.queryParams.demoTaskId);

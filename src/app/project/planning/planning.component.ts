@@ -35,7 +35,7 @@ export class PlanningComponent implements OnInit {
   public getPlanning(id: number) {
     this.projectService.getPlanning(this.projectId, id).subscribe((planning) => {
       this.planning = planning;
-      this.socketService.enterPlanningRoom(this.planning.id);
+      this.socketService.enterPlanningRoom(this.projectId, this.planning.id);
     });
   }
 

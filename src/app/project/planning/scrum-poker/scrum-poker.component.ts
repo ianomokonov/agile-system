@@ -63,15 +63,15 @@ export class ScrumPokerComponent {
   }
 
   public openCards() {
-    this.socketService.showPlanningCards(this.session.id);
+    this.socketService.showPlanningCards(this.projectId, this.session.id);
   }
 
   public closeSession(value) {
-    this.socketService.setPlanningPoints(this.session.id, this.taskId, value);
+    this.socketService.setPlanningPoints(this.projectId, this.session.id, this.taskId, value);
   }
 
   public resetCards() {
-    this.socketService.resetPlanningCards(this.session.id, this.session.task.id);
+    this.socketService.resetPlanningCards(this.projectId, this.session.id, this.session.task.id);
   }
 
   private getMantionedCards(cards) {

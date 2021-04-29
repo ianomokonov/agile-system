@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import demoHandler from '../handlers/demo.handler';
 import logger from '../logger';
 import checkProjectPermissions from '../middleware/check-project-permissions';
-import { Permissions } from '../utils';
+import { Permissions } from '../models/permissions';
 
 const demoRouter = Router({ mergeParams: true });
 

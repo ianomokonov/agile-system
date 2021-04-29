@@ -12,7 +12,7 @@ import { ProjectResponse } from '../models/responses/project.response';
 import planningRepository from '../repositories/planning.repository';
 import projectRepository from '../repositories/project.repository';
 import retroRepository from '../repositories/retro.repository';
-import { Permissions } from '../utils';
+import { Permissions } from '../models/permissions';
 import demoService from './demo-service';
 
 class ProjectService {

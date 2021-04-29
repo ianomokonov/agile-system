@@ -9,10 +9,9 @@ import {
 } from 'back/src/models/requests/project-role.models';
 import { ProjectResponse } from 'back/src/models/responses/project.response';
 import { ProjectRoleResponse } from 'back/src/models/responses/project-role.response';
-import { Observable, of } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { CreateTaskRequest } from 'back/src/models/requests/task.models';
 import { ProjectEditInfo } from 'back/src/models/responses/project-edit-info';
 import { Backlog } from 'back/src/models/responses/backlog';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
@@ -20,13 +19,11 @@ import { CreateSprintRequest } from 'back/src/models/requests/create-sprint.requ
 import { IdNameResponse } from 'back/src/models/responses/id-name.response';
 import { PlanningFullView } from 'back/src/models/responses/planning';
 import { PlanningUpdateRequest } from 'back/src/models/requests/planning-update.request';
-import { TaskService } from './task.service';
-import { UploadFile } from '../shared/multiple-file-uploader/multiple-file-uploader.component';
 
 @Injectable()
 export class ProjectService {
   private readonly baseUrl = `${environment.baseUrl}/project`;
-  constructor(private http: HttpClient, private taskService: TaskService) {}
+  constructor(private http: HttpClient) {}
 
   public getProject(projectId: number): Observable<ProjectResponse> {
     return this.http.get<ProjectResponse>(`${this.baseUrl}/${projectId}`);
@@ -86,26 +83,6 @@ export class ProjectService {
 
   public getProjectBacklog(projectId: number): Observable<Backlog> {
     return this.http.get<Backlog>(`${this.baseUrl}/${projectId}/backlog`);
-  }
-
-  public addTask(projectId: number, task: CreateTaskRequest): Observable<number> {
-    const { files } = task;
-    // eslint-disable-next-line no-param-reassign
-    delete task.files;
-    return this.http.post<number>(`${this.baseUrl}/${projectId}/add-task`, task).pipe(
-      switchMap((taskId) => {
-        if (!files?.length) {
-          return of(taskId);
-        }
-        const formData = new FormData();
-        files.forEach((file: UploadFile) => {
-          if (file.file) {
-            formData.append('files', file.file);
-          }
-        });
-        return this.taskService.uploadFiles(taskId, formData).pipe(map(() => taskId));
-      }),
-    );
   }
 
   public addSprint(projectId: number, sprint: CreateSprintRequest): Observable<number> {

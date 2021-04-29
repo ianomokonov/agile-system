@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import retroHandler from '../handlers/retro.handler';
 import logger from '../logger';
 import checkProjectPermissions from '../middleware/check-project-permissions';
-import { Permissions } from '../utils';
+import { Permissions } from '../models/permissions';
 
 const retroRouter = Router({ mergeParams: true });
 retroRouter.use(checkProjectPermissions(Permissions.CanReadProject));

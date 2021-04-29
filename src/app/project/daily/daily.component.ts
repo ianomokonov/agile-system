@@ -42,7 +42,7 @@ export class DailyComponent implements OnInit, OnDestroy {
   public getDaily() {
     this.dailyService.read(this.projectId).subscribe((daily) => {
       this.daily = daily;
-      this.socketService.enterDaily(daily.id);
+      this.socketService.enterDaily(this.projectId, daily.id);
     });
   }
 
@@ -105,11 +105,11 @@ export class DailyComponent implements OnInit, OnDestroy {
       this.socketService.resumeDaily(this.daily.id);
       return;
     }
-    this.socketService.startDaily(this.daily?.id);
+    this.socketService.startDaily(this.projectId, this.daily?.id);
     this.daily.isActive = true;
   }
   public next() {
-    this.socketService.dailyNext(this.daily.id);
+    this.socketService.dailyNext(this.projectId, this.daily.id);
   }
   public getTime() {
     return this.time?.toString();
@@ -121,7 +121,7 @@ export class DailyComponent implements OnInit, OnDestroy {
     this.socketService.pauseDaily(this.daily?.id);
   }
   public stop() {
-    this.socketService.stopDaily(this.daily.id);
+    this.socketService.stopDaily(this.projectId, this.daily.id);
   }
   public getParticipantsCount() {
     return `${this.daily?.participants?.length} ${this.getParticipantsCountLabel(

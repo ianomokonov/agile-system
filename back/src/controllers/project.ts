@@ -12,7 +12,7 @@ import projectUsersHandler from '../handlers/project/project-users.handler';
 import tasksHandler from '../handlers/task/tasks.handler';
 import authJWT from '../middleware/authJWT';
 import checkPermissions from '../middleware/check-project-permissions';
-import { Permissions } from '../utils';
+import { Permissions } from '../models/permissions';
 import dailyRouter from './daily';
 import demoRouter from './demo';
 import planningRouter from './planning';

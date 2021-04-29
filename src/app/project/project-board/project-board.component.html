@@ -13,13 +13,17 @@
       </div>
     </div>
     <div class="d-flex justify-content-end">
-      <button class="btn btn-outline-info ml-2" (click)="onStartDemo()" *ngIf="canStartDemo()">
+      <button
+        class="btn btn-outline-info ml-2"
+        (click)="onStartDemo()"
+        *ngIf="projectDataService.PID[permissions.CanStartDemo] && canStartDemo()"
+      >
         Начать демо
       </button>
       <button
         class="btn btn-outline-primary ml-2"
         *ngIf="!project.retro && project.demo?.isFinished"
-        (click)="onStartRetro()"
+        (click)="projectDataService.PID[permissions.CanStartRetro] && onStartRetro()"
       >
         Начать ретроспективу
       </button>
@@ -37,6 +41,7 @@
       [cdkDropListData]="tasksStatus"
       [id]="project.statuses[index].id.toString()"
       *ngFor="let tasksStatus of tasks; let first = first; let index = index"
+      [cdkDropListDisabled]="!projectDataService.PID[permissions.CanEditTaskStatus]"
       (cdkDropListDropped)="changeStatus($event)"
     >
       <div class="content">
@@ -45,7 +50,7 @@
             <small class="text-muted">#{{ task.id }}</small>
             <div class="badge bg-secondary" *ngIf="task.points">{{ task.points }}</div>
           </div>
-          <h6 [routerLink]="['/task', task.id]">{{ task.name }}</h6>
+          <h6 [routerLink]="['../task', task.id]">{{ task.name }}</h6>
           <div class="d-flex">
             <div class="mr-1" [taskType]="task.typeId">{{ task.typeId | taskType }}</div>
             <div [taskPriority]="task.priorityId">{{ task.priorityId | priority }}</div>
@@ -55,7 +60,11 @@
           >
         </div>
       </div>
-      <div *ngIf="first" class="text-center create-task rounded mx-2" (click)="createTask()">
+      <div
+        *ngIf="projectDataService.PID[permissions.CanCreateTask] && first"
+        class="text-center create-task rounded mx-2"
+        (click)="createTask()"
+      >
         <i class="fas fa-plus mr-1"></i>
         Создать задачу
       </div>

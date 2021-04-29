@@ -16,6 +16,7 @@ import { FileSaverService } from 'ngx-filesaver';
 import { UploadFile } from 'src/app/shared/multiple-file-uploader/multiple-file-uploader.component';
 import { TaskTypePipe } from 'src/app/shared/pipes/task-type.pipe';
 import { PriorityPipe } from 'src/app/shared/pipes/priority.pipe';
+import { Permissions } from 'back/src/models/permissions';
 import { EditTaskComponent } from './edit-task/edit-task.component';
 
 @Component({
@@ -27,6 +28,7 @@ export class TaskComponent {
   public task: TaskResponse;
   public editor = ClassicEditor;
   public editorConfig = editorConfig;
+  public permissions = Permissions;
   public editingDescription = false;
   public editingName = false;
   public sprints: IdNameResponse[] = [];
@@ -43,7 +45,7 @@ export class TaskComponent {
     private taskService: TaskService,
     private location: Location,
     private modalService: NgbModal,
-    private projectDataService: ProjectDataService,
+    public projectDataService: ProjectDataService,
     private projectService: ProjectService,
     private fileSaver: FileSaverService,
     private taskTypePipe: TaskTypePipe,

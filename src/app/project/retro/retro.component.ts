@@ -2,6 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Permissions } from 'back/src/models/permissions';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
 import { RetroCardCategory } from 'back/src/models/retro-card-category';
 import { Subject } from 'rxjs';
@@ -9,6 +10,7 @@ import { ProjectDataService } from 'src/app/services/project-data.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { RetroService } from 'src/app/services/retro.service';
 import { SocketService } from 'src/app/services/socket.service';
+import { TaskService } from 'src/app/services/task.service';
 import { CreateTaskComponent } from '../project-board/create-task/create-task.component';
 
 @Component({
@@ -19,6 +21,7 @@ import { CreateTaskComponent } from '../project-board/create-task/create-task.co
 export class RetroComponent implements OnInit {
   private projectId: number;
   public retro;
+  public permissions = Permissions;
   public cardCategory = RetroCardCategory;
   private cardInput$: Subject<any> = new Subject();
   private users: UserShortView[] = [];
@@ -40,9 +43,10 @@ export class RetroComponent implements OnInit {
     private retroService: RetroService,
     private socketService: SocketService,
     private modalService: NgbModal,
-    private projectDataService: ProjectDataService,
+    public projectDataService: ProjectDataService,
     private projectService: ProjectService,
     private router: Router,
+    private taskService: TaskService,
   ) {
     this.socketService.onAddRetroCard().subscribe((card) => {
       this.retro?.cards.push(card);
@@ -84,11 +88,9 @@ export class RetroComponent implements OnInit {
     });
     modal.result
       .then((task) => {
-        this.projectService
-          .addTask(this.projectDataService.project.id, task)
-          .subscribe((taskId) => {
-            card.taskId = taskId;
-          });
+        this.taskService.addTask(this.projectDataService.project.id, task).subscribe((taskId) => {
+          card.taskId = taskId;
+        });
       })
       .catch(() => {});
   }
@@ -102,7 +104,7 @@ export class RetroComponent implements OnInit {
     });
     this.activatedRoute.params.subscribe((params) => {
       if (params.retroId) {
-        this.socketService.enterRetroRoom(params.retroId);
+        this.socketService.enterRetroRoom(this.projectId, params.retroId);
         this.projectId = params.id;
         this.getRetro(params.retroId);
       }
@@ -116,7 +118,7 @@ export class RetroComponent implements OnInit {
   }
 
   public createCard(category: RetroCardCategory) {
-    this.socketService.addRetroCard(this.retro.id, category);
+    this.socketService.addRetroCard(this.projectId, this.retro.id, category);
   }
 
   // eslint-disable-next-line complexity
@@ -184,7 +186,7 @@ export class RetroComponent implements OnInit {
     // this.retroService.finish(this.projectId, this.retro.id).subscribe(() => {
     //   this.router.navigate(['../../', 'board'], { relativeTo: this.activatedRoute });
     // });
-    this.socketService.finishRetro(this.retro.id);
+    this.socketService.finishRetro(this.projectId, this.retro.id);
   }
 
   public completePoint(card) {

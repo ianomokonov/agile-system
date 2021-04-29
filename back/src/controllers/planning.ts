@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import planningHandler from '../handlers/planning.handler';
 import logger from '../logger';
 import checkProjectPermissions from '../middleware/check-project-permissions';
-import { Permissions } from '../utils';
+import { Permissions } from '../models/permissions';
 
 const planningRouter = Router({ mergeParams: true });
 planningRouter.use(checkProjectPermissions(Permissions.CanReadProject));

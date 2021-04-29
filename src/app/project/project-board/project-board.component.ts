@@ -2,6 +2,7 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/dr
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Permissions } from 'back/src/models/permissions';
 import { ProjectResponse } from 'back/src/models/responses/project.response';
 import { TaskShortView } from 'back/src/models/responses/task-short-view';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
@@ -20,13 +21,14 @@ import { CreateTaskComponent } from './create-task/create-task.component';
 export class ProjectBoardComponent implements OnInit {
   public project: ProjectResponse;
   public delay: number;
+  public permissions = Permissions;
   private users: UserShortView[];
   public tasks: TaskShortView[][] = [];
   constructor(
     private taskService: TaskService,
     private modalService: NgbModal,
     private projectService: ProjectService,
-    private projectDataService: ProjectDataService,
+    public projectDataService: ProjectDataService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private demoService: DemoService,
@@ -73,7 +75,7 @@ export class ProjectBoardComponent implements OnInit {
     modal.componentInstance.users = this.users;
     modal.result
       .then((task) => {
-        this.projectService.addTask(this.projectDataService.project.id, task).subscribe(() => {
+        this.taskService.addTask(this.projectDataService.project.id, task).subscribe(() => {
           this.refreshProjectInfo(this.projectDataService.project.id);
         });
       })

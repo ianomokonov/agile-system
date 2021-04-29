@@ -6,7 +6,8 @@ import updateTaskStatusHandler from '../handlers/task/update-task-status.handler
 import logger from '../logger';
 import authJWT from '../middleware/authJWT';
 import checkProjectPermissions from '../middleware/check-project-permissions';
-import { getFileExtension, Permissions } from '../utils';
+import { Permissions } from '../models/permissions';
+import { getFileExtension } from '../utils';
 
 const taskRouter = Router({ mergeParams: true });
 const storageConfig = multer.diskStorage({

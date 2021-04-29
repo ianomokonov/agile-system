@@ -2,8 +2,20 @@
   <div class="d-flex justify-content-between mb-3">
     <h4 class="mb-0">Бэклог</h4>
     <div class="text-right">
-      <div class="btn btn-outline-primary" (click)="onCreatTask()">Создать задачу</div>
-      <div class="btn btn-primary ml-2" (click)="onCreateSprint()">Создать спринт</div>
+      <div
+        class="btn btn-outline-primary"
+        *ngIf="projectDataService.PID[permissions.CanCreateTask]"
+        (click)="onCreatTask()"
+      >
+        Создать задачу
+      </div>
+      <div
+        class="btn btn-primary ml-2"
+        *ngIf="projectDataService.PID[permissions.CanCreateSprint]"
+        (click)="onCreateSprint()"
+      >
+        Создать спринт
+      </div>
     </div>
   </div>
   <ng-container *ngIf="backlog.sprints?.length || backlog.tasks?.length; else backlogPlaceholder">
@@ -22,7 +34,12 @@
         <ng-container *ngIf="!sprint.isFinished">
           <button
             class="btn btn-success"
-            *ngIf="!sprint.planningId && !sprint.isActive && sprint.tasks?.length"
+            *ngIf="
+              projectDataService.PID[permissions.CanStartScrumPocker] &&
+              !sprint.planningId &&
+              !sprint.isActive &&
+              sprint.tasks?.length
+            "
             (click)="onStartPlanning(sprint.id)"
           >
             Оценить задачи
@@ -36,7 +53,7 @@
           </button>
           <ng-container *ngIf="sprint.isActive">
             <button
-              *ngIf="canStartDemo(sprint)"
+              *ngIf="projectDataService.PID[permissions.CanStartDemo] && canStartDemo(sprint)"
               class="btn btn-outline-info"
               [routerLink]="['../planning', sprint.planningId]"
             >
@@ -44,7 +61,11 @@
             </button>
             <button
               class="btn btn-outline-primary ml-2"
-              *ngIf="!sprint.retro && sprint.demo?.isFinished"
+              *ngIf="
+                projectDataService.PID[permissions.CanStartRetro] &&
+                !sprint.retro &&
+                sprint.demo?.isFinished
+              "
               [routerLink]="['../planning', sprint.planningId]"
             >
               Начать ретроспективу
@@ -85,12 +106,20 @@
 
 <ng-template #backlogPlaceholder>
   <div class="backlog-placeholder">
-    <div class="backlog-placeholder__text text-center text-muted">
-      Вы еще не создали ни одного спринта или задачи. <br />
-      Создайте <a href="javascript:;" (click)="onCreatTask()">задачу</a> или
-      <a href="javascript:;" (click)="onCreateSprint()">спринт</a> кнопкой в правом верхнем углу
-    </div>
-    <img class="backlog-placeholder__arrow" src="../../../assets/images/strelka.svg" />
+    <ng-container *ngIf="projectDataService.PID[permissions.CanCreateTask]">
+      <div class="backlog-placeholder__text text-center text-muted">
+        Вы еще не создали ни одного спринта или задачи. <br />
+        Создайте <a href="javascript:;" (click)="onCreatTask()">задачу</a> или
+        <a href="javascript:;" (click)="onCreateSprint()">спринт</a> кнопкой в правом верхнем углу
+      </div>
+      <img class="backlog-placeholder__arrow" src="../../../assets/images/strelka.svg" />
+    </ng-container>
+    <ng-container *ngIf="!projectDataService.PID[permissions.CanCreateTask]">
+      <div class="backlog-placeholder__text text-center text-muted">
+        В проекте еще нет ни одной задачи...
+      </div>
+    </ng-container>
+
     <img src="../../../assets/images/no-tasks-icon.png" alt="" class="backlog-placeholder__image" />
   </div>
 </ng-template>
@@ -105,7 +134,7 @@
   <div class="task rounded d-flex align-items-start">
     <div class="col-8 d-flex align-items-center pl-0">
       <small class="text-muted mr-3">#{{ task.id }}</small>
-      <a [routerLink]="['/task', task.id]"
+      <a [routerLink]="['task', task.id]"
         ><h6 class="d-inline text-dark mb-0">{{ task.name }}</h6></a
       >
     </div>
@@ -116,7 +145,7 @@
       <div class="mr-1" [taskType]="task.typeId">{{ task.typeId | taskType }}</div>
       <div class="mr-1" [taskPriority]="task.priorityId">{{ task.priorityId | priority }}</div>
       <button
-        *ngIf="show"
+        *ngIf="projectDataService.PID[permissions.CanEditTask] && show"
         class="btn icon-btn ml-3"
         title="Добавить в текущий спринт"
         (click)="onAddToActiveSprint(task.id)"

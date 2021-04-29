@@ -8,7 +8,7 @@ import {
   CreateProjectRoleRequest,
   UpdateProjectRoleRequest,
 } from '../models/requests/project-role.models';
-import { getQueryText, Permissions } from '../utils';
+import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
 import { UserShortView } from '../models/responses/user-short-view';
 import { ProjectRoleResponse } from '../models/responses/project-role.response';
@@ -25,6 +25,7 @@ import retroRepository from './retro.repository';
 import { WebError } from '../models/error';
 // eslint-disable-next-line import/no-cycle
 import planningRepository from './planning.repository';
+import { Permissions } from '../models/permissions';
 
 sql.use('mysql');
 

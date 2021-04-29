@@ -37,10 +37,18 @@
         >
         </ng-container>
       </ng-container>
-      <button class="btn btn-success create-btn complete-retro" (click)="complete()">
+      <button
+        [disabled]="!projectDataService.PID[permissions.CanStartRetro]"
+        class="btn btn-success create-btn complete-retro"
+        (click)="complete()"
+      >
         <i class="fas fa-check"></i>
       </button>
-      <button class="btn btn-primary create-btn" (click)="createCard(cardCategory.Actions)">
+      <button
+        [disabled]="!projectDataService.PID[permissions.CanCreateRetroActions]"
+        class="btn btn-primary create-btn"
+        (click)="createCard(cardCategory.Actions)"
+      >
         <i class="fas fa-plus"></i>
       </button>
     </div>
@@ -56,6 +64,7 @@
           type="checkbox"
           [id]="index + 'point'"
           [(ngModel)]="card.isCompleted"
+          [disabled]="!projectDataService.PID[permissions.CanCreateRetroActions]"
           (change)="completePoint(card)"
         />
         <label class="form-check-label" [for]="index + 'point'">
@@ -74,7 +83,11 @@
   >
     <div class="actions" [ngClass]="{ 'can-create': canCreateTask && !card.taskId }">
       <ng-container *ngIf="canCreateTask">
-        <i class="fas fa-plus-circle" *ngIf="!card.taskId" (click)="onCreateTask(card)"></i>
+        <i
+          class="fas fa-plus-circle"
+          *ngIf="projectDataService.PID[permissions.CanCreateTask] && !card.taskId"
+          (click)="onCreateTask(card)"
+        ></i>
       </ng-container>
 
       <i class="fas fa-times-circle" *ngIf="card.isMy" (click)="onRemoveCard(card.id)"></i>
@@ -90,7 +103,7 @@
     <ng-template #disabled>
       <span [style.fontSize]="(card.fontSize || 16) + 'px'" [textContent]="card.text"></span>
     </ng-template>
-    <a [routerLink]="['/task', card.taskId]" class="description-link" *ngIf="card.taskId"
+    <a [routerLink]="['../../task', card.taskId]" class="description-link" *ngIf="card.taskId"
       ><i class="fas fa-align-left"></i
     ></a>
   </div>

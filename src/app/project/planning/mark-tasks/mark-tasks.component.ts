@@ -50,7 +50,7 @@ export class MarkTasksComponent implements OnInit {
   }
 
   public onRemoveFromSprintClick(taskId: number) {
-    this.socketService.removePlanningTask(taskId);
+    this.socketService.removePlanningTask(this.projectId, taskId);
   }
 
   public getPlanning(projectId: number, id?: number) {
@@ -73,6 +73,6 @@ export class MarkTasksComponent implements OnInit {
     if (!this.planning) {
       return;
     }
-    this.socketService.startPocker(task.id);
+    this.socketService.startPocker(this.projectId, task.id);
   }
 }

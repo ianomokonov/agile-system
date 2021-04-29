@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import projectSprintHandler from '../handlers/project/project-sprint.handler';
 import checkProjectPermissions from '../middleware/check-project-permissions';
-import { Permissions } from '../utils';
+import { Permissions } from '../models/permissions';
 
 const sprintRouter = Router({ mergeParams: true });
 

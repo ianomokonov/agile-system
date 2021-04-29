@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Permissions } from 'back/src/models/permissions';
 import { GetProfileInfoResponse } from 'back/src/models/responses/get-profile-info.response';
 import { ProjectResponse } from 'back/src/models/responses/project.response';
 import { ProfileService } from '../services/profile.service';
@@ -12,6 +13,7 @@ import { ProjectService } from '../services/project.service';
   styleUrls: ['./project.component.less'],
 })
 export class ProjectComponent implements OnInit {
+  public permissions = Permissions;
   public get project(): ProjectResponse {
     return this.projectDataService.project;
   }
@@ -35,7 +37,7 @@ export class ProjectComponent implements OnInit {
   public getProjectInfo(id: number) {
     this.projectDataService.getProject(id).subscribe();
     this.projectSecrive.getUserPermissions(id).subscribe((permissions) => {
-      console.log(permissions);
+      this.projectDataService.setPID(permissions);
     });
   }
 }

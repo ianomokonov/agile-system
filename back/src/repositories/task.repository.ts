@@ -158,7 +158,13 @@ class TaskRepository {
       request.creatorId,
       projectId,
     );
-    const query = sql.insert('projecttask', { ...request, statusId: 1, creatorId, projectId });
+    const query = sql.insert('projecttask', {
+      ...request,
+      statusId: 1,
+      creatorId,
+      projectId,
+      lastEditUserId: request.creatorId,
+    });
 
     const [{ insertId }] = await dbConnection.query<ResultSetHeader>(
       getQueryText(query.text),
