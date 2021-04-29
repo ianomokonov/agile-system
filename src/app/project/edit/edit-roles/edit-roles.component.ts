@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { ProjectPermissionResponse } from 'back/src/models/responses/permission.response';
 import { ProjectRoleResponse } from 'back/src/models/responses/project-role.response';
 import { ProjectService } from 'src/app/services/project.service';
 
@@ -12,7 +11,7 @@ import { ProjectService } from 'src/app/services/project.service';
 })
 export class EditRolesComponent implements OnInit {
   public roles: ProjectRoleResponse[];
-  public permissions: ProjectPermissionResponse[];
+  public permissions: string[];
   public createRoleForm: FormGroup;
   public get permissionsArray(): FormGroup[] {
     return (this.createRoleForm.get('permissions') as FormArray).controls as FormGroup[];
@@ -36,22 +35,21 @@ export class EditRolesComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.projectService.getPermissions().subscribe((permissions) => {
-      this.permissions = permissions;
-      const permissionsArray = this.createRoleForm.get('permissions') as FormArray;
-      permissionsArray.clear();
+    // eslint-disable-next-line no-restricted-globals
+    this.permissions = Object.values(Permissions).filter((v) => isNaN(parseInt(v as string, 10)));
+    const permissionsArray = this.createRoleForm.get('permissions') as FormArray;
+    permissionsArray.clear();
 
-      this.permissions.forEach((permission) => {
-        permissionsArray.push(
-          this.fb.group({
-            name: permission.name,
-            id: permission.id,
-            isChecked: this.editingRole
-              ? !!this.editingRole.permissionIds.find((id) => id === permission.id)
-              : false,
-          }),
-        );
-      });
+    this.permissions.forEach((permission) => {
+      permissionsArray.push(
+        this.fb.group({
+          name: permission,
+          id: Permissions[permission],
+          isChecked: this.editingRole
+            ? !!this.editingRole.permissionIds.find((id) => id === Permissions[permission])
+            : false,
+        }),
+      );
     });
   }
 

@@ -4,6 +4,7 @@ import { GetProfileInfoResponse } from 'back/src/models/responses/get-profile-in
 import { ProjectResponse } from 'back/src/models/responses/project.response';
 import { ProfileService } from '../services/profile.service';
 import { ProjectDataService } from '../services/project-data.service';
+import { ProjectService } from '../services/project.service';
 
 @Component({
   selector: 'app-project',
@@ -19,6 +20,7 @@ export class ProjectComponent implements OnInit {
     public projectDataService: ProjectDataService,
     private activatedRoute: ActivatedRoute,
     private profileService: ProfileService,
+    private projectSecrive: ProjectService,
   ) {}
 
   public ngOnInit(): void {
@@ -32,5 +34,8 @@ export class ProjectComponent implements OnInit {
 
   public getProjectInfo(id: number) {
     this.projectDataService.getProject(id).subscribe();
+    this.projectSecrive.getUserPermissions(id).subscribe((permissions) => {
+      console.log(permissions);
+    });
   }
 }

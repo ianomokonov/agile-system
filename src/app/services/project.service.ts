@@ -9,7 +9,6 @@ import {
 } from 'back/src/models/requests/project-role.models';
 import { ProjectResponse } from 'back/src/models/responses/project.response';
 import { ProjectRoleResponse } from 'back/src/models/responses/project-role.response';
-import { ProjectPermissionResponse } from 'back/src/models/responses/permission.response';
 import { Observable, of } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -81,8 +80,8 @@ export class ProjectService {
     return this.http.get<ProjectRoleResponse[]>(`${this.baseUrl}/${projectId}/roles`);
   }
 
-  public getPermissions(): Observable<ProjectPermissionResponse[]> {
-    return this.http.get<ProjectPermissionResponse[]>(`${this.baseUrl}/permissions`);
+  public getUserPermissions(projectId: number): Observable<number[]> {
+    return this.http.get<number[]>(`${this.baseUrl}/${projectId}/permissions`);
   }
 
   public getProjectBacklog(projectId: number): Observable<Backlog> {

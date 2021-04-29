@@ -100,8 +100,8 @@ class ProjectService {
     return project;
   }
 
-  public async getPermissions() {
-    return projectRepository.getProjectPermissions();
+  public async getUserPermissions(userId: number, projectId: number) {
+    return projectRepository.getProjectUserPermissions(userId, projectId);
   }
 
   public async checkPermission(userId: number, projectId: number, permission: Permissions) {

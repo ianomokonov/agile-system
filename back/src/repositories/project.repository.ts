@@ -12,7 +12,6 @@ import { getQueryText, Permissions } from '../utils';
 import dbConnection from './db-connection';
 import { UserShortView } from '../models/responses/user-short-view';
 import { ProjectRoleResponse } from '../models/responses/project-role.response';
-import { ProjectPermissionResponse } from '../models/responses/permission.response';
 import { ProjectResponse } from '../models/responses/project.response';
 import { StatusResponse } from '../models/responses/status.response';
 import { TaskShortView } from '../models/responses/task-short-view';
@@ -215,10 +214,35 @@ class ProjectRepository {
     return roles as ProjectRoleResponse[];
   }
 
-  public async getProjectPermissions() {
-    const [permissions] = await dbConnection.query<RowDataPacket[]>(`SELECT * FROM permission`);
+  public async getProjectUserPermissions(userId: number, projectId: number) {
+    let query = sql.select('project', '*').where({ id: projectId, ownerId: userId });
 
-    return permissions as ProjectPermissionResponse[];
+    const [projects] = await dbConnection.query(getQueryText(query.text), query.values);
+    if (projects[0]) {
+      return Object.values(Permissions).filter(
+        (v) => parseInt(v as string, 10) >= 0,
+      ) as Permissions[];
+    }
+
+    query = sql
+      .select('user', ['projectrolepermission.permissionId'])
+      .join('projectuser', { 'user.id': 'projectuser.userId' }, 'RIGHT')
+      .join('projectuserrole', { 'projectuserrole.projectUserId': 'projectuser.id' }, 'RIGHT')
+      .join(
+        'projectrolepermission',
+        {
+          'projectuserrole.projectRoleId': 'projectrolepermission.projectRoleId',
+        },
+        'RIGHT',
+      )
+      .where({ 'user.id': userId, 'projectuser.projectId': projectId });
+
+    const [permissions] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    return permissions.map((p) => p.permitionId) as Permissions[];
   }
 
   public async getRolePermissionIds(roleId: number) {
