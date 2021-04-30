@@ -63,3 +63,25 @@
     Задачи отсутствуют
   </div>
 </ng-template>
+
+<ng-template #emptyTaskModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Подтверждение начала спринта</h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close button"
+      aria-describedby="modal-title"
+      (click)="modal.dismiss()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <span class="mb-5">Отсутствуют оцененные задачи. Всё равно начать спринт?</span>
+    <div class="d-flex justify-content-end mt-3">
+      <button type="button" class="btn btn-outline-dark" (click)="startSprint(modal)">Начать</button>
+      <button type="button" class="btn btn-outline-dark mr-4 ml-3" (click)="modal.close('Save click')">Отмена</button>
+    </div>
+  </div>
+</ng-template>

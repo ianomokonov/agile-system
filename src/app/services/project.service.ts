@@ -35,6 +35,10 @@ export class ProjectService {
     return this.http.put<number>(`${this.baseUrl}/${projectId}`, request);
   }
 
+  public deleteProject(projectId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${projectId}`);
+  }
+
   public getProjectEditInfo(projectId: number): Observable<ProjectEditInfo> {
     return this.http.get<ProjectEditInfo>(`${this.baseUrl}/${projectId}/get-edit-info`);
   }

@@ -27,6 +27,10 @@ export class FileUploaderComponent implements ControlValueAccessor {
 
   public disabled: boolean;
 
+  public get imagePath() {
+    return `url(${this.value?.path})`;
+  }
+
   private onChange: (value?: any) => {};
   private onTouched: () => {};
 

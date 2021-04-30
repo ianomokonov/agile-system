@@ -1,4 +1,4 @@
-<div class="pb-2" *ngIf="backlog">
+<div class="pb-2" *ngIf="backlog" cdkDropListGroup>
   <div class="d-flex justify-content-between mb-3">
     <h4 class="mb-0">Бэклог</h4>
     <div class="text-right">
@@ -7,7 +7,13 @@
     </div>
   </div>
   <ng-container *ngIf="backlog.sprints?.length || backlog.tasks?.length; else backlogPlaceholder">
-    <div class="content rounded p-2 mb-2" *ngFor="let sprint of backlog.sprints">
+    <div
+      class="content rounded p-2 mb-2"
+      *ngFor="let sprint of backlog.sprints"
+      cdkDropList
+      (cdkDropListDropped)="drop($event, sprint)"
+      [cdkDropListData]="sprint.tasks"
+    >
       <div
         [ngClass]="{ 'mb-3': sprint.isOpened }"
         class="header d-flex justify-content-between align-items-center"
@@ -52,9 +58,9 @@
           >
         </ng-container>
       </div>
-      <ng-container *ngIf="sprint.isOpened"
-        ><ng-container *ngIf="sprint.tasks?.length; else noData">
-          <ng-container *ngFor="let task of sprint.tasks">
+      <ng-container *ngIf="sprint.isOpened">
+        <ng-container *ngIf="sprint.tasks?.length; else noData">
+          <div cdkDrag *ngFor="let task of sprint.tasks">
             <ng-container
               *ngTemplateOutlet="
                 taskTemp;
@@ -64,20 +70,27 @@
                 }
               "
             ></ng-container>
-          </ng-container> </ng-container
-      ></ng-container>
+          </div>
+        </ng-container>
+      </ng-container>
     </div>
-    <div class="content rounded p-2" *ngIf="backlog.tasks?.length">
+    <div
+      class="content rounded p-2"
+      *ngIf="backlog.tasks?.length"
+      cdkDropList
+      (cdkDropListDropped)="drop($event)"
+      [cdkDropListData]="backlog.tasks"
+    >
       <div class="header mb-3">Задачи без спринта</div>
       <ng-container *ngIf="backlog.tasks?.length; else noData">
-        <ng-container *ngFor="let task of backlog.tasks">
+        <div cdkDrag *ngFor="let task of backlog.tasks">
           <ng-container
             *ngTemplateOutlet="
               taskTemp;
               context: { $implicit: task, showBtn: !!projectDataService.project?.sprint }
             "
           ></ng-container>
-        </ng-container>
+        </div>
       </ng-container>
     </div>
   </ng-container>

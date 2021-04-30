@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PlanningFullView, PlanningStep } from 'back/src/models/responses/planning';
+import { takeWhile } from 'rxjs/operators';
 import { ProjectService } from 'src/app/services/project.service';
 import { SocketService } from 'src/app/services/socket.service';
 
@@ -9,7 +10,8 @@ import { SocketService } from 'src/app/services/socket.service';
   templateUrl: './planning.component.html',
   styleUrls: ['./planning.component.less'],
 })
-export class PlanningComponent implements OnInit {
+export class PlanningComponent implements OnInit, OnDestroy {
+  private rxAlive = true;
   public planning: PlanningFullView;
   public planningStep = PlanningStep;
   private projectId: number;
@@ -19,12 +21,15 @@ export class PlanningComponent implements OnInit {
     private projectService: ProjectService,
     public socketService: SocketService,
   ) {
-    this.socketService.of('updatePlanning').subscribe(() => {
-      this.getPlanning(this.planning.id);
-    });
+    this.socketService
+      .of('updatePlanning')
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe(() => {
+        this.getPlanning(this.planning.id);
+      });
   }
   public ngOnInit(): void {
-    this.activatedRoute.params.subscribe((params) => {
+    this.activatedRoute.params.pipe(takeWhile(() => this.rxAlive)).subscribe((params) => {
       if (params.planningId) {
         this.projectId = params.id;
         this.getPlanning(params.planningId);
@@ -32,11 +37,18 @@ export class PlanningComponent implements OnInit {
     });
   }
 
+  public ngOnDestroy(): void {
+    this.rxAlive = false;
+  }
+
   public getPlanning(id: number) {
-    this.projectService.getPlanning(this.projectId, id).subscribe((planning) => {
-      this.planning = planning;
-      this.socketService.enterPlanningRoom(this.planning.id);
-    });
+    this.projectService
+      .getPlanning(this.projectId, id)
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe((planning) => {
+        this.planning = planning;
+        this.socketService.enterPlanningRoom(this.planning.id);
+      });
   }
 
   public goHome() {

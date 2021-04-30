@@ -1,7 +1,7 @@
 <div class="pb-3 w-100 h-100">
   <div class="field rounded p-1">
     <div class="good m-1">
-      <span class="placeholder">Что было хорошо?</span>
+      <span class="placeholder" *ngIf="goodCards.length < 3">Что было хорошо?</span>
       <ng-container *ngFor="let card of goodCards">
         <ng-container *ngTemplateOutlet="cardTemp; context: { $implicit: card }"> </ng-container>
       </ng-container>
@@ -11,7 +11,7 @@
       </button>
     </div>
     <div class="bad m-1">
-      <span class="placeholder">Что не получилось?</span>
+      <span class="placeholder" *ngIf="badCards.length < 3">Что не получилось?</span>
       <ng-container *ngFor="let card of badCards">
         <ng-container *ngTemplateOutlet="cardTemp; context: { $implicit: card }"> </ng-container>
       </ng-container>
@@ -20,7 +20,7 @@
       </button>
     </div>
     <div class="improvments m-1">
-      <span class="placeholder">Что можно улучшить?</span>
+      <span class="placeholder" *ngIf="improvmentCards.length < 3">Что можно улучшить?</span>
       <ng-container *ngFor="let card of improvmentCards">
         <ng-container *ngTemplateOutlet="cardTemp; context: { $implicit: card }"> </ng-container>
       </ng-container>
@@ -30,7 +30,7 @@
       </button>
     </div>
     <div class="actions m-1">
-      <span class="placeholder">Дальнейшие действия</span>
+      <span class="placeholder" *ngIf="actionCards.length < 3">Дальнейшие действия</span>
       <ng-container *ngFor="let card of actionCards">
         <ng-container *ngTemplateOutlet="cardTemp; context: { $implicit: card }"> </ng-container>
       </ng-container>
@@ -65,7 +65,6 @@
 
 <ng-template #cardTemp let-card>
   <div class="retro-card" [ngClass]="{ isMy: card.isMy }" (click)="onCardClick($event)">
-    <i class="fas fa-times" *ngIf="card.isMy" (click)="onRemoveCard(card.id)"></i>
     <span
       *ngIf="card.isMy; else disabled"
       contenteditable
@@ -73,6 +72,7 @@
       [textContent]="card.text"
       (input)="scale($event.target, $event, card)"
     ></span>
+    <i class="fas fa-times" *ngIf="card.isMy" (click)="onRemoveCard(card.id)"></i>
     <ng-template #disabled>
       <span [style.fontSize]="(card.fontSize || 16) + 'px'" [textContent]="card.text"></span>
     </ng-template>

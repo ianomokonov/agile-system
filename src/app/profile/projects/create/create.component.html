@@ -3,22 +3,20 @@
     <i class="fas fa-long-arrow-alt-left mr-3"></i>{{ projectId ? 'К проекту' : 'Все проекты' }}
   </h4>
   <div class="shadow-form">
-    <ul class="nav nav-pills mb-3" *ngIf="projectId">
-      <li class="nav-item">
-        <a
-          class="nav-link"
-          routerLink="info"
-          [routerLinkActive]="'active'"
-          >Изменение проекта</a
-        >
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" routerLink="users" [routerLinkActive]="'active'">Участники</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" routerLink="roles" [routerLinkActive]="'active'">Роли</a>
-      </li>
-    </ul>
+    <div class="d-flex justify-content-between">
+      <ul class="nav nav-pills mb-3" *ngIf="projectId">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="info" [routerLinkActive]="'active'">Изменение проекта</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="users" [routerLinkActive]="'active'">Участники</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="roles" [routerLinkActive]="'active'">Роли</a>
+        </li>
+      </ul>
+      <a *ngIf="projectId" class="nav-link btn-del" (click)="deleteProject()">Удалить проект</a>
+    </div>
     <ng-container *ngIf="!this.projectId; else pages">
       <app-edit-project-form></app-edit-project-form
     ></ng-container>

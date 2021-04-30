@@ -15,10 +15,23 @@
   <div class="form-group">
     <label>Название</label>
     <input type="text" class="form-control" formControlName="name" ngbAutofocus />
+    <div *ngIf="createForm.controls['name'].errors">
+      <small class="text-danger" *ngIf="createForm.controls['name'].touched && createForm.controls['name'].errors?.maxlength">
+        Название задачи должно быть меньше 255 символов
+      </small>
+      <small class="text-danger" *ngIf="createForm.controls['name'].touched && createForm.controls['name'].errors?.required">
+        Укажите название задачи
+      </small>
+    </div>
   </div>
   <div class="form-group">
     <label>Описание</label>
     <ckeditor [editor]="editor" formControlName="description"></ckeditor>
+    <div *ngIf="createForm.controls['description'].errors">
+      <small class="text-danger" *ngIf="createForm.controls['description'].touched && createForm.controls['description'].errors?.required">
+        Укажите описание задачи
+      </small>
+    </div>
   </div>
   <div class="form-group">
     <label>Исполнитель</label>

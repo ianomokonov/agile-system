@@ -59,6 +59,11 @@ class ProjectRepository {
     return (result[0] as ResultSetHeader).insertId;
   }
 
+  public async delete(projectId: number) {
+    const query = sql.deletes('project').where({ id: projectId });
+    await dbConnection.query(getQueryText(query.text), query.values);
+  }
+
   public async addProjectUser(request: AddProjectUserRequest) {
     const query = sql.insert('projectuser', {
       projectId: request.projectId,

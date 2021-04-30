@@ -1,8 +1,12 @@
 <h5 class="text-center py-3">Редактирование профиля</h5>
 <form [formGroup]="userForm" class="px-3 pb-3" (submit)="onFormSubmit()">
   <file-uploader [imgClass]="'profile-img'" formControlName="image"
-    ><img class="profile-img placeholder" src="../../../assets/images/default_ava.jpg" alt=""
-  /></file-uploader>
+    ><div
+      class="profile-img placeholder"
+      [style.background-image]="'url(../../../assets/images/default_ava.jpg)'"
+      alt=""
+    ></div
+  ></file-uploader>
   <input type="text" class="form-control mb-3" placeholder="Имя" formControlName="name" />
   <input type="text" class="form-control mb-3" placeholder="Фамилия" formControlName="surname" />
   <input type="text" class="form-control mb-3" placeholder="Ссылка на ВК" formControlName="vk" />

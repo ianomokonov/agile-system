@@ -1,6 +1,6 @@
 <div class="d-flex align-items-center mb-3">
   <div *ngIf="value?.path; else placeholder">
-    <img [src]="value?.path" class="{{ imgClass }}" />
+    <div [style.background-image]="imagePath" class="{{ imgClass }}"></div>
   </div>
 
   <ng-template #placeholder>
