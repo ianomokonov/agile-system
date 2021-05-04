@@ -93,6 +93,19 @@ class DemoRepository {
     const query = sql.update('projectDemoTask', { isFinished: true }).where({ id: demoTaskId });
     await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
   }
+
+  public async reopenDemoTask(demoTaskId: number, userId: number) {
+    let query = sql.select('projectDemoTask', '*').where({ id: demoTaskId });
+    const [[demoTask]] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    query = sql.update('projectDemoTask', { isFinished: true }).where({ id: demoTaskId });
+    await Promise.all([
+      dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values),
+      taskRepository.updateTaskStatus(demoTask.taskId, 1, userId),
+    ]);
+  }
 }
 
 export default new DemoRepository();

@@ -60,12 +60,10 @@ export class DemoComponent implements OnInit {
       this.router.navigate(['../../', 'board'], { relativeTo: this.activatedRoute });
     });
     this.socketService.onAcceptDemoTask().subscribe((taskId) => {
-      const taskIndex = this.demo.taskToShow?.findIndex((t) => t.id === taskId);
-      if ((taskIndex || taskIndex === 0) && taskIndex > -1) {
-        this.demo.taskToShow[taskIndex].isFinished = true;
-        this.demo.shownTasks.unshift(this.demo.taskToShow[taskIndex]);
-        this.demo.taskToShow.splice(taskIndex, 1);
-      }
+      this.onFinishTask(taskId);
+    });
+    this.socketService.of('reopenDemoTask').subscribe(() => {
+      this.getDemo(this.demo?.id);
     });
     this.socketService.onActiveDemoTask().subscribe((demoTaskId) => {
       this.router.navigate([], {
@@ -89,6 +87,15 @@ export class DemoComponent implements OnInit {
     });
   }
 
+  public onFinishTask(taskId) {
+    const taskIndex = this.demo.taskToShow?.findIndex((t) => t.id === taskId);
+    if ((taskIndex || taskIndex === 0) && taskIndex > -1) {
+      this.demo.taskToShow[taskIndex].isFinished = true;
+      this.demo.shownTasks.unshift(this.demo.taskToShow[taskIndex]);
+      this.demo.taskToShow.splice(taskIndex, 1);
+    }
+  }
+
   public onTaskClick(demoTaskId) {
     this.socketService.activeDemoTask(demoTaskId);
   }
@@ -101,6 +108,16 @@ export class DemoComponent implements OnInit {
       this.onTaskClick(this.demo.taskToShow.find((t) => t.id !== demoTaskId).id);
     }
     this.socketService.acceptDemoTask(this.projectId, demoTaskId);
+  }
+
+  public reopenTask(demoTaskId) {
+    if (!this.activeTask) {
+      return;
+    }
+    if (this.demo.taskToShow.length !== 1) {
+      this.onTaskClick(this.demo.taskToShow.find((t) => t.id !== demoTaskId).id);
+    }
+    this.socketService.reopenDemoTask(this.projectId, demoTaskId);
   }
 
   // eslint-disable-next-line complexity

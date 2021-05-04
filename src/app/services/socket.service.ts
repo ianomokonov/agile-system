@@ -116,6 +116,10 @@ export class SocketService {
     this.socket.emit('acceptDemoTask', { projectId, taskId });
   }
 
+  public reopenDemoTask(projectId: number, taskId) {
+    this.socket.emit('reopenDemoTask', { projectId, taskId });
+  }
+
   public finishDemo(projectId: number) {
     this.socket.emit('finishDemo', projectId);
   }

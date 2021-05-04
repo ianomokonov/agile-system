@@ -248,6 +248,20 @@ io.use(authSocketJWT).on('connection', (socket) => {
     io.sockets.in(socket.demoRoom).emit('acceptDemoTask', taskId);
   });
 
+  socket.on('reopenDemoTask', async ({ projectId, taskId }) => {
+    if (
+      !(await checkSocketProjectPermissions(
+        projectId,
+        socket.userId,
+        Permissions.CanEditTaskStatus,
+      ))
+    ) {
+      return;
+    }
+    demoHandler.reopenTask(taskId, socket.userId);
+    io.sockets.in(socket.demoRoom).emit('reopenDemoTask', taskId);
+  });
+
   socket.on('finishDemo', async (projectId) => {
     if (
       !(await checkSocketProjectPermissions(projectId, socket.userId, Permissions.CanStartDemo))

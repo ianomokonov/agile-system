@@ -74,18 +74,35 @@
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="mb-0">
               {{ activeTask.task.name }}
-              <span class="badge badge-success" *ngIf="activeTask.isFinished">Принята</span>
+              <span
+                class="badge"
+                [ngClass]="{
+                  'badge-success': activeTask.task.status.id !== 1,
+                  'badge-secondary': activeTask.task.status.id === 1
+                }"
+                *ngIf="activeTask.isFinished"
+                >{{ activeTask.task.status.id === 1 ? 'Переоткрыта' : 'Принята' }}</span
+              >
             </h4>
-            <button
-              class="btn btn-primary"
-              (click)="acceptTask(activeTask.id)"
-              *ngIf="
-                this.projectDataService.PID[this.permissions.CanStartDemo] &&
-                !activeTask.isFinished
-              "
-            >
-              Принять
-            </button>
+            <div class="d-flex justify-content-end align-items-center">
+              <button
+                class="btn btn-outline-secondary"
+                (click)="reopenTask(activeTask.id)"
+                *ngIf="this.projectDataService.PID[this.permissions.CanEditTask]"
+              >
+                Переоткрыть
+              </button>
+              <button
+                class="btn btn-primary ml-2"
+                (click)="acceptTask(activeTask.id)"
+                *ngIf="
+                  this.projectDataService.PID[this.permissions.CanStartDemo] &&
+                  !activeTask.isFinished
+                "
+              >
+                Принять
+              </button>
+            </div>
           </div>
 
           <div class="form-group">
