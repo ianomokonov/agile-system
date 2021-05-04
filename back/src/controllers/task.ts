@@ -17,6 +17,23 @@ const storageConfig = multer.diskStorage({
   },
 });
 
+taskRouter.get(
+  `/search`,
+  authJWT,
+  checkProjectPermissions(Permissions.CanReadProject),
+  async (req, res) => {
+    try {
+      const result = await tasksHandler.search(
+        req.query.searchString.toString(),
+        res.locals.projectId,
+      );
+      res.status(StatusCodes.OK).json(result);
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
 taskRouter.delete(
   `/:id/remove-file/:fileId`,
   authJWT,

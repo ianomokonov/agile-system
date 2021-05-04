@@ -113,6 +113,7 @@
             <small class="text-muted">Вложения</small>
             <app-multiple-file-uploader
               [files]="getTaskFiles(activeTask.task)"
+              (download)="downloadFile($event)"
               [disabled]="true"
             ></app-multiple-file-uploader>
           </div>

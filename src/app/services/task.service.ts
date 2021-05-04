@@ -5,14 +5,20 @@ import { environment } from 'src/environments/environment';
 import { TaskResponse } from 'back/src/models/responses/task.response';
 import { CreateTaskRequest, UpdateTaskRequest } from 'back/src/models/requests/task.models';
 // eslint-disable-next-line import/no-cycle
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
+import { FileSaverService } from 'ngx-filesaver';
+import { TaskShortView } from 'back/src/models/responses/task-short-view';
 import { ProjectDataService } from './project-data.service';
 import { UploadFile } from '../shared/multiple-file-uploader/multiple-file-uploader.component';
 
 @Injectable()
 export class TaskService {
   private baseUrl = `${environment.baseUrl}/project`;
-  constructor(private http: HttpClient, private projectDataService: ProjectDataService) {}
+  constructor(
+    private http: HttpClient,
+    private projectDataService: ProjectDataService,
+    private fileSaver: FileSaverService,
+  ) {}
 
   public addTask(projectId: number, task: CreateTaskRequest): Observable<number> {
     const { files } = task;
@@ -40,13 +46,27 @@ export class TaskService {
     );
   }
 
-  public downloadFile(taskId: number, fileId: number) {
-    return this.http.get(
-      `${this.baseUrl}/${this.projectDataService.project?.id}/task/${taskId}/download-file/${fileId}`,
-      {
-        responseType: 'blob',
-      },
+  public search(searchString: string): Observable<TaskShortView[]> {
+    return this.http.get<TaskShortView[]>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/search?searchString=${
+        searchString ? encodeURI(searchString) : ''
+      }`,
     );
+  }
+
+  public downloadFile(taskId: number, file: UploadFile) {
+    return this.http
+      .get(
+        `${this.baseUrl}/${this.projectDataService.project?.id}/task/${taskId}/download-file/${file.id}`,
+        {
+          responseType: 'blob',
+        },
+      )
+      .pipe(
+        tap((response) => {
+          this.fileSaver.save(response, file.name);
+        }),
+      );
   }
 
   public uploadFiles(taskId: number, data: FormData): Observable<void> {

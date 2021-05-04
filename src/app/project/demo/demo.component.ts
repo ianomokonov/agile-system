@@ -56,6 +56,10 @@ export class DemoComponent implements OnInit {
     });
   }
 
+  public downloadFile(file) {
+    this.taskService.downloadFile(this.activeTask.task.id, file.id).subscribe();
+  }
+
   public ngOnInit(): void {
     this.socketService.onFinishDemo().subscribe(() => {
       sessionStorage.removeItem(this.commentKey);

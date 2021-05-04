@@ -21,6 +21,9 @@ class TaskService {
   public async updateTaskStatus(taskId: number, statusId: number, userId: number) {
     taskRepository.updateTaskStatus(taskId, statusId, userId);
   }
+  public async searchTasks(searchString: string, projectId: number) {
+    return taskRepository.searchTasks(searchString, projectId);
+  }
   public async read(id: number) {
     const task = await taskRepository.read(id);
     if (!task) {

@@ -4,6 +4,7 @@ import { Permissions } from 'back/src/models/permissions';
 import { ProjectDataService } from 'src/app/services/project-data.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { SocketService } from 'src/app/services/socket.service';
+import { TaskService } from 'src/app/services/task.service';
 import { getTaskFiles } from 'src/app/utils/constants';
 
 @Component({
@@ -29,6 +30,7 @@ export class ScrumPokerComponent {
     private activatedRoute: ActivatedRoute,
     public projectDataService: ProjectDataService,
     private socketService: SocketService,
+    private taskService: TaskService,
     private router: Router,
   ) {
     this.socketService.of('updatePlanningSession').subscribe(() => {
@@ -62,6 +64,10 @@ export class ScrumPokerComponent {
         this.router.navigate(['../../'], { relativeTo: this.activatedRoute });
       },
     );
+  }
+
+  public downloadFile(file) {
+    this.taskService.downloadFile(this.taskId, file.id).subscribe();
   }
 
   public setCard(value) {

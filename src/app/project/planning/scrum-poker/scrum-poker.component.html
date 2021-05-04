@@ -12,6 +12,7 @@
       <small class="text-muted">Вложения</small>
       <app-multiple-file-uploader
         [files]="getTaskFiles(session.task)"
+        (download)="downloadFile($event)"
         [disabled]="true"
       ></app-multiple-file-uploader>
     </div>

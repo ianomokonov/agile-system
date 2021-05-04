@@ -12,7 +12,6 @@ import { IdNameResponse } from 'back/src/models/responses/id-name.response';
 import { forkJoin } from 'rxjs';
 import { ProjectService } from 'src/app/services/project.service';
 import { editorConfig, taskFields, userSearchFn } from 'src/app/utils/constants';
-import { FileSaverService } from 'ngx-filesaver';
 import { UploadFile } from 'src/app/shared/multiple-file-uploader/multiple-file-uploader.component';
 import { TaskTypePipe } from 'src/app/shared/pipes/task-type.pipe';
 import { PriorityPipe } from 'src/app/shared/pipes/priority.pipe';
@@ -47,7 +46,6 @@ export class TaskComponent {
     private modalService: NgbModal,
     public projectDataService: ProjectDataService,
     private projectService: ProjectService,
-    private fileSaver: FileSaverService,
     private taskTypePipe: TaskTypePipe,
     private priorityPipe: PriorityPipe,
   ) {
@@ -132,9 +130,7 @@ export class TaskComponent {
   }
 
   public downloadFile(file) {
-    this.taskService.downloadFile(this.task.id, file.id).subscribe((fileResponse) => {
-      this.fileSaver.save(fileResponse, file.name);
-    });
+    this.taskService.downloadFile(this.task.id, file.id).subscribe();
   }
 
   public saveTaskName() {

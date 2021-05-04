@@ -80,6 +80,31 @@ class TaskRepository {
     return task as TaskShortView;
   }
 
+  public async searchTasks(searchString: string, projectId: number) {
+    const query = sql
+      .select('projecttask', [
+        'id',
+        'name',
+        'statusId',
+        'typeId',
+        'priorityId',
+        'projectId',
+        'createDate',
+        'projectUserId',
+        'projectSprintId',
+        'points',
+      ])
+      .where({ name: `${searchString}%` }, 'LIKE')
+      .and({ projectId })
+      .limit(20, undefined);
+    const [tasks] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    return tasks as TaskShortView[];
+  }
+
   public async getNewSprintTasks(sprintId?: number) {
     if (!sprintId) {
       return [];
