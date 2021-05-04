@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TaskResponse } from 'back/src/models/responses/task.response';
@@ -12,10 +13,8 @@ import { IdNameResponse } from 'back/src/models/responses/id-name.response';
 import { forkJoin } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
 import { ProjectService } from 'src/app/services/project.service';
-import { editorConfig, taskFields, userSearchFn } from 'src/app/utils/constants';
+import { editorConfig, userSearchFn } from 'src/app/utils/constants';
 import { UploadFile } from 'src/app/shared/multiple-file-uploader/multiple-file-uploader.component';
-import { TaskTypePipe } from 'src/app/shared/pipes/task-type.pipe';
-import { PriorityPipe } from 'src/app/shared/pipes/priority.pipe';
 import { Permissions } from 'back/src/models/permissions';
 import { EditTaskComponent } from './edit-task/edit-task.component';
 
@@ -49,8 +48,6 @@ export class TaskComponent implements OnDestroy {
     private modalService: NgbModal,
     public projectDataService: ProjectDataService,
     private projectService: ProjectService,
-    private taskTypePipe: TaskTypePipe,
-    private priorityPipe: PriorityPipe,
   ) {
     this.activatedRoute.params.pipe(takeWhile(() => this.rxAlive)).subscribe((params) => {
       this.getTaskInfo(params.id, true);
@@ -109,28 +106,6 @@ export class TaskComponent implements OnDestroy {
         );
         this.userControl.setValue(task.projectUser?.id, { emitEvent: false });
       });
-  }
-  public getHistoryField(item) {
-    return taskFields[item.fieldName] || item.fieldName;
-  }
-  // eslint-disable-next-line complexity
-  public getHistoryValue(item) {
-    if (item.fieldName === 'projectUserId') {
-      return item.user && `${item.user?.name} ${item.user?.surname}`;
-    }
-    if (item.fieldName === 'projecSprintId') {
-      return item.sprint?.name;
-    }
-    if (item.fieldName === 'statusId') {
-      return item.status?.name;
-    }
-    if (item.fieldName === 'typeId') {
-      return this.taskTypePipe.transform(item.newValue);
-    }
-    if (item.fieldName === 'priorityId') {
-      return this.priorityPipe.transform(item.newValue);
-    }
-    return item.newValue;
   }
   public saveTaskDescription() {
     this.taskService
@@ -207,6 +182,7 @@ export class TaskComponent implements OnDestroy {
   }
 
   public deleteTask() {
+    // eslint-disable-next-line no-alert
     if (!confirm('Вы действительно хотитет удалить задачу?')) return;
     this.taskService
       .removeTask(this.task.id)

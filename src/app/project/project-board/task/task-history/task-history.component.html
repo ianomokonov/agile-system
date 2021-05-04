@@ -1,0 +1,22 @@
+<div class="history" *ngIf="history?.length; else noData">
+  <div class="row m-0 history__header border-bottom">
+    <div class="col-3 pl-0">Пользователь</div>
+    <div class="col-3">Измененное поле</div>
+    <div class="col-4">Новое значение</div>
+    <div class="col-2 pr-0 text-right">Дата и время</div>
+  </div>
+  <div class="row m-0 history__item border-bottom" *ngFor="let item of history">
+    <div class="col-3 pl-0">{{ item.userName }} {{ item.userSurname }}</div>
+    <div class="col-3">
+      {{ getHistoryField(item) }}
+    </div>
+    <div class="col-4" [innerHTML]="getHistoryValue(item) || '—'"></div>
+    <div class="col-2 pr-0 text-right">
+      <small class="text-muted">{{ item.createDate | date: 'dd.MM.yyyy HH.mm' }}</small>
+    </div>
+  </div>
+</div>
+
+<ng-template #noData>
+    <p class="m-0 text-muted">История изменений отсутствует</p>
+</ng-template>
