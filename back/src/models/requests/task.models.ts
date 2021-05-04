@@ -9,6 +9,8 @@ export interface CreateTaskRequest {
   priorityId: Priority;
   typeId: TaskType;
   projectSprintId?: number;
+  files?: any[];
+  retroCardId?: number;
 }
 
 export interface UpdateTaskRequest {

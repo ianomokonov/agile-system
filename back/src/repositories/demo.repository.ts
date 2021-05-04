@@ -19,7 +19,7 @@ class DemoRepository {
       query.values,
     );
     await dbConnection.query<ResultSetHeader>(
-      `INSERT INTO projectDemoTask (taskId, demoId) SELECT pt.id, ${demoId} FROM projecttask pt WHERE pt.statusId=7 AND pt.projectSprintId=${sprintId}`,
+      `INSERT INTO projectDemoTask (taskId, demoId) SELECT pt.id, ${demoId} FROM projecttask pt WHERE pt.statusId=4 AND pt.projectSprintId=${sprintId}`,
     );
     return demoId;
   }
@@ -92,6 +92,19 @@ class DemoRepository {
   public async finishDemoTask(demoTaskId: number) {
     const query = sql.update('projectDemoTask', { isFinished: true }).where({ id: demoTaskId });
     await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
+  }
+
+  public async reopenDemoTask(demoTaskId: number, userId: number) {
+    let query = sql.select('projectDemoTask', '*').where({ id: demoTaskId });
+    const [[demoTask]] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    query = sql.update('projectDemoTask', { isFinished: true }).where({ id: demoTaskId });
+    await Promise.all([
+      dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values),
+      taskRepository.updateTaskStatus(demoTask.taskId, 1, userId),
+    ]);
   }
 }
 

@@ -1,11 +1,7 @@
 <div class="container" *ngIf="userInfo">
   <div class="head d-flex align-items-center justify-content-between border-bottom">
     <div class="user-info d-flex align-items-center">
-      <img
-        [src]="userInfo.image || '../../assets/images/default_ava.jpg'"
-        alt=""
-        class="profile-img placeholder ava"
-      />
+      <div class="profile-img placeholder ava" [style.background-image]="userImage" alt=""></div>
       <div class="info ml-2">
         <h5 class="name m-0">
           {{ userInfo.name }} {{ userInfo.surname }}

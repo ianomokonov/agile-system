@@ -21,16 +21,28 @@ html {
   font-size: 12px;
 }
 
-img.profile-img {
+div.profile-img {
   height: 60px !important;
   width: 60px !important;
-
   border-radius: 50%;
+  background-position: center;
+  background-size: cover;
 
   &.placeholder {
     border: 2px solid lightgray;
   }
 }
+
+// img.profile-img {
+//   height: 60px !important;
+//   width: 60px !important;
+
+//   border-radius: 50%;
+
+//   &.placeholder {
+//     border: 2px solid lightgray;
+//   }
+// }
 
 .form-group {
   label {
@@ -131,4 +143,12 @@ img.profile-img {
 
 .bg-info-lightest {
   background-color: @bg-info-lightest;
+}
+
+.cdk-drag.task.rounded.cdk-drag-dragging {
+  height: auto !important;
+
+  h6 {
+    overflow: auto !important;
+  }
 }

@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { GetProfileInfoResponse } from 'back/src/models/responses/get-profile-info.response';
+import { takeWhile } from 'rxjs/operators';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
@@ -9,8 +10,9 @@ import { UserService } from 'src/app/services/user.service';
   templateUrl: './edit-user.component.html',
   styleUrls: ['./edit-user.component.less'],
 })
-export class EditUserComponent {
+export class EditUserComponent implements OnDestroy {
   public userForm: FormGroup;
+  private rxAlive = true;
   public set user(user: GetProfileInfoResponse) {
     this.userForm?.patchValue({
       name: user.name,
@@ -34,6 +36,10 @@ export class EditUserComponent {
     });
   }
 
+  public ngOnDestroy(): void {
+    this.rxAlive = false;
+  }
+
   public onFormSubmit() {
     if (this.userForm.invalid) {
       this.userForm.markAllAsTouched();
@@ -49,9 +55,12 @@ export class EditUserComponent {
       formData.append('image', formValue.image?.file || formValue.image?.path);
     }
 
-    this.userService.editProfile(formData).subscribe(() => {
-      this.activeModal.close(formValue);
-    });
+    this.userService
+      .editProfile(formData)
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe(() => {
+        this.activeModal.close(formValue);
+      });
   }
 
   public onCancelClick() {

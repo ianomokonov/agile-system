@@ -24,7 +24,5 @@ export class ResetPasswordComponent extends SecurityBaseModel {
     }
 
     const formValue = this.form.getRawValue();
-
-    console.log(formValue);
   }
 }

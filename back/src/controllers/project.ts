@@ -12,20 +12,17 @@ import projectUsersHandler from '../handlers/project/project-users.handler';
 import tasksHandler from '../handlers/task/tasks.handler';
 import authJWT from '../middleware/authJWT';
 import checkPermissions from '../middleware/check-project-permissions';
-import { Permissions } from '../utils';
+import { Permissions } from '../models/permissions';
 import dailyRouter from './daily';
 import demoRouter from './demo';
 import planningRouter from './planning';
 import retroRouter from './retro';
 import sprintRouter from './sprint';
+import taskRouter from './task';
 
 const projectRouter = Router();
 projectRouter.use(authJWT);
 
-projectRouter.get(`/permissions`, async (req, res) => {
-  const permissions = await getProjectPermissionsHandler();
-  res.status(StatusCodes.OK).json(permissions);
-});
 projectRouter.get(`/:projectId`, checkPermissions(Permissions.CanReadProject), async (req, res) => {
   const project = await getProjectHandler(res.locals.projectId, res.locals.userId);
 
@@ -37,8 +34,22 @@ projectRouter.get(`/:projectId`, checkPermissions(Permissions.CanReadProject), a
 });
 
 projectRouter.put(`/:projectId`, checkPermissions(Permissions.CanEditProject), async (req, res) => {
-  await editProjectHandler(res.locals.projectId, req.body);
+  await editProjectHandler.update(res.locals.projectId, req.body);
   res.status(StatusCodes.OK).json('Проект изменен');
+});
+
+projectRouter.delete(
+  `/:projectId`,
+  checkPermissions(Permissions.CanEditProject),
+  async (req, res) => {
+    await editProjectHandler.delete(res.locals.projectId);
+    res.status(StatusCodes.OK).json('Проект удален');
+  },
+);
+
+projectRouter.get(`/:projectId/permissions`, async (req, res) => {
+  const permissions = await getProjectPermissionsHandler(res.locals.userId, +req.params.projectId);
+  res.status(StatusCodes.OK).json(permissions);
 });
 
 projectRouter.get(
@@ -201,5 +212,6 @@ projectRouter.use('/:projectId/planning', planningRouter);
 projectRouter.use('/:projectId/demo', demoRouter);
 projectRouter.use('/:projectId/retro', retroRouter);
 projectRouter.use('/:projectId/daily', dailyRouter);
+projectRouter.use('/:projectId/task', taskRouter);
 
 export default projectRouter;

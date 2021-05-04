@@ -1,21 +1,32 @@
 /* eslint-disable no-param-reassign */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Permissions } from 'back/src/models/permissions';
+import { UserShortView } from 'back/src/models/responses/user-short-view';
 import { RetroCardCategory } from 'back/src/models/retro-card-category';
 import { Subject } from 'rxjs';
+import { takeWhile } from 'rxjs/operators';
+import { ProjectDataService } from 'src/app/services/project-data.service';
+import { ProjectService } from 'src/app/services/project.service';
 import { RetroService } from 'src/app/services/retro.service';
 import { SocketService } from 'src/app/services/socket.service';
+import { TaskService } from 'src/app/services/task.service';
+import { CreateTaskComponent } from '../project-board/create-task/create-task.component';
 
 @Component({
   selector: 'app-retro',
   templateUrl: './retro.component.html',
   styleUrls: ['./retro.component.less'],
 })
-export class RetroComponent implements OnInit {
+export class RetroComponent implements OnInit, OnDestroy {
+  private rxAlive = true;
   private projectId: number;
   public retro;
+  public permissions = Permissions;
   public cardCategory = RetroCardCategory;
   private cardInput$: Subject<any> = new Subject();
+  private users: UserShortView[] = [];
 
   public get goodCards() {
     return this.retro?.cards.filter((c) => c.category === RetroCardCategory.Good);
@@ -33,65 +44,118 @@ export class RetroComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private retroService: RetroService,
     private socketService: SocketService,
+    private modalService: NgbModal,
+    public projectDataService: ProjectDataService,
+    private projectService: ProjectService,
     private router: Router,
+    private taskService: TaskService,
   ) {
-    this.socketService.onAddRetroCard().subscribe((card) => {
-      this.retro?.cards.push(card);
-    });
-    this.socketService.onRemoveRetroCard().subscribe((cardId) => {
-      this.retro.cards = this.retro.cards.filter((c) => c.id !== cardId);
-    });
-    this.socketService.onUpdateRetroCard().subscribe((card) => {
-      const curCard =
-        this.retro?.cards.find((c) => c.id === card.cardId) ||
-        this.retro?.oldCards.find((c) => c.id === card.cardId);
+    this.socketService
+      .onAddRetroCard()
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe((card) => {
+        this.retro?.cards.push(card);
+      });
+    this.socketService
+      .onRemoveRetroCard()
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe((cardId) => {
+        this.retro.cards = this.retro.cards.filter((c) => c.id !== cardId);
+      });
+    this.socketService
+      .onUpdateRetroCard()
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe((card) => {
+        const curCard =
+          this.retro?.cards.find((c) => c.id === card.cardId) ||
+          this.retro?.oldCards.find((c) => c.id === card.cardId);
 
-      if (curCard) {
-        Object.keys(curCard).forEach((key) => {
-          if (key in card.request) {
-            curCard[key] = card.request[key];
-          }
+        if (curCard) {
+          Object.keys(curCard).forEach((key) => {
+            if (key in card.request) {
+              curCard[key] = card.request[key];
+            }
+          });
+        }
+      });
+    this.activatedRoute.params.subscribe((params) => {
+      if (params.id) {
+        this.projectService.getProject(params.id).subscribe((project) => {
+          this.users = project.users;
         });
       }
     });
-    this.socketService.onFinishRetro().subscribe(() => {
-      this.router.navigate(['../../', 'board'], { relativeTo: this.activatedRoute });
+    this.socketService
+      .onFinishRetro()
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe(() => {
+        this.router.navigate(['../../', 'board'], { relativeTo: this.activatedRoute });
+      });
+  }
+
+  public onCreateTask(card) {
+    const modal = this.modalService.open(CreateTaskComponent);
+    modal.componentInstance.users = this.users;
+    modal.componentInstance.patchValue({
+      description: card.text,
+      projectSprintId: this.retro.sprintId,
     });
+    modal.result
+      .then((task) => {
+        this.taskService.addTask(this.projectDataService.project.id, task).subscribe((taskId) => {
+          card.taskId = taskId;
+        });
+      })
+      .catch(() => {});
   }
 
   public ngOnInit(): void {
-    this.cardInput$.subscribe((card) => {
+    this.cardInput$.pipe(takeWhile(() => this.rxAlive)).subscribe((card) => {
       this.socketService.updateRetroCard(card.id, {
         text: card.text,
         fontSize: card.fontSize,
       });
     });
-    this.activatedRoute.params.subscribe((params) => {
+    this.activatedRoute.params.pipe(takeWhile(() => this.rxAlive)).subscribe((params) => {
       if (params.retroId) {
-        this.socketService.enterRetroRoom(params.retroId);
+        this.socketService.enterRetroRoom(this.projectId, params.retroId);
         this.projectId = params.id;
         this.getRetro(params.retroId);
       }
     });
   }
 
+  public ngOnDestroy(): void {
+    this.rxAlive = false;
+  }
+
   public getRetro(id: number) {
-    this.retroService.read(this.projectId, id).subscribe((retro) => {
-      this.retro = retro;
-    });
+    this.retroService
+      .read(this.projectId, id)
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe((retro) => {
+        this.retro = retro;
+      });
   }
 
   public createCard(category: RetroCardCategory) {
-    this.socketService.addRetroCard(this.retro.id, category);
+    const cards = this.retro?.cards.filter((c) => c.category === category);
+    if (
+      (cards[cards.length - 1]?.text == null || cards[cards.length - 1]?.text === '') &&
+      cards.length !== 0
+    ) {
+      return;
+    }
+    this.socketService.addRetroCard(this.projectId, this.retro.id, category);
   }
 
   // eslint-disable-next-line complexity
-  public scale(block, event, card) {
+  public scale(block, event, card, taskId) {
     const step = 0.1;
     const minfs = 9;
     const maxfs = 15;
     const sch = block.offsetHeight;
-    const h = block.parentElement.offsetHeight;
+    const h = taskId ? block.parentElement.offsetHeight - 18 : block.parentElement.offsetHeight;
 
     if (event.inputType === 'deleteContentBackward') {
       if (sch + 15 <= h) {
@@ -101,7 +165,7 @@ export class RetroComponent implements OnInit {
           block.style.fontSize = `${fontsize}px`;
           card.fontSize = fontsize;
 
-          this.scale(block, event, card);
+          this.scale(block, event, card, taskId);
           card.text = block.innerText;
           this.cardInput$.next(card);
           return;
@@ -121,7 +185,7 @@ export class RetroComponent implements OnInit {
         card.fontSize = fontsize;
         block.style.fontSize = `${fontsize}px`;
 
-        this.scale(block, event, card);
+        this.scale(block, event, card, taskId);
         card.text = block.innerText;
         this.cardInput$.next(card);
         return;
@@ -140,17 +204,17 @@ export class RetroComponent implements OnInit {
   }
 
   public onRemoveCard(cardId) {
-    // this.retroService.removeCard(this.projectId, cardId).subscribe(() => {
+    // this.retroService.removeCard(this.projectId, cardId).pipe(takeWhile(() => this.rxAlive)).subscribe(() => {
     //   this.retro.cards = this.retro.cards.filter((card) => card.id !== cardId);
     // });
     this.socketService.removeRetroCard(cardId);
   }
 
   public complete() {
-    // this.retroService.finish(this.projectId, this.retro.id).subscribe(() => {
+    // this.retroService.finish(this.projectId, this.retro.id).pipe(takeWhile(() => this.rxAlive)).subscribe(() => {
     //   this.router.navigate(['../../', 'board'], { relativeTo: this.activatedRoute });
     // });
-    this.socketService.finishRetro(this.retro.id);
+    this.socketService.finishRetro(this.projectId, this.retro.id);
   }
 
   public completePoint(card) {

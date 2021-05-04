@@ -6,6 +6,7 @@ import {
   HttpRequest,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, filter, switchMap, take } from 'rxjs/operators';
 import { TokenService } from '../services/token.service';
@@ -16,7 +17,11 @@ export class AuthInterceptor implements HttpInterceptor {
   private isRefreshing = false;
   private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-  constructor(private userService: UserService, private tokenService: TokenService) {}
+  constructor(
+    private userService: UserService,
+    private tokenService: TokenService,
+    private router: Router,
+  ) {}
 
   public intercept(req: HttpRequest<{}>, next: HttpHandler): Observable<HttpEvent<{}>> {
     let params = req;
@@ -52,6 +57,12 @@ export class AuthInterceptor implements HttpInterceptor {
           this.isRefreshing = false;
           this.refreshTokenSubject.next(token.accessToken);
           return next.handle(this.addToken(request, token.accessToken));
+        }),
+        catchError((error) => {
+          this.userService.logout().subscribe(() => {
+            this.router.navigate(['/sign-in']);
+          });
+          return throwError(error);
         }),
       );
     }

@@ -15,11 +15,14 @@ class TaskService {
 
     return taskRepository.create(projectId, request);
   }
-  public async update(request: Partial<UpdateTaskRequest>) {
-    taskRepository.update(request);
+  public async update(request: Partial<UpdateTaskRequest>, userId: number) {
+    taskRepository.update(request, userId);
   }
-  public async updateTaskStatus(taskId: number, statusId: number) {
-    taskRepository.updateTaskStatus(taskId, statusId);
+  public async updateTaskStatus(taskId: number, statusId: number, userId: number) {
+    taskRepository.updateTaskStatus(taskId, statusId, userId);
+  }
+  public async searchTasks(searchString: string, projectId: number) {
+    return taskRepository.searchTasks(searchString, projectId);
   }
   public async read(id: number) {
     const task = await taskRepository.read(id);

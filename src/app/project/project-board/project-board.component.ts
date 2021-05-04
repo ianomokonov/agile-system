@@ -1,11 +1,12 @@
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Permissions } from 'back/src/models/permissions';
 import { ProjectResponse } from 'back/src/models/responses/project.response';
 import { TaskShortView } from 'back/src/models/responses/task-short-view';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
-import { forkJoin } from 'rxjs';
+import { takeWhile } from 'rxjs/operators';
 import { DemoService } from 'src/app/services/demo.service';
 import { ProjectDataService } from 'src/app/services/project-data.service';
 import { ProjectService } from 'src/app/services/project.service';
@@ -18,34 +19,44 @@ import { CreateTaskComponent } from './create-task/create-task.component';
   templateUrl: './project-board.component.html',
   styleUrls: ['./project-board.component.less'],
 })
-export class ProjectBoardComponent implements OnInit {
+export class ProjectBoardComponent implements OnInit, OnDestroy {
+  private rxAlive = true;
   public project: ProjectResponse;
   public delay: number;
+  public permissions = Permissions;
   private users: UserShortView[];
   public tasks: TaskShortView[][] = [];
   constructor(
     private taskService: TaskService,
     private modalService: NgbModal,
     private projectService: ProjectService,
-    private projectDataService: ProjectDataService,
+    public projectDataService: ProjectDataService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private demoService: DemoService,
     private retroService: RetroService,
   ) {}
   public ngOnInit() {
-    this.activatedRoute.parent?.params.subscribe((params) => {
-      this.projectDataService.getProject(params.id, true).subscribe((project) => {
-        if (!project.sprint) {
-          this.router.navigate(['../backlog'], { relativeTo: this.activatedRoute });
-          return;
-        }
-        this.project = project;
-        this.setTasks(project.sprint?.tasks);
-        this.users = this.project.users;
-      });
+    this.activatedRoute.parent?.params.pipe(takeWhile(() => this.rxAlive)).subscribe((params) => {
+      this.projectDataService
+        .getProject(params.id, true)
+        .pipe(takeWhile(() => this.rxAlive))
+        .subscribe((project) => {
+          if (!project.sprint) {
+            this.router.navigate(['../backlog'], { relativeTo: this.activatedRoute });
+            return;
+          }
+          this.project = project;
+          this.setTasks(project.sprint?.tasks);
+          this.users = this.project.users;
+        });
     });
   }
+
+  public ngOnDestroy(): void {
+    this.rxAlive = false;
+  }
+
   public getFinishDate(startDate?: Date) {
     if (!startDate) {
       return null;
@@ -74,9 +85,12 @@ export class ProjectBoardComponent implements OnInit {
     modal.componentInstance.users = this.users;
     modal.result
       .then((task) => {
-        this.projectService.addTask(this.projectDataService.project.id, task).subscribe(() => {
-          this.refreshProjectInfo(this.projectDataService.project.id);
-        });
+        this.taskService
+          .addTask(this.projectDataService.project.id, task)
+          .pipe(takeWhile(() => this.rxAlive))
+          .subscribe(() => {
+            this.refreshProjectInfo(this.projectDataService.project.id);
+          });
       })
       .catch(() => {});
   }
@@ -93,6 +107,7 @@ export class ProjectBoardComponent implements OnInit {
       );
       this.taskService
         .updateTaskStatus(+event.container.data[event.currentIndex].id, +event.container.id)
+        .pipe(takeWhile(() => this.rxAlive))
         .subscribe(() => {
           this.refreshProjectInfo(this.projectDataService.project.id);
         });
@@ -100,18 +115,23 @@ export class ProjectBoardComponent implements OnInit {
   }
 
   public refreshProjectInfo(id: number) {
-    this.projectDataService.getProject(id, true).subscribe((info) => {
-      this.project = info;
-      this.setTasks(info.sprint?.tasks);
-    });
+    this.projectDataService
+      .getProject(id, true)
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe((info) => {
+        this.project = info;
+        this.setTasks(info.sprint?.tasks);
+      });
   }
 
   public onStartDemo() {
     this.demoService
       .start(this.projectDataService.project?.id, this.project?.sprint?.id)
+      .pipe(takeWhile(() => this.rxAlive))
       .subscribe((demoId) => {
         this.projectDataService
           .getProject(this.projectDataService.project?.id, true)
+          .pipe(takeWhile(() => this.rxAlive))
           .subscribe(() => {
             this.router.navigate(['../demo', demoId], { relativeTo: this.activatedRoute });
           });
@@ -121,9 +141,11 @@ export class ProjectBoardComponent implements OnInit {
   public onStartRetro() {
     this.retroService
       .start(this.projectDataService.project?.id, this.projectDataService.project?.sprint?.id)
+      .pipe(takeWhile(() => this.rxAlive))
       .subscribe((retroId) => {
         this.projectDataService
           .getProject(this.projectDataService.project?.id, true)
+          .pipe(takeWhile(() => this.rxAlive))
           .subscribe(() => {
             this.router.navigate(['../retro', retroId], { relativeTo: this.activatedRoute });
           });
@@ -135,6 +157,6 @@ export class ProjectBoardComponent implements OnInit {
       return false;
     }
 
-    return !!this.project.sprint?.tasks.find((t) => t.statusId === 7);
+    return !!this.project.sprint?.tasks.find((t) => t.statusId === 4);
   }
 }

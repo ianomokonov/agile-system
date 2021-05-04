@@ -1,4 +1,5 @@
 import { AbstractControl, FormGroup, ValidatorFn } from '@angular/forms';
+import { takeWhile } from 'rxjs/operators';
 
 export class SecurityBaseModel {
   public errorText = '';
@@ -8,7 +9,7 @@ export class SecurityBaseModel {
 
   constructor(formGroup: FormGroup) {
     this.form = formGroup;
-    this.form.valueChanges.subscribe(() => {
+    this.form.valueChanges.pipe(takeWhile(() => this.rxAlive)).subscribe(() => {
       this.errorText = this.getErrorText();
     });
   }
@@ -21,7 +22,8 @@ export class SecurityBaseModel {
     Object.keys(this.form.controls).forEach((controlName) => {
       const control = this.form?.controls[controlName];
       if (control?.invalid) {
-        control.markAsDirty();
+        // control.markAsDirty();
+        control.markAsTouched();
       }
     });
   }

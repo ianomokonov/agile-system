@@ -1,13 +1,21 @@
-<div class="container pt-5" *ngIf="task">
-  <a class="btn btn-link pl-0" (click)="backClicked()"><i class="fas fa-arrow-left"></i> назад</a>
-  <div class="row pt-4 mb-5">
+<div class="container pb-5" *ngIf="task">
+  <div class="row pt-1 mb-5">
     <div class="col-9">
       <small class="text-muted">#{{ task.id }}</small>
-      <h4 class="mb-2" *ngIf="task.name && !editingName" (click)="editingName = !editingName">
+      <h4
+        class="mb-2"
+        *ngIf="task.name && !editingName"
+        (click)="projectDataService.PID[permissions.CanEditTask] && (editingName = !editingName)"
+      >
         {{ task.name }}
       </h4>
       <div class="input-group" *ngIf="!task.name || editingName">
-        <input type="text" class="form-control" [formControl]="nameControl" />
+        <input
+          type="text"
+          class="form-control"
+          [formControl]="nameControl"
+          [disabled]="!projectDataService.PID[permissions.CanEditTask]"
+        />
         <span class="input-group-text fas fa-save cursor-pointer" (click)="saveTaskName()"></span>
         <span
           class="input-group-text cursor-pointer"
@@ -19,7 +27,20 @@
       </div>
     </div>
     <div class="col text-right pt-4">
-      <button class="btn btn-outline-primary mb-1" (click)="editTaskInfo()">Изменить</button>
+      <button
+        class="btn btn-outline-primary mb-1 mr-2"
+        *ngIf="projectDataService.PID[permissions.CanEditTask]"
+        (click)="editTaskInfo()"
+      >
+        Изменить
+      </button>
+      <button
+        *ngIf="projectDataService.PID[permissions.CanCreateTask]"
+        class="btn btn-outline-danger mb-1"
+        (click)="deleteTask()"
+      >
+        Удалить
+      </button>
       <!-- <button class="btn btn-primary ml-1 mb-1">Начать оценку</button> -->
     </div>
   </div>
@@ -58,20 +79,36 @@
           <i
             *ngIf="!editingDescription"
             class="fas fa-pencil-alt ml-2 cursor-pointer"
-            (click)="editingDescription = !editingDescription"
+            (click)="
+              projectDataService.PID[permissions.CanEditTask] &&
+                (editingDescription = !editingDescription)
+            "
           ></i>
         </h5>
         <div class="section-body">
-          <p class="description" [innerHTML]="task.description" *ngIf="!editingDescription"></p>
+          <p
+            class="description formatted-text ck-content"
+            [innerHTML]="task.description"
+            *ngIf="!editingDescription"
+          ></p>
           <ckeditor
             [editor]="editor"
+            [config]="editorConfig"
             [formControl]="descriptionControl"
+            [disabled]="!projectDataService.PID[permissions.CanEditTask]"
             *ngIf="editingDescription"
           ></ckeditor>
-          <div class="text-right mt-2">
+          <div class="text-right mt-2 mb-3">
             <button
-              class="btn btn-primary"
+              class="btn btn-outline-secondary"
               *ngIf="editingDescription"
+              (click)="editingDescription = !editingDescription"
+            >
+              Отмена
+            </button>
+            <button
+              class="btn btn-primary ml-1"
+              *ngIf="editingDescription && projectDataService.PID[permissions.CanEditTask]"
               (click)="saveTaskDescription()"
             >
               Сохранить
@@ -79,30 +116,38 @@
           </div>
         </div>
       </section>
-      <section class="border-top pt-3">
+      <section class="border-top pt-3 mb-3">
         <h5 class="section-header">
           Вложения
-          <i class="fas fa-link ml-2 cursor-pointer" (click)="onUploadFileClick($event)"></i>
+          <i class="fas fa-link ml-2 cursor-pointer" (click)="upload.uploadFiles($event)"></i>
         </h5>
-        <div class="upload-area" #inputFileContainer>
-          <ng-container *ngIf="task.files?.length; else noFiles">
-            <div class="upload-area__file" *ngFor="let file of task.files">
-              <i
-                *ngIf="!isImage(file.url)"
-                class="upload-area__file-icon"
-                [ngClass]="getFileIconClass(file.name)"
-                (click)="downloadFile(file)"
-              ></i>
-              <a target="_blank" *ngIf="isImage(file.url)" [href]="file.url"
-                ><img class="upload-area__file-image" [src]="file.url"
-              /></a>
-              <span class="upload-area__file-name">{{ file.name }}</span>
-              <i
-                class="upload-area__file-remove fas fa-times-circle text-danger"
-                (click)="removeFile(file.id)"
-              ></i>
+        <app-multiple-file-uploader
+          [formControl]="filesControl"
+          (download)="downloadFile($event)"
+          (remove)="removeFile($event)"
+          [disabled]="!projectDataService.PID[permissions.CanEditTask]"
+          #upload
+        ></app-multiple-file-uploader>
+      </section>
+      <section class="border-top pt-3" *ngIf="task.history?.length">
+        <h5 class="section-header">История изменений</h5>
+        <div class="history">
+          <div class="row m-0 history__header border-bottom">
+            <div class="col-3 pl-0">Пользователь</div>
+            <div class="col-3">Измененное поле</div>
+            <div class="col-4">Новое значение</div>
+            <div class="col-2 pr-0 text-right">Дата и время</div>
+          </div>
+          <div class="row m-0 history__item border-bottom" *ngFor="let item of task.history">
+            <div class="col-3 pl-0">{{ item.userName }} {{ item.userSurname }}</div>
+            <div class="col-3">
+              {{ getHistoryField(item) }}
             </div>
-          </ng-container>
+            <div class="col-4" [innerHTML]="getHistoryValue(item) || '—'"></div>
+            <div class="col-2 pr-0 text-right">
+              <small class="text-muted">{{ item.createDate | date: 'dd.MM.yyyy HH.mm' }}</small>
+            </div>
+          </div>
         </div>
       </section>
     </div>
@@ -115,6 +160,7 @@
           bindValue="id"
           [formControl]="userControl"
           [closeOnSelect]="true"
+          [clearable]="task.status?.id === 1"
           [searchFn]="userSerachFn"
         >
           <ng-template ng-label-tmp let-item="item">
@@ -143,9 +189,3 @@
     </div>
   </div>
 </div>
-
-<ng-template #noFiles>
-  <span class="text-muted text-center p-4 btn btn-link w-100" (click)="onUploadFileClick($event)"
-    >Загрузить файлы</span
-  >
-</ng-template>

@@ -7,6 +7,7 @@ import { ProjectService } from './project.service';
 @Injectable()
 export class ProjectDataService {
   public project: ProjectResponse;
+  public PID: { [name: string]: boolean } = {};
   constructor(private projectService: ProjectService) {}
 
   public getProject(projectId: number, forceUpdate: boolean = false) {
@@ -18,5 +19,11 @@ export class ProjectDataService {
         this.project = project;
       }),
     );
+  }
+
+  public setPID(permissions: number[]) {
+    permissions.forEach((p) => {
+      this.PID[p.toString()] = true;
+    });
   }
 }

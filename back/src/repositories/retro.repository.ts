@@ -75,6 +75,7 @@ class RetroRepository {
         'category',
         'text',
         'fontSize',
+        'taskId',
         'user.name as userName',
         'user.surname as userSurname',
         `(user.id = ${userId}) as isMy`,
@@ -97,6 +98,7 @@ class RetroRepository {
         'category',
         'text',
         'fontSize',
+        'taskId',
         'user.name as userName',
         'user.surname as userSurname',
         `(user.id = ${userId}) as isMy`,
@@ -120,13 +122,9 @@ class RetroRepository {
         'retroId',
         'category',
         'text',
-        'executorId',
+        'taskId',
         'isCompleted',
-        'user.name as executorName',
-        'user.surname as executorSurname',
       ])
-      .join('projectUser', { 'projectRetroCard.executorId': 'projectUser.id' }, 'LEFT')
-      .join('user', { 'projectUser.userId': 'user.id' }, 'LEFT')
       .join('projectRetro', { 'projectRetroCard.retroId': 'projectRetro.id' })
       .join('projectSprint', { 'projectRetro.sprintId': 'projectSprint.id' })
       .where({ retroId }, '!=')
@@ -147,13 +145,10 @@ class RetroRepository {
         'retroId',
         'category',
         'text',
-        'executorId',
         'isCompleted',
         'user.name as executorName',
         'user.surname as executorSurname',
       ])
-      .join('projectUser', { 'projectRetroCard.executorId': 'projectUser.id' }, 'LEFT')
-      .join('user', { 'projectUser.userId': 'user.id' }, 'LEFT')
       .join('projectRetro', { 'projectRetroCard.retroId': 'projectRetro.id' })
       .join('projectSprint', { 'projectRetro.sprintId': 'projectSprint.id' })
       .where({ 'projectRetroCard.id': cardId });

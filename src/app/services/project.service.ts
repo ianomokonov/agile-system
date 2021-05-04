@@ -9,11 +9,9 @@ import {
 } from 'back/src/models/requests/project-role.models';
 import { ProjectResponse } from 'back/src/models/responses/project.response';
 import { ProjectRoleResponse } from 'back/src/models/responses/project-role.response';
-import { ProjectPermissionResponse } from 'back/src/models/responses/permission.response';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { CreateTaskRequest } from 'back/src/models/requests/task.models';
 import { ProjectEditInfo } from 'back/src/models/responses/project-edit-info';
 import { Backlog } from 'back/src/models/responses/backlog';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
@@ -33,6 +31,10 @@ export class ProjectService {
 
   public updateProject(projectId: number, request: CreateProjectRequest): Observable<number> {
     return this.http.put<number>(`${this.baseUrl}/${projectId}`, request);
+  }
+
+  public deleteProject(projectId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${projectId}`);
   }
 
   public getProjectEditInfo(projectId: number): Observable<ProjectEditInfo> {
@@ -79,16 +81,12 @@ export class ProjectService {
     return this.http.get<ProjectRoleResponse[]>(`${this.baseUrl}/${projectId}/roles`);
   }
 
-  public getPermissions(): Observable<ProjectPermissionResponse[]> {
-    return this.http.get<ProjectPermissionResponse[]>(`${this.baseUrl}/permissions`);
+  public getUserPermissions(projectId: number): Observable<number[]> {
+    return this.http.get<number[]>(`${this.baseUrl}/${projectId}/permissions`);
   }
 
   public getProjectBacklog(projectId: number): Observable<Backlog> {
     return this.http.get<Backlog>(`${this.baseUrl}/${projectId}/backlog`);
-  }
-
-  public addTask(projectId: number, task: CreateTaskRequest): Observable<number> {
-    return this.http.post<number>(`${this.baseUrl}/${projectId}/add-task`, task);
   }
 
   public addSprint(projectId: number, sprint: CreateSprintRequest): Observable<number> {

@@ -8,15 +8,20 @@
     >
       <div class="d-flex align-items-center">
         <small class="text-muted mr-3">#{{ task.id }}</small>
-        <a [routerLink]="task.activeSessionId ? ['task', task.id] : ['/task', task.id]"
+        <a [routerLink]="task.activeSessionId ? ['task', task.id] : ['../../task', task.id]"
           ><h6 class="d-inline text-dark mb-0">{{ task.name }}</h6></a
         >
       </div>
       <div>
-        <div class="badge btn-outline-primary mr-2" (click)="onRemoveFromSprintClick(task.id)">
+        <div
+          class="badge btn-outline-primary mr-2"
+          *ngIf="projectDataService.PID[permissions.CanEditTask]"
+          (click)="onRemoveFromSprintClick(task.id)"
+        >
           Убрать из спринта
         </div>
         <div
+          *ngIf="task.activeSessionId || (projectDataService.PID[permissions.CanStartScrumPocker] && canStartPocker())"
           class="badge"
           [ngClass]="{
             'badge-primary': !task.activeSessionId,
@@ -36,7 +41,7 @@
     <span>Оцененные задачи</span>
     <button
       class="btn btn-primary"
-      *ngIf="planning?.isActive && !planning?.notMarkedTasks?.length"
+      *ngIf="projectDataService.PID[permissions.CanStartScrumPocker] && planning?.sprintId && !planning?.notMarkedTasks?.length"
       (click)="onStartSprintClick()"
     >
       Начать спринт
@@ -53,13 +58,44 @@
           ><h6 class="d-inline text-dark mb-0">{{ session.task.name }}</h6></a
         >
       </div>
-      <div class="badge badge-success" *ngIf="session.task.points">{{ session.task.points }}</div>
-      <div class="badge badge-secondary" *ngIf="session.isCanceled">Отменена</div>
+      <div>
+        <div class="badge badge-success" *ngIf="session.task.points">{{ session.task.points }}</div>
+        <div
+          *ngIf="projectDataService.PID[permissions.CanStartScrumPocker] && session.isCanceled && canStartPocker()"
+          class="badge btn-outline-primary ml-2"
+          (click)="onStartPokerClick(session.task)"
+        >
+          Начать оценку
+        </div>
+        <div class="badge badge-secondary ml-2" *ngIf="session.isCanceled">Отменена</div>
+      </div>
     </div>
   </ng-container>
 </div>
 <ng-template #noData>
   <div class="d-flex justify-content-center align-items-center text-muted p-4">
     Задачи отсутствуют
+  </div>
+</ng-template>
+
+<ng-template #emptyTaskModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Подтверждение начала спринта</h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close button"
+      aria-describedby="modal-title"
+      (click)="modal.dismiss()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <span class="mb-5">Отсутствуют оцененные задачи. Всё равно начать спринт?</span>
+    <div class="d-flex justify-content-end mt-3">
+      <button type="button" class="btn btn-outline-dark" (click)="startSprint(modal)">Начать</button>
+      <button type="button" class="btn btn-outline-dark mr-4 ml-3" (click)="modal.close('Save click')">Отмена</button>
+    </div>
   </div>
 </ng-template>

@@ -9,7 +9,7 @@ export interface ProjectResponse {
   description: string;
   isClosed: boolean;
   sprint: Sprint;
-  activePlanningId?: number;
+  activePlanningId: number;
   retro?: { id: number; isFinished };
   demo?: { id: number; isFinished };
   statuses: StatusResponse[];

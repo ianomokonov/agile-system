@@ -20,7 +20,8 @@ CREATE TABLE `user` (
   `vk` varchar(255),
   `gitHub` varchar(255),
   `image` varchar(255),
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+   CONSTRAINT uniqEMAIL UNIQUE (email)
 ) COMMENT 'Таблица пользователей';
 
 -- ---
@@ -62,6 +63,7 @@ CREATE TABLE `projectRoles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `projectId` int(11) NOT NULL,
+  CONSTRAINT uniqPR UNIQUE (projectId, name),
   PRIMARY KEY (`id`)
 ) COMMENT 'Роли участников проекта, открывающие им функционал в сисетме';
 
@@ -88,7 +90,8 @@ DROP TABLE IF EXISTS `permission`;
 CREATE TABLE `permission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  CONSTRAINT uniqPERN UNIQUE (name)
 ) COMMENT 'Разрешения';
 
 -- ---
@@ -101,7 +104,8 @@ CREATE TABLE `projectRolePermission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `projectRoleId` int(11) NOT NULL,
   `permissionId` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+   CONSTRAINT uniqRP UNIQUE (projectRoleId, permissionId)
 ) COMMENT 'Разрешения для ролей проекта';
 
 -- ---
@@ -154,22 +158,6 @@ CREATE TABLE `projectTaskFiles` (
 ) COMMENT 'Файлы задач';
 
 -- ---
--- Table 'epics'
--- Таблица для эпиков
--- ---
-DROP TABLE IF EXISTS `epics`;
-
-CREATE TABLE `epics` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `description` MEDIUMTEXT NOT NULL,
-  `color` varchar(255),
-  `createDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  `lastEditDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) COMMENT 'Таблица для эпиков';
-
--- ---
 -- Table 'projectTaskStatus'
 -- возможные статусы задач проекта
 -- ---
@@ -178,50 +166,9 @@ DROP TABLE IF EXISTS `projectTaskStatus`;
 CREATE TABLE `projectTaskStatus` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+   CONSTRAINT uniqSTATUS UNIQUE (name)
 ) COMMENT 'возможные статусы задач проекта';
-
--- ---
--- Table 'projectTaskLink'
--- Связи между задачами проекта
--- ---
-DROP TABLE IF EXISTS `projectTaskLink`;
-
-CREATE TABLE `projectTaskLink` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `linkTypeId` int(11) NOT NULL,
-  `fromTaskId` int(11) NOT NULL,
-  `toTaskId` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) COMMENT 'Связи между задачами проекта';
-
--- ---
--- Table 'linkType'
--- типы связей между задачами
--- ---
-DROP TABLE IF EXISTS `linkType`;
-
-CREATE TABLE `linkType` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
-) COMMENT 'типы связей между задачами';
-
--- ---
--- Table 'comment'
--- комментарии к задаче
--- ---
-DROP TABLE IF EXISTS `comment`;
-
-CREATE TABLE `comment` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `userId` int(11) NOT NULL,
-  `text` MEDIUMTEXT NOT NULL,
-  `createDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  `lastEditDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  `projectTaskId` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) COMMENT 'комментарии к задаче';
 
 -- ---
 -- Table 'taskHistoryOperations'
@@ -231,7 +178,8 @@ DROP TABLE IF EXISTS `taskHistoryOperations`;
 
 CREATE TABLE `taskHistoryOperations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `operationName` varchar(255) NOT NULL,
+  `fieldName` varchar(255) NOT NULL,
+  `newValue` MEDIUMTEXT NOT NULL,
   `createDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `projectUserId` int(11) NOT NULL,
   `projectTaskId` int(11) NOT NULL,
@@ -267,6 +215,7 @@ CREATE TABLE `projectSprint` (
   `isFinished` bit DEFAULT 0,
   `projectId` int(11) NOT NULL,
   `createDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
+   CONSTRAINT uniqPU UNIQUE (projectId, name),
   PRIMARY KEY (`id`)
 ) COMMENT 'спринты проекта';
 
@@ -281,7 +230,8 @@ CREATE TABLE `projectRetro` (
   `createDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `sprintId` int(11) NOT NULL,
   `isFinished` bit NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  CONSTRAINT uniqSprintRetro UNIQUE (sprintId)
 ) COMMENT 'ретро проекта';
 
 -- ---
@@ -299,7 +249,7 @@ CREATE TABLE `projectRetroCard` (
   `fontSize` DECIMAL(10, 2) NULL,
   `completeRetroId` int(11) NULL,
   `isCompleted` bit NOT NULL DEFAULT 0,
-  `executorId` int(11) NULL,
+  `taskId` int(11) NULL,
   PRIMARY KEY (`id`)
 ) COMMENT 'карты ретро проекта';
 
@@ -316,7 +266,8 @@ CREATE TABLE `projectDaily` (
   `isActive` bit NOT NULL DEFAULT 0,
   `minutes` int(3) NOT NULL DEFAULT 0,
   `seconds` int(3) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  CONSTRAINT uniqProjectDaily UNIQUE (projectId)
 ) COMMENT 'дейли проекта';
 
 DROP TABLE IF EXISTS `projectDailyParticipant`;
@@ -329,6 +280,7 @@ CREATE TABLE `projectDailyParticipant` (
   `seconds` int(3) NOT NULL DEFAULT 0,
   `isDone` bit NOT NULL DEFAULT 0,
   `isActive` bit NOT NULL DEFAULT 0,
+  CONSTRAINT uniqDailyParticipant UNIQUE (userId, dailyId),
   PRIMARY KEY (`id`)
 ) COMMENT 'участники дейли проекта';
 
@@ -345,6 +297,7 @@ CREATE TABLE `projectDemo` (
   `isFinished` bit DEFAULT 0,
   `projectId` int(11) NOT NULL,
   `activeTaskId` int(11) NULL,
+  CONSTRAINT uniqPR UNIQUE (sprintId),
   PRIMARY KEY (`id`)
 ) COMMENT 'демо проекта';
 
@@ -372,13 +325,10 @@ DROP TABLE IF EXISTS `projectPlanning`;
 CREATE TABLE `projectPlanning` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `createDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  `sprintId` int(11) NOT NULL,
+  `sprintId` int(11) NULL,
   `activeSprintId` int(11) NULL,
-  `isActive` bit DEFAULT 0,
-  `isFinished` bit DEFAULT 0,
   `projectId` int(11) NOT NULL,
   `activeTaskId` int(11) NULL,
-  `activeStep` int(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`)
 ) COMMENT 'планирования проекта';
 
@@ -410,6 +360,7 @@ CREATE TABLE `planningTaskSessionCard` (
   `sessionId` int(11) NOT NULL,
   `userId` int(11) NOT NULL,
   `value` int(11) NOT NULL,
+  CONSTRAINT uniqSessionUserCard UNIQUE (userId, sessionId),
   PRIMARY KEY (`id`)
 ) COMMENT 'оценки задачи';
 
@@ -474,11 +425,6 @@ ADD
 ALTER TABLE
   `projectTask`
 ADD
-  FOREIGN KEY (epicId) REFERENCES `epics` (`id`) ON DELETE NO ACTION;
-
-ALTER TABLE
-  `projectTask`
-ADD
   FOREIGN KEY (parentId) REFERENCES `projectTask` (`id`) ON DELETE
 SET
   NULL;
@@ -506,31 +452,6 @@ ADD
   FOREIGN KEY (projectSprintId) REFERENCES `projectSprint` (`id`) ON DELETE
 SET
   NULL;
-
-ALTER TABLE
-  `projectTaskLink`
-ADD
-  FOREIGN KEY (linkTypeId) REFERENCES `linkType` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE
-  `projectTaskLink`
-ADD
-  FOREIGN KEY (fromTaskId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE
-  `projectTaskLink`
-ADD
-  FOREIGN KEY (toTaskId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE
-  `comment`
-ADD
-  FOREIGN KEY (userId) REFERENCES `projectUser` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE
-  `comment`
-ADD
-  FOREIGN KEY (projectTaskId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE
   `taskHistoryOperations`
@@ -614,7 +535,7 @@ ADD
 ALTER TABLE
   `projectRetroCard`
 ADD
-  FOREIGN KEY (executorId) REFERENCES `projectUser` (`id`) ON DELETE
+  FOREIGN KEY (taskId) REFERENCES `projectTask` (`id`) ON DELETE
 SET
   NULL;
 
@@ -648,13 +569,10 @@ ADD
 INSERT INTO
   `projectTaskStatus` (`name`, `id`)
 VALUES
-  ('to do', 1),
-  ('dev in progress', 2),
-  ('under review', 3),
-  ('dev completed', 4),
-  ('testing', 5),
-  ('test completed', 6),
-  ('done', 7);
+  ('нужно сделать', 1),
+  ('в работе', 2),
+  ('на проверке', 3),
+  ('сделано', 4);
 
 INSERT INTO
   `permission` (`name`, `id`)
@@ -676,4 +594,4 @@ END $$ DELIMITER ;
 ALTER TABLE
   `projectplanning`
 ADD
-  FOREIGN KEY (activeTaskId) REFERENCES `projectTask` (`id`) ON DELETE NO ACTION;
+  FOREIGN KEY (activeTaskId) REFERENCES `projectTask` (`id`) ON DELETE SET NULL;

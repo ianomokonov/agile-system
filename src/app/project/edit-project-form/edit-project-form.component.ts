@@ -1,20 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
+import { takeWhile } from 'rxjs/operators';
 import { ProjectService } from 'src/app/services/project.service';
 import { UserService } from 'src/app/services/user.service';
 import { Tag } from 'src/app/shared/tags-input/tags-input.component';
+import { editorConfig } from 'src/app/utils/constants';
+import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 @Component({
   selector: 'app-edit-project-form',
   templateUrl: './edit-project-form.component.html',
   styleUrls: ['./edit-project-form.component.less'],
 })
-export class EditProjectFormComponent implements OnInit {
+export class EditProjectFormComponent implements OnInit, OnDestroy {
+  private rxAlive = true;
   public formGroup: FormGroup;
   public users: (UserShortView & Tag)[] = [];
   public projectId: number;
+  public editor = ClassicEditor;
+  public editorConfig = editorConfig;
 
   constructor(
     private fb: FormBuilder,
@@ -30,18 +36,25 @@ export class EditProjectFormComponent implements OnInit {
   }
 
   public ngOnInit() {
-    this.activatedRoute.parent?.params.subscribe((params) => {
+    this.activatedRoute.parent?.params.pipe(takeWhile(() => this.rxAlive)).subscribe((params) => {
       if (params.id) {
         this.getProjectInfo(params.id);
       }
     });
   }
 
+  public ngOnDestroy(): void {
+    this.rxAlive = false;
+  }
+
   public getProjectInfo(projectId: number) {
-    this.projectService.getProjectEditInfo(projectId).subscribe((project) => {
-      this.formGroup.patchValue(project);
-      this.projectId = projectId;
-    });
+    this.projectService
+      .getProjectEditInfo(projectId)
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe((project) => {
+        this.formGroup.patchValue(project);
+        this.projectId = projectId;
+      });
   }
 
   public createProject() {
@@ -52,11 +65,13 @@ export class EditProjectFormComponent implements OnInit {
 
     const formValue = this.formGroup.getRawValue();
 
-    this.getRequest(formValue).subscribe((projectId) => {
-      if (!this.projectId) {
-        this.router.navigate(['/project', projectId, 'backlog']);
-      }
-    });
+    this.getRequest(formValue)
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe((projectId) => {
+        if (!this.projectId) {
+          this.router.navigate(['/project', projectId, 'backlog']);
+        }
+      });
   }
 
   private getRequest(formValue: any) {

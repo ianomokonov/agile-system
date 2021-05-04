@@ -1,5 +1,5 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TaskResponse } from 'back/src/models/responses/task.response';
 import { TaskService } from 'src/app/services/task.service';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
@@ -10,9 +10,14 @@ import { ProjectDataService } from 'src/app/services/project-data.service';
 import { ProjectResponse } from 'back/src/models/responses/project.response';
 import { IdNameResponse } from 'back/src/models/responses/id-name.response';
 import { forkJoin } from 'rxjs';
+import { takeWhile } from 'rxjs/operators';
 import { ProjectService } from 'src/app/services/project.service';
-import { extensions, userSearchFn } from 'src/app/utils/constants';
-import { FileSaverService } from 'ngx-filesaver';
+import { editorConfig, extensions, taskFields, userSearchFn } from 'src/app/utils/constants';
+import { UploadFile } from 'src/app/shared/multiple-file-uploader/multiple-file-uploader.component';
+import { TaskTypePipe } from 'src/app/shared/pipes/task-type.pipe';
+import { PriorityPipe } from 'src/app/shared/pipes/priority.pipe';
+import { Permissions } from 'back/src/models/permissions';
+import { getFileExtension } from 'back/src/utils';
 import { EditTaskComponent } from './edit-task/edit-task.component';
 
 @Component({
@@ -20,81 +25,135 @@ import { EditTaskComponent } from './edit-task/edit-task.component';
   templateUrl: './task.component.html',
   styleUrls: ['./task.component.less'],
 })
-export class TaskComponent {
+export class TaskComponent implements OnDestroy {
+  private rxAlive = true;
   public task: TaskResponse;
   public editor = ClassicEditor;
+  public editorConfig = editorConfig;
+  public permissions = Permissions;
   public editingDescription = false;
   public editingName = false;
   public sprints: IdNameResponse[] = [];
   public userSerachFn = userSearchFn;
+
   public project: ProjectResponse;
   public descriptionControl: FormControl = new FormControl();
   public userControl: FormControl = new FormControl();
+  public filesControl: FormControl = new FormControl();
   public nameControl: FormControl = new FormControl(null, Validators.required);
   @ViewChild('inputFileContainer') private inputFileContainer: ElementRef<HTMLDivElement>;
   constructor(
     private activatedRoute: ActivatedRoute,
+    private router: Router,
     private taskService: TaskService,
     private location: Location,
     private modalService: NgbModal,
-    private projectDataService: ProjectDataService,
+    public projectDataService: ProjectDataService,
     private projectService: ProjectService,
-    private fileSaver: FileSaverService,
+    private taskTypePipe: TaskTypePipe,
+    private priorityPipe: PriorityPipe,
   ) {
-    this.activatedRoute.params.subscribe((params) => {
+    this.activatedRoute.params.pipe(takeWhile(() => this.rxAlive)).subscribe((params) => {
       this.getTaskInfo(params.id, true);
     });
 
-    this.userControl.valueChanges.subscribe((userId) => {
+    this.userControl.valueChanges.pipe(takeWhile(() => this.rxAlive)).subscribe((userId) => {
       this.taskService
         .editTask(this.task.id, {
           projectUserId: userId,
         })
+        .pipe(takeWhile(() => this.rxAlive))
         .subscribe(() => {
           this.userControl.markAsPristine();
         });
     });
+    this.filesControl.valueChanges.subscribe((files: UploadFile[]) => {
+      const notUploudedFiles = files.filter((file) => !!file.file);
+      if (notUploudedFiles?.length) {
+        this.uploadFiles(notUploudedFiles.map((file) => file.file || null));
+      }
+    });
+  }
+
+  public ngOnDestroy(): void {
+    this.rxAlive = false;
   }
 
   private getTaskInfo(id: number, getProject = false) {
     this.editingDescription = false;
     this.editingName = false;
-    this.taskService.getTask(id).subscribe((task) => {
-      if (getProject) {
-        forkJoin([
-          this.projectDataService.getProject(task.projectId),
-          this.projectService.getProjectSprints(task.projectId),
-        ]).subscribe(([project, sprints]) => {
-          this.project = project;
-          this.sprints = sprints;
-        });
-      }
-      this.task = task;
-      this.descriptionControl.setValue(task.description);
-      this.nameControl.setValue(task.name);
-      this.userControl.setValue(task.projectUser?.id, { emitEvent: false });
-    });
+    this.taskService
+      .getTask(id)
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe((task) => {
+        if (getProject) {
+          forkJoin([
+            this.projectDataService.getProject(task.projectId),
+            this.projectService.getProjectSprints(task.projectId),
+          ])
+            .pipe(takeWhile(() => this.rxAlive))
+            .subscribe(([project, sprints]) => {
+              this.project = project;
+              this.sprints = sprints;
+            });
+        }
+        this.task = task;
+        this.descriptionControl.setValue(task.description);
+        this.nameControl.setValue(task.name);
+        this.filesControl.setValue(
+          task.files?.map((file) => ({
+            id: file.id,
+            name: file.name,
+            url: file.url,
+          })) as UploadFile[],
+          { emitEvent: false },
+        );
+        this.userControl.setValue(task.projectUser?.id, { emitEvent: false });
+      });
   }
-
+  public getHistoryField(item) {
+    return taskFields[item.fieldName] || item.fieldName;
+  }
+  // eslint-disable-next-line complexity
+  public getHistoryValue(item) {
+    if (item.fieldName === 'projectUserId') {
+      return item.user && `${item.user?.name} ${item.user?.surname}`;
+    }
+    if (item.fieldName === 'projecSprintId') {
+      return item.sprint?.name;
+    }
+    if (item.fieldName === 'statusId') {
+      return item.status?.name;
+    }
+    if (item.fieldName === 'typeId') {
+      return this.taskTypePipe.transform(item.newValue);
+    }
+    if (item.fieldName === 'priorityId') {
+      return this.priorityPipe.transform(item.newValue);
+    }
+    return item.newValue;
+  }
   public saveTaskDescription() {
     this.taskService
       .editTask(this.task.id, {
         description: this.descriptionControl.value,
       })
+      .pipe(takeWhile(() => this.rxAlive))
       .subscribe(() => {
         this.getTaskInfo(this.task.id);
       });
   }
 
   public downloadFile(file) {
-    this.taskService.downloadFile(this.task.id, file.id).subscribe((fileResponse) => {
-      this.fileSaver.save(fileResponse, file.name);
-    });
+    this.taskService
+      .downloadFile(this.task.id, file.id)
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe();
   }
 
   // eslint-disable-next-line complexity
   public getFileIconClass(fileName: string) {
-    const extension = this.getFileExtension(fileName);
+    const extension = getFileExtension(fileName);
     if (extensions.word.indexOf(extension) > -1) {
       return 'fas fa-file-word text-primary';
     }
@@ -132,6 +191,7 @@ export class TaskComponent {
       .editTask(this.task.id, {
         name: this.nameControl.value,
       })
+      .pipe(takeWhile(() => this.rxAlive))
       .subscribe(() => {
         this.getTaskInfo(this.task.id);
       });
@@ -143,6 +203,7 @@ export class TaskComponent {
         projectUserId: -1,
         projectId: this.task.projectId,
       })
+      .pipe(takeWhile(() => this.rxAlive))
       .subscribe(() => {
         this.getTaskInfo(this.task.id);
       });
@@ -167,65 +228,48 @@ export class TaskComponent {
     modal.componentInstance.task = this.task;
     modal.result
       .then((result) => {
-        this.taskService.editTask(this.task.id, result).subscribe(() => {
-          this.getTaskInfo(this.task.id);
-        });
+        this.taskService
+          .editTask(this.task.id, result)
+          .pipe(takeWhile(() => this.rxAlive))
+          .subscribe(() => {
+            this.getTaskInfo(this.task.id);
+          });
       })
       .catch(() => {});
   }
 
-  public removeFile(fileId) {
-    this.taskService.removeFile(this.task.id, fileId).subscribe(() => {
-      this.getTaskInfo(this.task.id);
-    });
+  public deleteTask() {
+    if (!confirm('Вы действительно хотитет удалить задачу?')) return;
+    this.taskService
+      .removeTask(this.task.id)
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe(() => {
+        this.router.navigate([`/project/${this.projectDataService.project.id}`]);
+      });
   }
 
-  private uploadFiles(files: FileList) {
+  public removeFile({ id: fileId }: UploadFile) {
+    this.taskService
+      .removeFile(this.task.id, fileId)
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe(() => {
+        this.getTaskInfo(this.task.id);
+      });
+  }
+
+  private uploadFiles(files: (File | null)[]) {
     const fromData = new FormData();
-    Array.from(files).forEach((file) => {
-      fromData.append('files', file);
-    });
-
-    this.taskService.uploadFiles(this.task.id, fromData).subscribe(() => {
-      this.getTaskInfo(this.task.id);
-    });
-  }
-
-  public onUploadFileClick(event: MouseEvent): void {
-    event.preventDefault();
-    const fileInput = this.createUploadFileInput();
-    this.inputFileContainer.nativeElement.append(fileInput);
-
-    fileInput.addEventListener('change', () => {
-      if (!fileInput.files?.length) {
-        fileInput.remove();
-        return;
+    files.forEach((file) => {
+      if (file) {
+        fromData.append('files', file);
       }
-
-      this.uploadFiles(fileInput.files);
-
-      fileInput.remove();
     });
-    fileInput.click();
-  }
 
-  private createUploadFileInput(): HTMLInputElement {
-    const wrapper = document.createElement('div');
-
-    wrapper.innerHTML = `
-      <input hidden name="images" type="file" multiple>
-    `;
-
-    return wrapper.firstElementChild as HTMLInputElement;
-  }
-
-  private getFileExtension(fileName: string) {
-    const result = fileName.match(/\.\w+$/);
-
-    if (result) {
-      return result[0];
-    }
-
-    return '';
+    this.taskService
+      .uploadFiles(this.task.id, fromData)
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe(() => {
+        this.getTaskInfo(this.task.id);
+      });
   }
 }

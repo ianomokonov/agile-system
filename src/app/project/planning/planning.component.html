@@ -29,11 +29,7 @@
           (click)="goHome()"
           [disabled]="planning.activeStep === planningStep.NewTasks"
         >
-          <span class="bs-stepper-circle"
-            ><span *ngIf="planning.activeStep === planningStep.MarkTasks; else stepDone"
-              >2</span
-            ></span
-          >
+          <span class="bs-stepper-circle"><span>2</span></span>
           <span class="bs-stepper-label text-dark">Оценка новых задач</span>
         </button>
       </div>

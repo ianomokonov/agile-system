@@ -3,10 +3,10 @@ import { StatusCodes } from 'http-status-codes';
 import dailyHandler from '../handlers/daily.handler';
 import logger from '../logger';
 import checkProjectPermissions from '../middleware/check-project-permissions';
-import { Permissions } from '../utils';
+import { Permissions } from '../models/permissions';
 
 const dailyRouter = Router({ mergeParams: true });
-dailyRouter.use(checkProjectPermissions(Permissions.CanEditProject));
+dailyRouter.use(checkProjectPermissions(Permissions.CanReadProject));
 dailyRouter.get(``, async (req, res) => {
   try {
     const daily = await dailyHandler.read(res.locals.projectId);

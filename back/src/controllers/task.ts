@@ -5,10 +5,11 @@ import tasksHandler from '../handlers/task/tasks.handler';
 import updateTaskStatusHandler from '../handlers/task/update-task-status.handler';
 import logger from '../logger';
 import authJWT from '../middleware/authJWT';
-import checkTaskPermissions from '../middleware/check-task-permissions';
-import { getFileExtension, Permissions } from '../utils';
+import checkProjectPermissions from '../middleware/check-project-permissions';
+import { Permissions } from '../models/permissions';
+import { getFileExtension } from '../utils';
 
-const taskRouter = Router();
+const taskRouter = Router({ mergeParams: true });
 const storageConfig = multer.diskStorage({
   destination: 'src/files/taskfiles/',
   filename: (req, file, callback) => {
@@ -16,10 +17,27 @@ const storageConfig = multer.diskStorage({
   },
 });
 
+taskRouter.get(
+  `/search`,
+  authJWT,
+  checkProjectPermissions(Permissions.CanReadProject),
+  async (req, res) => {
+    try {
+      const result = await tasksHandler.search(
+        req.query.searchString.toString(),
+        res.locals.projectId,
+      );
+      res.status(StatusCodes.OK).json(result);
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
 taskRouter.delete(
   `/:id/remove-file/:fileId`,
   authJWT,
-  checkTaskPermissions(Permissions.CanEditProject),
+  checkProjectPermissions(Permissions.CanEditTask),
   async (req, res) => {
     try {
       await tasksHandler.removeFile(+req.params.fileId);
@@ -33,7 +51,7 @@ taskRouter.delete(
 taskRouter.get(
   `/:id/download-file/:fileId`,
   authJWT,
-  checkTaskPermissions(Permissions.CanReadProject),
+  checkProjectPermissions(Permissions.CanReadProject),
   async (req, res) => {
     try {
       const url = await tasksHandler.getFileUrl(+req.params.fileId);
@@ -46,7 +64,7 @@ taskRouter.get(
 taskRouter.get(
   `/:id`,
   authJWT,
-  checkTaskPermissions(Permissions.CanReadProject),
+  checkProjectPermissions(Permissions.CanReadProject),
   async (req, res) => {
     try {
       const result = await tasksHandler.read(+req.params.id);
@@ -61,10 +79,10 @@ taskRouter.get(
 taskRouter.put(
   `/:id/edit`,
   authJWT,
-  checkTaskPermissions(Permissions.CanEditProject),
+  checkProjectPermissions(Permissions.CanEditTask),
   async (req, res) => {
     try {
-      await tasksHandler.update({ id: +req.params.id, ...req.body });
+      await tasksHandler.update({ id: +req.params.id, ...req.body }, res.locals.userId);
       res.status(StatusCodes.OK).json('Задача обновлена');
     } catch (error) {
       res.status(error.statusCode).json(error.error);
@@ -75,7 +93,7 @@ taskRouter.put(
 taskRouter.post(
   `/:id/upload-files`,
   authJWT,
-  checkTaskPermissions(Permissions.CanEditProject),
+  checkProjectPermissions(Permissions.CanEditTask),
   multer({ storage: storageConfig }).array('files'),
   async (req, res) => {
     try {
@@ -98,7 +116,7 @@ taskRouter.post(
 taskRouter.delete(
   `/:id/remove`,
   authJWT,
-  checkTaskPermissions(Permissions.CanEditProject),
+  checkProjectPermissions(Permissions.CanCreateTask),
   async (req, res) => {
     try {
       await tasksHandler.delete(+req.params.id);
@@ -112,10 +130,10 @@ taskRouter.delete(
 taskRouter.put(
   `/:id/update-status`,
   authJWT,
-  checkTaskPermissions(Permissions.CanEditProject),
+  checkProjectPermissions(Permissions.CanEditTaskStatus),
   async (req, res) => {
     try {
-      await updateTaskStatusHandler(+req.params.id, req.body.statusId);
+      await updateTaskStatusHandler(+req.params.id, req.body.statusId, res.locals.userId);
       res.status(StatusCodes.OK).json('Статус задачи обновлен');
     } catch (error) {
       res.status(error.statusCode).json(error.error);

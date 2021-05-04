@@ -1,6 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TaskResponse } from 'back/src/models/responses/task.response';
+import { takeWhile } from 'rxjs/operators';
 import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
@@ -8,7 +9,8 @@ import { SocketService } from 'src/app/services/socket.service';
   templateUrl: './discuss-new-tasks.component.html',
   styleUrls: ['./discuss-new-tasks.component.less'],
 })
-export class DiscussNewTasksComponent {
+export class DiscussNewTasksComponent implements OnDestroy {
+  private rxAlive = true;
   private tasksPrivate: TaskResponse[];
   @Input() public newSprintId: number;
   @Input() public set tasks(tasks) {
@@ -30,16 +32,22 @@ export class DiscussNewTasksComponent {
     return this.tasksPrivate;
   }
   public activeTask: TaskResponse | undefined;
+  private projectId: number;
   constructor(
     private activatedRoute: ActivatedRoute,
     private socketService: SocketService,
     private router: Router,
   ) {
-    this.activatedRoute.queryParams.subscribe((params) => {
+    this.activatedRoute.queryParams.pipe(takeWhile(() => this.rxAlive)).subscribe((params) => {
       if (params.taskId && this.tasks?.length) {
+        this.projectId = params.id;
         this.setActiveTask(params.taskId);
       }
     });
+  }
+
+  public ngOnDestroy(): void {
+    this.rxAlive = false;
   }
 
   public onTaskClick(taskId) {
@@ -50,11 +58,11 @@ export class DiscussNewTasksComponent {
   }
 
   public takeToSprint(taskId: number) {
-    this.socketService.takePlanningTask(taskId, this.newSprintId);
+    this.socketService.takePlanningTask(this.projectId, taskId, this.newSprintId);
   }
 
   public removeFromSprint(taskId: number) {
-    this.socketService.removePlanningTask(taskId);
+    this.socketService.removePlanningTask(this.projectId, taskId);
   }
 
   private setActiveTask(taskId) {

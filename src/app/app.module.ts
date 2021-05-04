@@ -42,7 +42,6 @@ import { TaskTypePipe } from './shared/pipes/task-type.pipe';
 import { RetroService } from './services/retro.service';
 import { PlanningComponent } from './project/planning/planning.component';
 import { DiscussNewTasksComponent } from './project/planning/discuss-new-tasks/discuss-new-tasks.component';
-import { TaskListComponent } from './project/planning/task-list/task-list.component';
 import { ScrumPokerComponent } from './project/planning/scrum-poker/scrum-poker.component';
 import { MarkTasksComponent } from './project/planning/mark-tasks/mark-tasks.component';
 import { DemoComponent } from './project/demo/demo.component';
@@ -56,6 +55,7 @@ import { TaskPriorityDirective } from './project/directives/task-priority.direct
 import { TaskTypeDirective } from './project/directives/task-type.directive';
 import { FileUploaderComponent } from './shared/file-uploader/file-uploader.component';
 import { FinishDailyModalComponent } from './project/daily/finish-daily-modal/finish-daily-modal.component';
+import { MultipleFileUploaderComponent } from './shared/multiple-file-uploader/multiple-file-uploader.component';
 
 @NgModule({
   declarations: [
@@ -82,7 +82,6 @@ import { FinishDailyModalComponent } from './project/daily/finish-daily-modal/fi
     TaskTypePipe,
     PlanningComponent,
     DiscussNewTasksComponent,
-    TaskListComponent,
     ScrumPokerComponent,
     MarkTasksComponent,
     DemoComponent,
@@ -92,6 +91,7 @@ import { FinishDailyModalComponent } from './project/daily/finish-daily-modal/fi
     TaskTypeDirective,
     FileUploaderComponent,
     FinishDailyModalComponent,
+    MultipleFileUploaderComponent,
   ],
   imports: [
     BrowserModule,
@@ -120,6 +120,8 @@ import { FinishDailyModalComponent } from './project/daily/finish-daily-modal/fi
     SocketService,
     AuthSocket,
     DailyService,
+    TaskTypePipe,
+    PriorityPipe,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     // { provide: HTTP_INTERCEPTORS, useClass: ContentTypeInterceptor, multi: true },
   ],
