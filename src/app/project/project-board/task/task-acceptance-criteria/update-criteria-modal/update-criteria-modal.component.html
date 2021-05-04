@@ -1,0 +1,35 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-title">Создание задачи</h4>
+  <button
+    type="button"
+    class="close"
+    aria-label="Close button"
+    aria-describedby="modal-title"
+    (click)="dismiss()"
+  >
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="modal-body" [formGroup]="createForm">
+  <div class="form-group">
+    <input
+      type="text"
+      class="form-control"
+      formControlName="name"
+      placeholder="Название"
+      ngbAutofocus
+    />
+  </div>
+  <div class="form-group">
+    <ckeditor
+      [editor]="editor"
+      [config]="editorConfig"
+      formControlName="description"
+    ></ckeditor>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-primary" (click)="dismiss()">Отмена</button>
+  <button type="button" ngbAutofocus class="btn btn-primary" (click)="close()">Сохранить</button>
+</div>
