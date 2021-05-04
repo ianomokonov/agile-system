@@ -12,12 +12,11 @@ import { IdNameResponse } from 'back/src/models/responses/id-name.response';
 import { forkJoin } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
 import { ProjectService } from 'src/app/services/project.service';
-import { editorConfig, extensions, taskFields, userSearchFn } from 'src/app/utils/constants';
+import { editorConfig, taskFields, userSearchFn } from 'src/app/utils/constants';
 import { UploadFile } from 'src/app/shared/multiple-file-uploader/multiple-file-uploader.component';
 import { TaskTypePipe } from 'src/app/shared/pipes/task-type.pipe';
 import { PriorityPipe } from 'src/app/shared/pipes/priority.pipe';
 import { Permissions } from 'back/src/models/permissions';
-import { getFileExtension } from 'back/src/utils';
 import { EditTaskComponent } from './edit-task/edit-task.component';
 
 @Component({
@@ -149,37 +148,6 @@ export class TaskComponent implements OnDestroy {
       .downloadFile(this.task.id, file.id)
       .pipe(takeWhile(() => this.rxAlive))
       .subscribe();
-  }
-
-  // eslint-disable-next-line complexity
-  public getFileIconClass(fileName: string) {
-    const extension = getFileExtension(fileName);
-    if (extensions.word.indexOf(extension) > -1) {
-      return 'fas fa-file-word text-primary';
-    }
-    if (extensions.excel.indexOf(extension) > -1) {
-      return 'fas fa-file-excel text-success';
-    }
-    if (extensions.pdf.indexOf(extension) > -1) {
-      return 'fas fa-file-pdf text-danger';
-    }
-    if (extensions.audio.indexOf(extension) > -1) {
-      return 'fas fa-file-audio text-info';
-    }
-    if (extensions.video.indexOf(extension) > -1) {
-      return 'fas fa-file-video text-info';
-    }
-    if (extensions.archive.indexOf(extension) > -1) {
-      return 'fas fa-file-archive text-secondary';
-    }
-    if (extensions.powerpoint.indexOf(extension) > -1) {
-      return 'fas fa-file-powervoint text-warning';
-    }
-    return 'fas fa-file text-secondary';
-  }
-
-  public isImage(fileUrl: string): boolean {
-    return !!fileUrl.match(/\.png|\.jpg|\.jpeg$/);
   }
 
   public saveTaskName() {

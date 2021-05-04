@@ -449,7 +449,7 @@ class ProjectRepository {
     JOIN projectuser pu ON u.id = pu.userId 
     JOIN projectuserrole pur ON pu.id = pur.projectUserId 
     JOIN projectrolepermission prp ON pur.projectRoleId = prp.projectRoleId
-      WHERE p.permissionId = '${permission}' AND u.id = ${userId} AND pu.projectId = ${projectId}`;
+      WHERE prp.permissionId = '${permission}' AND u.id = ${userId} AND pu.projectId = ${projectId}`;
 
     const [users] = await dbConnection.query(query);
 
