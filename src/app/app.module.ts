@@ -57,8 +57,8 @@ import { FileUploaderComponent } from './shared/file-uploader/file-uploader.comp
 import { FinishDailyModalComponent } from './project/daily/finish-daily-modal/finish-daily-modal.component';
 import { MultipleFileUploaderComponent } from './shared/multiple-file-uploader/multiple-file-uploader.component';
 import { TaskCommentsComponent } from './project/project-board/task/task-comments/task-comments.component';
-import { TaskAcceptanceTestsComponent } from './project/project-board/task/task-acceptance-tests/task-acceptance-tests.component';
 import { TaskHistoryComponent } from './project/project-board/task/task-history/task-history.component';
+import { TaskAcceptanceCriteriaComponent } from './project/project-board/task/task-acceptance-criteria/task-acceptance-criteria.component';
 
 @NgModule({
   declarations: [
@@ -96,8 +96,8 @@ import { TaskHistoryComponent } from './project/project-board/task/task-history/
     FinishDailyModalComponent,
     MultipleFileUploaderComponent,
     TaskCommentsComponent,
-    TaskAcceptanceTestsComponent,
     TaskHistoryComponent,
+    TaskAcceptanceCriteriaComponent,
   ],
   imports: [
     BrowserModule,

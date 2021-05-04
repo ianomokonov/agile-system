@@ -34,6 +34,20 @@ taskRouter.get(
   },
 );
 
+taskRouter.get(
+  `/:id/history`,
+  authJWT,
+  checkProjectPermissions(Permissions.CanReadProject),
+  async (req, res) => {
+    try {
+      const result = await tasksHandler.getHistory(+req.params.id);
+      res.status(StatusCodes.OK).json(result);
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
 taskRouter.delete(
   `/:id/remove-file/:fileId`,
   authJWT,

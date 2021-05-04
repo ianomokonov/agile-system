@@ -52,6 +52,9 @@ class TaskService {
   public async getFile(fileId) {
     return taskRepository.getFile(fileId);
   }
+  public async getTaskHistory(taskId) {
+    return taskRepository.getTaskHistory(taskId);
+  }
 
   public async removeFile(fileId: number) {
     return taskRepository.removeFile(fileId);

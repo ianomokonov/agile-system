@@ -13,6 +13,9 @@ export class TasksHandler {
   public async read(taskId: number) {
     return taskService.read(taskId);
   }
+  public async getHistory(taskId: number) {
+    return taskService.getTaskHistory(taskId);
+  }
   public async search(searchString: string, projectId: number) {
     return taskService.searchTasks(searchString, projectId);
   }

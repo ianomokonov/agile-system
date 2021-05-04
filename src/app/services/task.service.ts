@@ -8,6 +8,7 @@ import { CreateTaskRequest, UpdateTaskRequest } from 'back/src/models/requests/t
 import { map, switchMap, tap } from 'rxjs/operators';
 import { FileSaverService } from 'ngx-filesaver';
 import { TaskShortView } from 'back/src/models/responses/task-short-view';
+import { TaskHistory } from 'back/src/models/responses/task-history';
 import { ProjectDataService } from './project-data.service';
 import { UploadFile } from '../shared/multiple-file-uploader/multiple-file-uploader.component';
 
@@ -51,6 +52,24 @@ export class TaskService {
       `${this.baseUrl}/${this.projectDataService.project?.id}/task/search?searchString=${
         searchString ? encodeURI(searchString) : ''
       }`,
+    );
+  }
+
+  public getHistory(taskId: number): Observable<TaskHistory[]> {
+    return this.http.get<TaskHistory[]>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/${taskId}/history`,
+    );
+  }
+
+  public getAcceptanceCriteria(taskId: number): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/${taskId}/acceptance-criteria`,
+    );
+  }
+
+  public getComments(taskId: number): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/${taskId}/comments`,
     );
   }
 

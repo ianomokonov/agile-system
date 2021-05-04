@@ -40,18 +40,16 @@ class TaskRepository {
     const [[task]] = await dbConnection.query<RowDataPacket[]>(`SELECT *
         FROM projecttask 
         WHERE id=${taskId}`);
-    const [status, user, creator, sprints, history] = await Promise.all([
+    const [status, user, creator, sprints] = await Promise.all([
       this.getStatus(task.statusId),
       projectRepository.getProjectUser(task.projectUserId),
       projectRepository.getProjectUser(task.creatorId),
       projectRepository.getProjectSprintNames(task.projectId, task.projectSprintId),
-      this.getTaskHistory(taskId),
     ]);
 
     task.status = status;
     task.projectUser = user;
     task.creator = creator;
-    task.history = history;
     task.sprint = task.projectSprintId ? sprints[0] : null;
     task.files = await this.getFiles(taskId);
     return task as TaskResponse;

@@ -12,7 +12,7 @@ import { PlanningComponent } from './project/planning/planning.component';
 import { ScrumPokerComponent } from './project/planning/scrum-poker/scrum-poker.component';
 import { ProjectBacklogComponent } from './project/project-backlog/project-backlog.component';
 import { ProjectBoardComponent } from './project/project-board/project-board.component';
-import { TaskAcceptanceTestsComponent } from './project/project-board/task/task-acceptance-tests/task-acceptance-tests.component';
+import { TaskAcceptanceCriteriaComponent } from './project/project-board/task/task-acceptance-criteria/task-acceptance-criteria.component';
 import { TaskCommentsComponent } from './project/project-board/task/task-comments/task-comments.component';
 import { TaskHistoryComponent } from './project/project-board/task/task-history/task-history.component';
 import { TaskComponent } from './project/project-board/task/task.component';
@@ -93,7 +93,7 @@ const routes: Routes = [
         component: DailyComponent,
       },
       {
-        path: 'task/:id',
+        path: 'task/:taskId',
         component: TaskComponent,
         children: [
           {
@@ -106,8 +106,8 @@ const routes: Routes = [
             component: TaskCommentsComponent,
           },
           {
-            path: 'acceptance-tests',
-            component: TaskAcceptanceTestsComponent,
+            path: 'acceptance-criteria',
+            component: TaskAcceptanceCriteriaComponent,
           },
           {
             path: 'history',
