@@ -30,12 +30,7 @@ sql.use('mysql');
 class ProjectRepository {
   public async getUserProjects(userId: number) {
     const query = sql
-      .select('project', [
-        'project.id',
-        'project.name',
-        'project.repository',
-        'project.lastEditDate',
-      ])
+      .select('project', ['project.id', 'project.name', 'project.lastEditDate'])
       .join('projectUser', { projectId: 'project.id' }, 'RIGHT OUTER')
       .where({ ownerId: userId })
       .or({ 'projectUser.userId': userId })
