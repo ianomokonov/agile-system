@@ -60,7 +60,7 @@
       </div>
       <ng-container *ngIf="sprint.isOpened">
         <ng-container *ngIf="sprint.tasks?.length; else noData">
-          <div cdkDrag *ngFor="let task of sprint.tasks">
+          <div class="task rounded d-flex align-items-start" cdkDrag *ngFor="let task of sprint.tasks">
             <ng-container
               *ngTemplateOutlet="
                 taskTemp;
@@ -83,7 +83,7 @@
     >
       <div class="header mb-3">Задачи без спринта</div>
       <ng-container *ngIf="backlog.tasks?.length; else noData">
-        <div cdkDrag *ngFor="let task of backlog.tasks">
+        <div class="task rounded d-flex align-items-start" cdkDrag *ngFor="let task of backlog.tasks">
           <ng-container
             *ngTemplateOutlet="
               taskTemp;
@@ -115,27 +115,25 @@
 </ng-template>
 
 <ng-template #taskTemp let-task let-show="showBtn">
-  <div class="task rounded d-flex align-items-start">
-    <div class="col-8 d-flex align-items-center pl-0">
-      <small class="text-muted mr-3">#{{ task.id }}</small>
-      <a [routerLink]="['/task', task.id]"
-        ><h6 class="d-inline text-dark mb-0">{{ task.name }}</h6></a
-      >
-    </div>
-    <div class="col-4 pr-0 d-flex align-items-center justify-content-end task-info">
-      <small class="text-muted mr-1"
-        >{{ task.projectUser?.name }} {{ task.projectUser?.surname }}</small
-      >
-      <div class="mr-1" [taskType]="task.typeId">{{ task.typeId | taskType }}</div>
-      <div class="mr-1" [taskPriority]="task.priorityId">{{ task.priorityId | priority }}</div>
-      <button
-        *ngIf="show"
-        class="btn icon-btn ml-3"
-        title="Добавить в текущий спринт"
-        (click)="onAddToActiveSprint(task.id)"
-      >
-        <i class="far fa-plus-square"></i>
-      </button>
-    </div>
+  <div class="col-8 d-flex align-items-center pl-0">
+    <small class="text-muted mr-3">#{{ task.id }}</small>
+    <a [routerLink]="['/task', task.id]"
+      ><h6 class="d-inline text-dark mb-0">{{ task.name }}</h6></a
+    >
+  </div>
+  <div class="col-4 pr-0 d-flex align-items-center justify-content-end task-info">
+    <small class="text-muted mr-1"
+      >{{ task.projectUser?.name }} {{ task.projectUser?.surname }}</small
+    >
+    <div class="mr-1" [taskType]="task.typeId">{{ task.typeId | taskType }}</div>
+    <div class="mr-1" [taskPriority]="task.priorityId">{{ task.priorityId | priority }}</div>
+    <button
+      *ngIf="show"
+      class="btn icon-btn ml-3"
+      title="Добавить в текущий спринт"
+      (click)="onAddToActiveSprint(task.id)"
+    >
+      <i class="far fa-plus-square"></i>
+    </button>
   </div>
 </ng-template>

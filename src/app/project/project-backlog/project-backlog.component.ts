@@ -168,7 +168,7 @@ export class ProjectBacklogComponent implements OnInit, OnDestroy {
       });
   }
 
-  public drop(event: CdkDragDrop<TaskShortView[]>, sprint: Sprint) {
+  public drop(event: CdkDragDrop<TaskShortView[]>, sprint?: Sprint) {
     if (sprint) {
       const sprintTemp = sprint;
       if (!sprint.isOpened) sprintTemp.isOpened = true;
@@ -182,9 +182,11 @@ export class ProjectBacklogComponent implements OnInit, OnDestroy {
         event.previousIndex,
         event.currentIndex,
       );
-      this.taskService.editTask(+event.container.data[event.currentIndex].id, {
-        projectSprintId: sprint.id || null,
-      });
+      this.taskService
+        .editTask(+event.container.data[event.currentIndex].id, {
+          projectSprintId: sprint?.id || null,
+        })
+        .subscribe();
     }
   }
 }
