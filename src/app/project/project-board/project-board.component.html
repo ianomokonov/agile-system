@@ -45,7 +45,7 @@
       (cdkDropListDropped)="changeStatus($event)"
     >
       <div class="content">
-        <div class="task rounded" *ngFor="let task of tasksStatus" cdkDrag>
+        <div class="task rounded" *ngFor="let task of tasksStatus" cdkDrag [cdkDragDisabled]="first && !task.projectUser">
           <div class="d-flex justify-content-between mb-1">
             <small class="text-muted">#{{ task.id }}</small>
             <div class="badge bg-secondary" *ngIf="task.points">{{ task.points }}</div>

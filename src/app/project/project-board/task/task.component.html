@@ -72,7 +72,10 @@
           <i
             *ngIf="!editingDescription"
             class="fas fa-pencil-alt ml-2 cursor-pointer"
-            (click)="projectDataService.PID[permissions.CanEditTask] && (editingDescription = !editingDescription)"
+            (click)="
+              projectDataService.PID[permissions.CanEditTask] &&
+                (editingDescription = !editingDescription)
+            "
           ></i>
         </h5>
         <div class="section-body">
@@ -150,7 +153,7 @@
           bindValue="id"
           [formControl]="userControl"
           [closeOnSelect]="true"
-          [disabled]="projectDataService.PID[permissions.CanEditTask]"
+          [clearable]="task.status?.id === 1"
           [searchFn]="userSerachFn"
         >
           <ng-template ng-label-tmp let-item="item">
