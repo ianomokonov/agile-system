@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { takeWhile } from 'rxjs/operators';
 import { Permissions } from 'back/src/models/permissions';
 import { ProjectDataService } from 'src/app/services/project-data.service';
 import { ProjectService } from 'src/app/services/project.service';
@@ -12,7 +13,8 @@ import { getTaskFiles } from 'src/app/utils/constants';
   templateUrl: './scrum-poker.component.html',
   styleUrls: ['./scrum-poker.component.less'],
 })
-export class ScrumPokerComponent {
+export class ScrumPokerComponent implements OnDestroy {
+  private rxAlive = true;
   public marks = [0, 1, 2, 3, 5, 8, 13, 20, 40, 100];
   public activeMark;
   public showCards = false;
@@ -33,10 +35,13 @@ export class ScrumPokerComponent {
     private taskService: TaskService,
     private router: Router,
   ) {
-    this.socketService.of('updatePlanningSession').subscribe(() => {
-      this.getSession({ id: this.projectId, taskId: this.taskId, planningId: this.planningId });
-    });
-    activatedRoute.params.subscribe((params) => {
+    this.socketService
+      .of('updatePlanningSession')
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe(() => {
+        this.getSession({ id: this.projectId, taskId: this.taskId, planningId: this.planningId });
+      });
+    activatedRoute.params.pipe(takeWhile(() => this.rxAlive)).subscribe((params) => {
       if (params.taskId && params.planningId) {
         this.getSession(params as any);
         this.projectId = params.id;
@@ -46,24 +51,31 @@ export class ScrumPokerComponent {
     });
   }
 
+  public ngOnDestroy(): void {
+    this.rxAlive = false;
+  }
+
   public getSession({ id, taskId, planningId }) {
     this.mantionedCards = [];
     this.showResultValue = false;
-    this.projectService.getPlanningSession(id, planningId, taskId).subscribe(
-      (session) => {
-        this.session = session;
-        if (this.session.resultValue || this.session.resultValue === 0) {
-          this.showResultValue = true;
-        }
-        this.activeMark = session.cards.find((c) => c.isMy)?.value;
-        if (session.showCards) {
-          this.mantionedCards = this.getMantionedCards(session.cards);
-        }
-      },
-      () => {
-        this.router.navigate(['../../'], { relativeTo: this.activatedRoute });
-      },
-    );
+    this.projectService
+      .getPlanningSession(id, planningId, taskId)
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe(
+        (session) => {
+          this.session = session;
+          if (this.session.resultValue || this.session.resultValue === 0) {
+            this.showResultValue = true;
+          }
+          this.activeMark = session.cards.find((c) => c.isMy)?.value;
+          if (session.showCards) {
+            this.mantionedCards = this.getMantionedCards(session.cards);
+          }
+        },
+        () => {
+          this.router.navigate(['../../'], { relativeTo: this.activatedRoute });
+        },
+      );
   }
 
   public downloadFile(file) {

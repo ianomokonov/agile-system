@@ -45,8 +45,13 @@ export class SignInComponent extends SecurityBaseModel implements OnDestroy {
     this.userService
       .login(email, password)
       .pipe(takeWhile(() => this.rxAlive))
-      .subscribe(() => {
-        this.router.navigate(['/profile']);
-      });
+      .subscribe(
+        () => {
+          this.router.navigate(['/profile']);
+        },
+        () => {
+          this.errorText = 'Пользователь с указанными данными не найден';
+        },
+      );
   }
 }

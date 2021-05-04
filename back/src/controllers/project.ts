@@ -34,9 +34,18 @@ projectRouter.get(`/:projectId`, checkPermissions(Permissions.CanReadProject), a
 });
 
 projectRouter.put(`/:projectId`, checkPermissions(Permissions.CanEditProject), async (req, res) => {
-  await editProjectHandler(res.locals.projectId, req.body);
+  await editProjectHandler.update(res.locals.projectId, req.body);
   res.status(StatusCodes.OK).json('Проект изменен');
 });
+
+projectRouter.delete(
+  `/:projectId`,
+  checkPermissions(Permissions.CanEditProject),
+  async (req, res) => {
+    await editProjectHandler.delete(res.locals.projectId);
+    res.status(StatusCodes.OK).json('Проект удален');
+  },
+);
 
 projectRouter.get(`/:projectId/permissions`, async (req, res) => {
   const permissions = await getProjectPermissionsHandler(res.locals.userId, +req.params.projectId);

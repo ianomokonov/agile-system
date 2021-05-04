@@ -1,4 +1,4 @@
-<div class="container pb-5" *ngIf="task">
+<div class="container-fluid pb-5" *ngIf="task">
   <div class="row pt-1 mb-5">
     <div class="col-9">
       <small class="text-muted">#{{ task.id }}</small>
@@ -28,11 +28,18 @@
     </div>
     <div class="col text-right pt-4">
       <button
-        class="btn btn-outline-primary mb-1"
+        class="btn btn-outline-primary mb-1 mr-2"
         *ngIf="projectDataService.PID[permissions.CanEditTask]"
         (click)="editTaskInfo()"
       >
         Изменить
+      </button>
+      <button
+        *ngIf="projectDataService.PID[permissions.CanCreateTask]"
+        class="btn btn-outline-danger mb-1"
+        (click)="deleteTask()"
+      >
+        Удалить
       </button>
       <!-- <button class="btn btn-primary ml-1 mb-1">Начать оценку</button> -->
     </div>

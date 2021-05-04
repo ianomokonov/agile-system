@@ -52,6 +52,16 @@
         height: calc(100% - 40px - 1rem);
       }
     }
+
+    .task {
+      h6 {
+        overflow: hidden;
+        max-height: 114px;
+        display: -webkit-box;
+        -webkit-line-clamp: 6;
+        -webkit-box-orient: vertical;
+      }
+    }
   }
 }
 
@@ -63,6 +73,14 @@
   padding: 0.5rem;
   box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14),
     0 3px 14px 2px rgba(0, 0, 0, 0.12);
+
+  h6 {
+    overflow: hidden;
+    max-height: 114px;
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+  }
 }
 
 .cdk-drag-placeholder {

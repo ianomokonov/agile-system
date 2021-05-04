@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ProjectRoleResponse } from 'back/src/models/responses/project-role.response';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
 import { concat, forkJoin, Observable, of, Subject } from 'rxjs';
-import { catchError, debounceTime, map, switchMap } from 'rxjs/operators';
+import { catchError, debounceTime, map, switchMap, takeWhile } from 'rxjs/operators';
 import { ProjectService } from 'src/app/services/project.service';
 import { UserService } from 'src/app/services/user.service';
 
@@ -13,7 +13,8 @@ import { UserService } from 'src/app/services/user.service';
   templateUrl: './edit-users.component.html',
   styleUrls: ['./edit-users.component.less'],
 })
-export class EditUsersComponent {
+export class EditUsersComponent implements OnDestroy {
+  private rxAlive = true;
   private projectId: number;
   public projectUsers: UserShortView[];
   public searchedUsers$: Observable<UserShortView[]>;
@@ -28,7 +29,7 @@ export class EditUsersComponent {
     private userService: UserService,
     private fb: FormBuilder,
   ) {
-    this.activatedRoute.parent?.params.subscribe((params) => {
+    this.activatedRoute.parent?.params.pipe(takeWhile(() => this.rxAlive)).subscribe((params) => {
       this.projectId = params.id;
       this.getProjectInfo();
     });
@@ -56,6 +57,10 @@ export class EditUsersComponent {
     );
   }
 
+  public ngOnDestroy(): void {
+    this.rxAlive = false;
+  }
+
   public onSelectSearch({ term }: any) {
     this.searchUser$.next(term);
   }
@@ -73,10 +78,13 @@ export class EditUsersComponent {
   }
 
   public removeUser(userId: number) {
-    this.projectService.removeProjectUser(this.projectId, userId).subscribe(() => {
-      this.onUserClick();
-      this.getProjectInfo();
-    });
+    this.projectService
+      .removeProjectUser(this.projectId, userId)
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe(() => {
+        this.onUserClick();
+        this.getProjectInfo();
+      });
   }
 
   public saveProjectUser() {
@@ -86,15 +94,17 @@ export class EditUsersComponent {
     }
 
     const formValue = this.userForm.getRawValue();
-    this.getRequest(formValue).subscribe(
-      () => {
-        this.onUserClick();
-        this.getProjectInfo();
-      },
-      () => {
-        this.onUserClick();
-      },
-    );
+    this.getRequest(formValue)
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe(
+        () => {
+          this.onUserClick();
+          this.getProjectInfo();
+        },
+        () => {
+          this.onUserClick();
+        },
+      );
   }
 
   private getRequest(formValue: any) {
@@ -116,14 +126,18 @@ export class EditUsersComponent {
     forkJoin([
       this.projectService.getProjectUsers(this.projectId),
       this.projectService.getProjectRoles(this.projectId),
-    ]).subscribe(([projectUsers, roles]) => {
-      this.projectUsers = projectUsers;
-      this.roles = roles;
+    ])
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe(([projectUsers, roles]) => {
+        this.projectUsers = projectUsers;
+        this.roles = roles;
 
-      this.getUsers('').subscribe((users) => {
-        this.searchedUsers$ = of(users);
+        this.getUsers('')
+          .pipe(takeWhile(() => this.rxAlive))
+          .subscribe((users) => {
+            this.searchedUsers$ = of(users);
+          });
       });
-    });
   }
 
   private getUsers(term: string): Observable<UserShortView[]> {

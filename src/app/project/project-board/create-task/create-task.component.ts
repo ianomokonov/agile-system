@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
@@ -9,13 +9,15 @@ import { ProjectService } from 'src/app/services/project.service';
 import { IdNameResponse } from 'back/src/models/responses/id-name.response';
 import { TaskType } from 'back/src/models/task-type';
 import { Priority } from 'back/src/models/priority';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   selector: 'app-create-task',
   templateUrl: './create-task.component.html',
   styleUrls: ['./create-task.component.less'],
 })
-export class CreateTaskComponent implements OnInit {
+export class CreateTaskComponent implements OnInit, OnDestroy {
+  private rxAlive = true;
   public users: UserShortView[] = [];
   public editor = ClassicEditor;
   public createForm: FormGroup;
@@ -30,7 +32,7 @@ export class CreateTaskComponent implements OnInit {
     private projectService: ProjectService,
   ) {
     this.createForm = fb.group({
-      name: [null, Validators.required],
+      name: [null, [Validators.required, Validators.maxLength(255)]],
       description: [null, Validators.required],
       projectUserId: [null],
       typeId: [TaskType.Feature, Validators.required],
@@ -43,11 +45,15 @@ export class CreateTaskComponent implements OnInit {
   public ngOnInit() {
     this.projectService
       .getProjectSprints(this.projectDataService.project?.id)
+      .pipe(takeWhile(() => this.rxAlive))
       .subscribe((sprints) => {
         this.sprints = sprints;
       });
   }
 
+  public ngOnDestroy(): void {
+    this.rxAlive = false;
+  }
   public patchValue(value) {
     this.createForm.patchValue(value);
   }

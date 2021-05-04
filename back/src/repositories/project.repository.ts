@@ -56,6 +56,11 @@ class ProjectRepository {
     return (result[0] as ResultSetHeader).insertId;
   }
 
+  public async delete(projectId: number) {
+    const query = sql.deletes('project').where({ id: projectId });
+    await dbConnection.query(getQueryText(query.text), query.values);
+  }
+
   public async addProjectUser(request: AddProjectUserRequest) {
     const query = sql.insert('projectuser', {
       projectId: request.projectId,
@@ -444,7 +449,7 @@ class ProjectRepository {
     JOIN projectuser pu ON u.id = pu.userId 
     JOIN projectuserrole pur ON pu.id = pur.projectUserId 
     JOIN projectrolepermission prp ON pur.projectRoleId = prp.projectRoleId
-      WHERE p.permissionId = '${permission}' AND u.id = ${userId} AND pu.projectId = ${projectId}`;
+      WHERE prp.permissionId = '${permission}' AND u.id = ${userId} AND pu.projectId = ${projectId}`;
 
     const [users] = await dbConnection.query(query);
 

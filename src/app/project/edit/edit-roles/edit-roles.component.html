@@ -29,6 +29,14 @@
 
   <div class="form-group">
     <input type="text" class="form-control" formControlName="name" placeholder="Название роли" />
+    <div *ngIf="createRoleForm.controls['name'].errors">
+      <small class="text-danger" *ngIf="createRoleForm.controls['name'].touched && createRoleForm.controls['name'].errors?.uniq">
+        Данное имя уже существует
+      </small>
+      <small class="text-danger" *ngIf="createRoleForm.controls['name'].touched && createRoleForm.controls['name'].errors?.required">
+        Название роли не может быть пустым
+      </small>
+    </div>
   </div>
   <div class="row">
     <div class="col-4" *ngFor="let control of permissionsArray; let index = index">
@@ -45,6 +53,7 @@
       </div>
     </div>
   </div>
+
   <div class="text-right">
     <button class="btn btn-primary">Сохранить</button>
   </div>

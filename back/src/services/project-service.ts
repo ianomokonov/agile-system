@@ -21,6 +21,10 @@ class ProjectService {
     return projectId;
   }
 
+  public async delete(projectId: number) {
+    return projectRepository.delete(projectId);
+  }
+
   public async addProjectUser(request: AddProjectUserRequest) {
     return projectRepository.addProjectUser(request);
   }

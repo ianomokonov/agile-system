@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { takeWhile } from 'rxjs/operators';
 import { Permissions } from 'back/src/models/permissions';
 import { DailyService } from 'src/app/services/daily.service';
 import { ProjectDataService } from 'src/app/services/project-data.service';
@@ -13,6 +14,7 @@ import { FinishDailyModalComponent } from './finish-daily-modal/finish-daily-mod
   styleUrls: ['./daily.component.less'],
 })
 export class DailyComponent implements OnInit, OnDestroy {
+  private rxAlive = true;
   public time = '00:00';
   public dailyTime = '00:00';
   public lastParticipant = false;
@@ -31,7 +33,7 @@ export class DailyComponent implements OnInit, OnDestroy {
     private dailyService: DailyService,
     private modalService: NgbModal,
   ) {
-    activatedRoute.params.subscribe((params) => {
+    activatedRoute.params.pipe(takeWhile(() => this.rxAlive)).subscribe((params) => {
       if (params.id) {
         this.projectId = params.id;
         this.getDaily();
@@ -41,61 +43,89 @@ export class DailyComponent implements OnInit, OnDestroy {
 
   public ngOnDestroy() {
     this.socketService.leaveDaily();
+    this.rxAlive = false;
   }
 
   public getDaily() {
-    this.dailyService.read(this.projectId).subscribe((daily) => {
-      this.daily = daily;
-      this.socketService.enterDaily(this.projectId, daily.id);
-    });
+    this.dailyService
+      .read(this.projectId)
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe((daily) => {
+        this.daily = daily;
+        this.socketService.enterDaily(this.projectId, daily.id);
+      });
   }
 
   public ngOnInit(): void {
-    this.socketService.newParticipant().subscribe((m) => {
-      this.daily.participants = m;
-      if (!this.nextParticipants?.length) {
-        this.lastParticipant = true;
-        return;
-      }
-      this.lastParticipant = false;
-    });
-    this.socketService.nextDailyParticipant().subscribe((parts) => {
-      this.daily.participants = parts;
+    this.socketService
+      .newParticipant()
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe((m) => {
+        this.daily.participants = m;
+        if (!this.nextParticipants?.length) {
+          this.lastParticipant = true;
+          return;
+        }
+        this.lastParticipant = false;
+      });
+    this.socketService
+      .nextDailyParticipant()
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe((parts) => {
+        this.daily.participants = parts;
 
-      this.lastParticipant = !this.nextParticipants?.length;
-      this.daily.isActive = true;
-    });
-    this.socketService.participantExit().subscribe((id: number) => {
-      this.daily.participants = this.daily.participants.filter((p) => p.id !== id);
-    });
-    this.socketService.dailyPause().subscribe(() => {
-      this.isPaused = true;
-    });
-    this.socketService.dailyResume().subscribe(() => {
-      this.isPaused = false;
-    });
-    this.socketService.participantExit().subscribe((id: number) => {
-      this.daily.participants = this.daily.participants.filter((p) => p.id !== id);
-    });
-    this.socketService.onStopDaily().subscribe((participantsCount) => {
-      this.getDaily();
-      this.openStopModal(participantsCount);
-    });
+        this.lastParticipant = !this.nextParticipants?.length;
+        this.daily.isActive = true;
+      });
+    this.socketService
+      .participantExit()
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe((id: number) => {
+        this.daily.participants = this.daily.participants.filter((p) => p.id !== id);
+      });
+    this.socketService
+      .dailyPause()
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe(() => {
+        this.isPaused = true;
+      });
+    this.socketService
+      .dailyResume()
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe(() => {
+        this.isPaused = false;
+      });
+    this.socketService
+      .participantExit()
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe((id: number) => {
+        this.daily.participants = this.daily.participants.filter((p) => p.id !== id);
+      });
+    this.socketService
+      .onStopDaily()
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe((participantsCount) => {
+        this.getDaily();
+        this.openStopModal(participantsCount);
+      });
 
-    this.socketService.dailyTime().subscribe(([time, activeTime]) => {
-      this.dailyTime = time;
-      this.time = activeTime;
-    });
+    this.socketService
+      .dailyTime()
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe(([time, activeTime]) => {
+        this.dailyTime = time;
+        this.time = activeTime;
+      });
   }
 
   private openStopModal(participantsCount) {
     const modal = this.modalService.open(FinishDailyModalComponent, { centered: true });
     modal.componentInstance.time = this.dailyTime;
     modal.componentInstance.participantsCount = participantsCount;
-    modal.closed.subscribe((path) => {
+    modal.closed.pipe(takeWhile(() => this.rxAlive)).subscribe((path) => {
       this.router.navigate([path], { relativeTo: this.activatedRoute });
     });
-    modal.dismissed.subscribe(() => {
+    modal.dismissed.pipe(takeWhile(() => this.rxAlive)).subscribe(() => {
       this.time = '00:00';
       this.dailyTime = '00:00';
     });
