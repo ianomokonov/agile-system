@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { ProjectPermissionResponse } from 'back/src/models/responses/permission.response';
+import { Permissions } from 'back/src/models/permissions';
 import { ProjectRoleResponse } from 'back/src/models/responses/project-role.response';
 import { takeWhile } from 'rxjs/operators';
 import { ProjectService } from 'src/app/services/project.service';
@@ -14,7 +14,7 @@ import { ProjectService } from 'src/app/services/project.service';
 export class EditRolesComponent implements OnInit, OnDestroy {
   private rxAlive = true;
   public roles: ProjectRoleResponse[];
-  public permissions: ProjectPermissionResponse[];
+  public permissions: string[];
   public createRoleForm: FormGroup;
   public get permissionsArray(): FormGroup[] {
     return (this.createRoleForm.get('permissions') as FormArray).controls as FormGroup[];
@@ -38,26 +38,23 @@ export class EditRolesComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.projectService
-      .getPermissions()
-      .pipe(takeWhile(() => this.rxAlive))
-      .subscribe((permissions) => {
-        this.permissions = permissions;
-        const permissionsArray = this.createRoleForm.get('permissions') as FormArray;
-        permissionsArray.clear();
+    // eslint-disable-next-line no-restricted-globals
+    this.permissions = Object.keys(Permissions).filter((v) => isNaN(parseInt(v as string, 10)));
 
-        this.permissions.forEach((permission) => {
-          permissionsArray.push(
-            this.fb.group({
-              name: permission.name,
-              id: permission.id,
-              isChecked: this.editingRole
-                ? !!this.editingRole.permissionIds.find((id) => id === permission.id)
-                : false,
-            }),
-          );
-        });
-      });
+    const permissionsArray = this.createRoleForm.get('permissions') as FormArray;
+    permissionsArray.clear();
+
+    this.permissions.forEach((permission) => {
+      permissionsArray.push(
+        this.fb.group({
+          name: permission,
+          id: Permissions[permission],
+          isChecked: this.editingRole
+            ? !!this.editingRole.permissionIds.find((id) => id === Permissions[permission])
+            : false,
+        }),
+      );
+    });
   }
 
   public ngOnDestroy(): void {

@@ -32,6 +32,7 @@ export class DiscussNewTasksComponent implements OnDestroy {
     return this.tasksPrivate;
   }
   public activeTask: TaskResponse | undefined;
+  private projectId: number;
   constructor(
     private activatedRoute: ActivatedRoute,
     private socketService: SocketService,
@@ -39,6 +40,7 @@ export class DiscussNewTasksComponent implements OnDestroy {
   ) {
     this.activatedRoute.queryParams.pipe(takeWhile(() => this.rxAlive)).subscribe((params) => {
       if (params.taskId && this.tasks?.length) {
+        this.projectId = params.id;
         this.setActiveTask(params.taskId);
       }
     });
@@ -56,11 +58,11 @@ export class DiscussNewTasksComponent implements OnDestroy {
   }
 
   public takeToSprint(taskId: number) {
-    this.socketService.takePlanningTask(taskId, this.newSprintId);
+    this.socketService.takePlanningTask(this.projectId, taskId, this.newSprintId);
   }
 
   public removeFromSprint(taskId: number) {
-    this.socketService.removePlanningTask(taskId);
+    this.socketService.removePlanningTask(this.projectId, taskId);
   }
 
   private setActiveTask(taskId) {

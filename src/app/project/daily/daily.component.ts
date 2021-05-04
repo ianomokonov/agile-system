@@ -2,7 +2,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { takeWhile } from 'rxjs/operators';
+import { Permissions } from 'back/src/models/permissions';
 import { DailyService } from 'src/app/services/daily.service';
+import { ProjectDataService } from 'src/app/services/project-data.service';
 import { SocketService } from 'src/app/services/socket.service';
 import { FinishDailyModalComponent } from './finish-daily-modal/finish-daily-modal.component';
 
@@ -16,6 +18,7 @@ export class DailyComponent implements OnInit, OnDestroy {
   public time = '00:00';
   public dailyTime = '00:00';
   public lastParticipant = false;
+  public permissions = Permissions;
   public isPaused = false;
   public get nextParticipants() {
     return this.daily?.participants?.filter((p) => !p.isActive && !p.isDone);
@@ -25,6 +28,7 @@ export class DailyComponent implements OnInit, OnDestroy {
   constructor(
     private socketService: SocketService,
     private activatedRoute: ActivatedRoute,
+    public projectDataService: ProjectDataService,
     private router: Router,
     private dailyService: DailyService,
     private modalService: NgbModal,
@@ -48,7 +52,7 @@ export class DailyComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.rxAlive))
       .subscribe((daily) => {
         this.daily = daily;
-        this.socketService.enterDaily(daily.id);
+        this.socketService.enterDaily(this.projectId, daily.id);
       });
   }
 
@@ -135,11 +139,11 @@ export class DailyComponent implements OnInit, OnDestroy {
       this.socketService.resumeDaily(this.daily.id);
       return;
     }
-    this.socketService.startDaily(this.daily?.id);
+    this.socketService.startDaily(this.projectId, this.daily?.id);
     this.daily.isActive = true;
   }
   public next() {
-    this.socketService.dailyNext(this.daily.id);
+    this.socketService.dailyNext(this.projectId, this.daily.id);
   }
   public getTime() {
     return this.time?.toString();
@@ -151,7 +155,7 @@ export class DailyComponent implements OnInit, OnDestroy {
     this.socketService.pauseDaily(this.daily?.id);
   }
   public stop() {
-    this.socketService.stopDaily(this.daily.id);
+    this.socketService.stopDaily(this.projectId, this.daily.id);
   }
   public getParticipantsCount() {
     return `${this.daily?.participants?.length} ${this.getParticipantsCountLabel(

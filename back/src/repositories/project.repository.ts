@@ -8,11 +8,10 @@ import {
   CreateProjectRoleRequest,
   UpdateProjectRoleRequest,
 } from '../models/requests/project-role.models';
-import { getQueryText, Permissions } from '../utils';
+import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
 import { UserShortView } from '../models/responses/user-short-view';
 import { ProjectRoleResponse } from '../models/responses/project-role.response';
-import { ProjectPermissionResponse } from '../models/responses/permission.response';
 import { ProjectResponse } from '../models/responses/project.response';
 import { StatusResponse } from '../models/responses/status.response';
 import { TaskShortView } from '../models/responses/task-short-view';
@@ -24,18 +23,16 @@ import { IdNameResponse } from '../models/responses/id-name.response';
 import demoRepository from './demo.repository';
 import retroRepository from './retro.repository';
 import { WebError } from '../models/error';
+// eslint-disable-next-line import/no-cycle
+import planningRepository from './planning.repository';
+import { Permissions } from '../models/permissions';
 
 sql.use('mysql');
 
 class ProjectRepository {
   public async getUserProjects(userId: number) {
     const query = sql
-      .select('project', [
-        'project.id',
-        'project.name',
-        'project.repository',
-        'project.lastEditDate',
-      ])
+      .select('project', ['project.id', 'project.name', 'project.lastEditDate'])
       .join('projectUser', { projectId: 'project.id' }, 'RIGHT OUTER')
       .where({ ownerId: userId })
       .or({ 'projectUser.userId': userId })
@@ -223,10 +220,35 @@ class ProjectRepository {
     return roles as ProjectRoleResponse[];
   }
 
-  public async getProjectPermissions() {
-    const [permissions] = await dbConnection.query<RowDataPacket[]>(`SELECT * FROM permission`);
+  public async getProjectUserPermissions(userId: number, projectId: number) {
+    let query = sql.select('project', '*').where({ id: projectId, ownerId: userId });
 
-    return permissions as ProjectPermissionResponse[];
+    const [projects] = await dbConnection.query(getQueryText(query.text), query.values);
+    if (projects[0]) {
+      return Object.values(Permissions).filter(
+        (v) => parseInt(v as string, 10) >= 0,
+      ) as Permissions[];
+    }
+
+    query = sql
+      .select('user', ['projectrolepermission.permissionId'])
+      .join('projectuser', { 'user.id': 'projectuser.userId' }, 'RIGHT')
+      .join('projectuserrole', { 'projectuserrole.projectUserId': 'projectuser.id' }, 'RIGHT')
+      .join(
+        'projectrolepermission',
+        {
+          'projectuserrole.projectRoleId': 'projectrolepermission.projectRoleId',
+        },
+        'RIGHT',
+      )
+      .where({ 'user.id': userId, 'projectuser.projectId': projectId });
+
+    const [permissions] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    return permissions.map((p) => p.permitionId) as Permissions[];
   }
 
   public async getRolePermissionIds(roleId: number) {
@@ -283,11 +305,16 @@ class ProjectRepository {
       return;
     }
 
+    const values = [];
+
     const query = `INSERT INTO projectuserrole (projectRoleId, projectUserId) VALUES ${roleIds
-      .map((id) => `(${id}, '${projectUserId}'), `)
+      .map((id) => {
+        values.push(id, projectUserId);
+        return `(?, ?), `;
+      })
       .join('')}`.replace(/,\s$/, '');
 
-    await dbConnection.query(query);
+    await dbConnection.query(query, values);
   }
 
   private async addProjectRolePermissions(projectRoleId: number, permissionIds: number[]) {
@@ -299,12 +326,15 @@ class ProjectRepository {
       console.error('Список разрешений не может быть пустым');
       return;
     }
-
+    const values = [];
     const query = `INSERT INTO projectrolepermission (projectRoleId, permissionId) VALUES ${permissionIds
-      .map((id) => `(${projectRoleId}, '${id}'), `)
+      .map((id) => {
+        values.push(projectRoleId, id);
+        return `(?, ?), `;
+      })
       .join('')}`.replace(/,\s$/, '');
 
-    await dbConnection.query(query);
+    await dbConnection.query(query, values);
   }
 
   private async removeProjectUserRoles(projectUserId: number) {
@@ -335,9 +365,7 @@ class ProjectRepository {
       return null;
     }
 
-    const query = sql
-      .select('project', ['id', 'name', 'repository', 'description'])
-      .where({ id: projectId });
+    const query = sql.select('project', ['id', 'name', 'description']).where({ id: projectId });
 
     const [[project]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -396,7 +424,7 @@ class ProjectRepository {
   }
 
   public async getProjectStatuses() {
-    const query = sql.select('projecttaskstatus', '*');
+    const query = sql.select('projecttaskstatus', '*').orderby('id');
 
     const [statuses] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -421,8 +449,7 @@ class ProjectRepository {
     JOIN projectuser pu ON u.id = pu.userId 
     JOIN projectuserrole pur ON pu.id = pur.projectUserId 
     JOIN projectrolepermission prp ON pur.projectRoleId = prp.projectRoleId
-    JOIN permission p ON prp.permissionId = p.id
-      WHERE p.name = '${permission}' AND u.id = ${userId}`;
+      WHERE p.permissionId = '${permission}' AND u.id = ${userId} AND pu.projectId = ${projectId}`;
 
     const [users] = await dbConnection.query(query);
 
@@ -440,10 +467,10 @@ class ProjectRepository {
     return sprintId;
   }
 
-  public async getProjectSprintNames(projectId: number, sprintId?: number) {
+  public async getProjectSprintNames(projectId?: number, sprintId?: number) {
     const query = sql.select('projectsprint', ['id', 'name']);
     if (sprintId) {
-      query.where({ projectId, isFinished: false, id: sprintId });
+      query.where({ isFinished: false, id: sprintId });
     } else {
       query.where({ projectId, isFinished: false });
     }
@@ -455,19 +482,13 @@ class ProjectRepository {
     return sprints as IdNameResponse[];
   }
 
-  public async startSprint(sprintId: number, projectId: number) {
+  public async startSprint(sprintId: number, projectId: number, userId: number) {
     let query = sql.select('projectsprint', ['id']).where({ isActive: true, projectId });
     const [[sprint]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
     );
-    query = sql
-      .update('projectplanning', {
-        isActive: false,
-        isFinished: true,
-      })
-      .where({ sprintId, projectId });
-    await dbConnection.query(getQueryText(query.text), query.values);
+    await planningRepository.start(projectId, null, sprintId);
 
     query = sql
       .update('projectsprint', {
@@ -489,9 +510,9 @@ class ProjectRepository {
 
     if (sprint) {
       query = sql
-        .update('projectTask', { projectSprintId: sprintId })
+        .update('projectTask', { projectSprintId: sprintId, lastEditUserId: userId })
         .where({ projectSprintId: sprint.id })
-        .and({ statusId: 7 }, '!=');
+        .and({ statusId: 4 }, '!=');
       await dbConnection.query(getQueryText(query.text), query.values);
     }
   }

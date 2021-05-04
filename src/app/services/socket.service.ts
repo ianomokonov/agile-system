@@ -8,20 +8,20 @@ export class SocketService {
 
   // --------------------------- DAILY ------------------------------------
 
-  public enterDaily(dailyId: number) {
-    this.socket.emit('enterDaily', dailyId);
+  public enterDaily(projectId: number, dailyId: number) {
+    this.socket.emit('enterDaily', { projectId, dailyId });
   }
   public leaveDaily() {
     this.socket.emit('leaveDaily');
   }
-  public dailyNext(dailyId: number) {
-    this.socket.emit('dailyNext', dailyId);
+  public dailyNext(projectId: number, dailyId: number) {
+    this.socket.emit('dailyNext', { projectId, dailyId });
   }
-  public startDaily(dailyId: number) {
-    this.socket.emit('startDaily', dailyId);
+  public startDaily(projectId: number, dailyId: number) {
+    this.socket.emit('startDaily', { projectId, dailyId });
   }
-  public stopDaily(dailyId: number) {
-    this.socket.emit('stopDaily', dailyId);
+  public stopDaily(projectId: number, dailyId: number) {
+    this.socket.emit('stopDaily', { projectId, dailyId });
   }
   public pauseDaily(dailyId: number) {
     this.socket.emit('pauseDaily', dailyId);
@@ -60,16 +60,16 @@ export class SocketService {
 
   // --------------------------- RETRO ------------------------------------
 
-  public enterRetroRoom(retroId) {
-    this.socket.emit('enterRetro', retroId);
+  public enterRetroRoom(projectId: number, retroId) {
+    this.socket.emit('enterRetro', { projectId, retroId });
   }
 
   public leaveRetroRoom(retroId) {
     this.socket.emit('leaveRetro', retroId);
   }
 
-  public addRetroCard(retroId, category: RetroCardCategory) {
-    this.socket.emit('addRetroCard', { retroId, category });
+  public addRetroCard(projectId: number, retroId, category: RetroCardCategory) {
+    this.socket.emit('addRetroCard', { projectId, retroId, category });
   }
 
   public removeRetroCard(cardId: number) {
@@ -80,8 +80,8 @@ export class SocketService {
     this.socket.emit('updateRetroCard', { cardId, request });
   }
 
-  public finishRetro(retroId: number) {
-    this.socket.emit('finishRetro', retroId);
+  public finishRetro(projectId: number, retroId: number) {
+    this.socket.emit('finishRetro', { projectId, retroId });
   }
 
   public onAddRetroCard() {
@@ -104,20 +104,24 @@ export class SocketService {
 
   // --------------------------- DEMO ------------------------------------
 
-  public enterDemoRoom(demoId) {
-    this.socket.emit('enterDemo', demoId);
+  public enterDemoRoom(projectId: number, demoId) {
+    this.socket.emit('enterDemo', { projectId, demoId });
   }
 
   public activeDemoTask(taskId) {
     this.socket.emit('activeDemoTask', taskId);
   }
 
-  public acceptDemoTask(taskId) {
-    this.socket.emit('acceptDemoTask', taskId);
+  public acceptDemoTask(projectId: number, taskId) {
+    this.socket.emit('acceptDemoTask', { projectId, taskId });
   }
 
-  public finishDemo() {
-    this.socket.emit('finishDemo');
+  public reopenDemoTask(projectId: number, taskId) {
+    this.socket.emit('reopenDemoTask', { projectId, taskId });
+  }
+
+  public finishDemo(projectId: number) {
+    this.socket.emit('finishDemo', projectId);
   }
 
   public onActiveDemoTask() {
@@ -136,36 +140,40 @@ export class SocketService {
 
   // --------------------------- PLANNING ------------------------------------
 
-  public enterPlanningRoom(planningId) {
-    this.socket.emit('enterPlanning', planningId);
+  public enterPlanningRoom(projectId: number, planningId) {
+    this.socket.emit('enterPlanning', { projectId, planningId });
   }
 
-  public takePlanningTask(taskId, sprintId) {
-    this.socket.emit('takePlanningTask', { taskId, sprintId });
+  public leavePlanningRoom() {
+    this.socket.emit('leavePlanning');
   }
 
-  public removePlanningTask(taskId) {
-    this.socket.emit('removePlanningTask', taskId);
+  public takePlanningTask(projectId: number, taskId, sprintId) {
+    this.socket.emit('takePlanningTask', { projectId, taskId, sprintId });
   }
 
-  public startPocker(taskId) {
-    this.socket.emit('startPocker', taskId);
+  public removePlanningTask(projectId: number, taskId) {
+    this.socket.emit('removePlanningTask', { projectId, taskId });
+  }
+
+  public startPocker(projectId: number, taskId) {
+    this.socket.emit('startPocker', { projectId, taskId });
   }
 
   public planningVote(sessionId, points) {
     this.socket.emit('planningVote', { sessionId, points });
   }
 
-  public showPlanningCards(sessionId) {
-    this.socket.emit('showPlanningCards', sessionId);
+  public showPlanningCards(projectId: number, sessionId) {
+    this.socket.emit('showPlanningCards', { projectId, sessionId });
   }
 
-  public resetPlanningCards(sessionId, taskId) {
-    this.socket.emit('resetPlanningCards', { sessionId, taskId });
+  public resetPlanningCards(projectId: number, sessionId, taskId) {
+    this.socket.emit('resetPlanningCards', { projectId, sessionId, taskId });
   }
 
-  public setPlanningPoints(sessionId, taskId, points) {
-    this.socket.emit('setPlanningPoints', { sessionId, taskId, points });
+  public setPlanningPoints(projectId: number, sessionId, taskId, points) {
+    this.socket.emit('setPlanningPoints', { projectId, sessionId, taskId, points });
   }
 
   public startPlanningSprint(sprintId, projectId) {

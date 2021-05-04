@@ -12,8 +12,12 @@ import { IdNameResponse } from 'back/src/models/responses/id-name.response';
 import { forkJoin } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
 import { ProjectService } from 'src/app/services/project.service';
-import { extensions, userSearchFn } from 'src/app/utils/constants';
-import { FileSaverService } from 'ngx-filesaver';
+import { editorConfig, extensions, taskFields, userSearchFn } from 'src/app/utils/constants';
+import { UploadFile } from 'src/app/shared/multiple-file-uploader/multiple-file-uploader.component';
+import { TaskTypePipe } from 'src/app/shared/pipes/task-type.pipe';
+import { PriorityPipe } from 'src/app/shared/pipes/priority.pipe';
+import { Permissions } from 'back/src/models/permissions';
+import { getFileExtension } from 'back/src/utils';
 import { EditTaskComponent } from './edit-task/edit-task.component';
 
 @Component({
@@ -25,13 +29,17 @@ export class TaskComponent implements OnDestroy {
   private rxAlive = true;
   public task: TaskResponse;
   public editor = ClassicEditor;
+  public editorConfig = editorConfig;
+  public permissions = Permissions;
   public editingDescription = false;
   public editingName = false;
   public sprints: IdNameResponse[] = [];
   public userSerachFn = userSearchFn;
+
   public project: ProjectResponse;
   public descriptionControl: FormControl = new FormControl();
   public userControl: FormControl = new FormControl();
+  public filesControl: FormControl = new FormControl();
   public nameControl: FormControl = new FormControl(null, Validators.required);
   @ViewChild('inputFileContainer') private inputFileContainer: ElementRef<HTMLDivElement>;
   constructor(
@@ -40,9 +48,10 @@ export class TaskComponent implements OnDestroy {
     private taskService: TaskService,
     private location: Location,
     private modalService: NgbModal,
-    private projectDataService: ProjectDataService,
+    public projectDataService: ProjectDataService,
     private projectService: ProjectService,
-    private fileSaver: FileSaverService,
+    private taskTypePipe: TaskTypePipe,
+    private priorityPipe: PriorityPipe,
   ) {
     this.activatedRoute.params.pipe(takeWhile(() => this.rxAlive)).subscribe((params) => {
       this.getTaskInfo(params.id, true);
@@ -57,6 +66,12 @@ export class TaskComponent implements OnDestroy {
         .subscribe(() => {
           this.userControl.markAsPristine();
         });
+    });
+    this.filesControl.valueChanges.subscribe((files: UploadFile[]) => {
+      const notUploudedFiles = files.filter((file) => !!file.file);
+      if (notUploudedFiles?.length) {
+        this.uploadFiles(notUploudedFiles.map((file) => file.file || null));
+      }
     });
   }
 
@@ -85,10 +100,39 @@ export class TaskComponent implements OnDestroy {
         this.task = task;
         this.descriptionControl.setValue(task.description);
         this.nameControl.setValue(task.name);
+        this.filesControl.setValue(
+          task.files?.map((file) => ({
+            id: file.id,
+            name: file.name,
+            url: file.url,
+          })) as UploadFile[],
+          { emitEvent: false },
+        );
         this.userControl.setValue(task.projectUser?.id, { emitEvent: false });
       });
   }
-
+  public getHistoryField(item) {
+    return taskFields[item.fieldName] || item.fieldName;
+  }
+  // eslint-disable-next-line complexity
+  public getHistoryValue(item) {
+    if (item.fieldName === 'projectUserId') {
+      return item.user && `${item.user?.name} ${item.user?.surname}`;
+    }
+    if (item.fieldName === 'projecSprintId') {
+      return item.sprint?.name;
+    }
+    if (item.fieldName === 'statusId') {
+      return item.status?.name;
+    }
+    if (item.fieldName === 'typeId') {
+      return this.taskTypePipe.transform(item.newValue);
+    }
+    if (item.fieldName === 'priorityId') {
+      return this.priorityPipe.transform(item.newValue);
+    }
+    return item.newValue;
+  }
   public saveTaskDescription() {
     this.taskService
       .editTask(this.task.id, {
@@ -104,14 +148,12 @@ export class TaskComponent implements OnDestroy {
     this.taskService
       .downloadFile(this.task.id, file.id)
       .pipe(takeWhile(() => this.rxAlive))
-      .subscribe((fileResponse) => {
-        this.fileSaver.save(fileResponse, file.name);
-      });
+      .subscribe();
   }
 
   // eslint-disable-next-line complexity
   public getFileIconClass(fileName: string) {
-    const extension = this.getFileExtension(fileName);
+    const extension = getFileExtension(fileName);
     if (extensions.word.indexOf(extension) > -1) {
       return 'fas fa-file-word text-primary';
     }
@@ -206,7 +248,7 @@ export class TaskComponent implements OnDestroy {
       });
   }
 
-  public removeFile(fileId) {
+  public removeFile({ id: fileId }: UploadFile) {
     this.taskService
       .removeFile(this.task.id, fileId)
       .pipe(takeWhile(() => this.rxAlive))
@@ -215,10 +257,12 @@ export class TaskComponent implements OnDestroy {
       });
   }
 
-  private uploadFiles(files: FileList) {
+  private uploadFiles(files: (File | null)[]) {
     const fromData = new FormData();
-    Array.from(files).forEach((file) => {
-      fromData.append('files', file);
+    files.forEach((file) => {
+      if (file) {
+        fromData.append('files', file);
+      }
     });
 
     this.taskService
@@ -227,43 +271,5 @@ export class TaskComponent implements OnDestroy {
       .subscribe(() => {
         this.getTaskInfo(this.task.id);
       });
-  }
-
-  public onUploadFileClick(event: MouseEvent): void {
-    event.preventDefault();
-    const fileInput = this.createUploadFileInput();
-    this.inputFileContainer.nativeElement.append(fileInput);
-
-    fileInput.addEventListener('change', () => {
-      if (!fileInput.files?.length) {
-        fileInput.remove();
-        return;
-      }
-
-      this.uploadFiles(fileInput.files);
-
-      fileInput.remove();
-    });
-    fileInput.click();
-  }
-
-  private createUploadFileInput(): HTMLInputElement {
-    const wrapper = document.createElement('div');
-
-    wrapper.innerHTML = `
-      <input hidden name="images" type="file" multiple>
-    `;
-
-    return wrapper.firstElementChild as HTMLInputElement;
-  }
-
-  private getFileExtension(fileName: string) {
-    const result = fileName.match(/\.\w+$/);
-
-    if (result) {
-      return result[0];
-    }
-
-    return '';
   }
 }

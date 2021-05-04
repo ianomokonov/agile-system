@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Permissions } from 'back/src/models/permissions';
 import { Backlog } from 'back/src/models/responses/backlog';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
 import { Sprint } from 'back/src/models/sprint';
@@ -24,6 +25,7 @@ export class ProjectBacklogComponent implements OnInit, OnDestroy {
   public backlog: Backlog;
   private users: UserShortView[];
   public showTasks = false;
+  public permissions = Permissions;
   constructor(
     private projectService: ProjectService,
     public projectDataService: ProjectDataService,
@@ -65,7 +67,7 @@ export class ProjectBacklogComponent implements OnInit, OnDestroy {
     modal.componentInstance.users = this.users;
     modal.result
       .then((task) => {
-        this.projectService
+        this.taskService
           .addTask(this.projectDataService.project.id, task)
           .pipe(takeWhile(() => this.rxAlive))
           .subscribe(() => {
@@ -107,15 +109,31 @@ export class ProjectBacklogComponent implements OnInit, OnDestroy {
       return false;
     }
 
-    return !!sprint.tasks.find((t) => t.statusId === 7);
+    return !!sprint.tasks.find((t) => t.statusId === 4);
   }
 
   public onStartPlanning(sprintId) {
+    if (this.projectDataService.project.activePlanningId) {
+      this.projectService
+        .updatePlanning(
+          this.projectDataService.project.id,
+          this.projectDataService.project.activePlanningId,
+          { sprintId },
+        )
+        .subscribe(() => {
+          this.projectDataService.getProject(this.projectDataService.project.id, true);
+          this.router.navigate(['planning', this.projectDataService.project.activePlanningId], {
+            relativeTo: this.activatedRoute.parent,
+          });
+        });
+      return;
+    }
+
     this.projectService
       .startPlanning(
-        this.projectDataService.project?.id,
+        this.projectDataService.project.id,
         sprintId,
-        this.projectDataService.project?.sprint?.id,
+        this.projectDataService.project.sprint?.id,
       )
       .pipe(takeWhile(() => this.rxAlive))
       .subscribe((planningId: number) => {

@@ -1,27 +1,36 @@
-<div class="info px-2 border-bottom pb-3 mb-3" *ngIf="project?.sprint">
+<div class="info px-2 border-bottom pb-2 mb-2" *ngIf="project?.sprint">
   <div>
     <h3 class="mb-0">{{ project.sprint.name }}</h3>
     <small class="text-muted">{{ project.sprint.goal }}</small>
   </div>
   <div class="dates" *ngIf="project.sprint.startDate">
     <div class="d-flex justify-content-end mb-1">
-      
       {{ project.sprint.startDate | date: 'dd.MM.yyyy' }}
       <span class="px-1">—</span>
       {{ getFinishDate(project.sprint.startDate) | date: 'dd.MM.yyyy' }}
-      <div class="badge bg-danger ml-1 d-flex align-items-center" *ngIf="delay">Просрочено: {{ delay }}</div>
+      <div class="badge bg-danger ml-1 d-flex align-items-center" *ngIf="delay">
+        Просрочено: {{ delay }}
+      </div>
     </div>
     <div class="d-flex justify-content-end">
-      <button class="btn btn-outline-info ml-2" (click)="onStartDemo()" *ngIf="canStartDemo()">
+      <button
+        class="btn btn-outline-info ml-2"
+        (click)="onStartDemo()"
+        *ngIf="projectDataService.PID[permissions.CanStartDemo] && canStartDemo()"
+      >
         Начать демо
       </button>
-      <button class="btn btn-outline-primary ml-2" *ngIf="!project.retro && project.demo?.isFinished" (click)="onStartRetro()">
+      <button
+        class="btn btn-outline-primary ml-2"
+        *ngIf="!project.retro && project.demo?.isFinished"
+        (click)="projectDataService.PID[permissions.CanStartRetro] && onStartRetro()"
+      >
         Начать ретроспективу
       </button>
     </div>
   </div>
 </div>
-<div class="scrollable" *ngIf="tasks?.length">
+<ng-container *ngIf="tasks?.length">
   <div class="headers">
     <div class="header mx-1" *ngFor="let status of project.statuses">{{ status.name }}</div>
   </div>
@@ -32,26 +41,33 @@
       [cdkDropListData]="tasksStatus"
       [id]="project.statuses[index].id.toString()"
       *ngFor="let tasksStatus of tasks; let first = first; let index = index"
+      [cdkDropListDisabled]="!projectDataService.PID[permissions.CanEditTaskStatus]"
       (cdkDropListDropped)="changeStatus($event)"
     >
-      <div *ngIf="first" class="text-center create-task rounded" (click)="createTask()">
+      <div class="content">
+        <div class="task rounded" *ngFor="let task of tasksStatus" cdkDrag [cdkDragDisabled]="first && !task.projectUser">
+          <div class="d-flex justify-content-between mb-1">
+            <small class="text-muted">#{{ task.id }}</small>
+            <div class="badge bg-secondary" *ngIf="task.points">{{ task.points }}</div>
+          </div>
+          <h6 [routerLink]="['../task', task.id]">{{ task.name }}</h6>
+          <div class="d-flex">
+            <div class="mr-1" [taskType]="task.typeId">{{ task.typeId | taskType }}</div>
+            <div [taskPriority]="task.priorityId">{{ task.priorityId | priority }}</div>
+          </div>
+          <small class="text-muted"
+            >{{ task.projectUser?.name }} {{ task.projectUser?.surname }}</small
+          >
+        </div>
+      </div>
+      <div
+        *ngIf="projectDataService.PID[permissions.CanCreateTask] && first"
+        class="text-center create-task rounded mx-2"
+        (click)="createTask()"
+      >
         <i class="fas fa-plus mr-1"></i>
         Создать задачу
       </div>
-      <div class="task rounded" *ngFor="let task of tasksStatus" cdkDrag>
-        <div class="d-flex justify-content-between mb-1">
-          <small class="text-muted">#{{ task.id }}</small>
-          <div class="badge bg-secondary" *ngIf="task.points">{{ task.points }}</div>
-        </div>
-        <h6 [routerLink]="['/task', task.id]">{{ task.name }}</h6>
-        <div class="d-flex">
-          <div class="mr-1" [taskType]="task.typeId">{{ task.typeId | taskType }}</div>
-          <div [taskPriority]="task.priorityId">{{ task.priorityId | priority }}</div>
-        </div>
-        <small class="text-muted"
-          >{{ task.projectUser?.name }} {{ task.projectUser?.surname }}</small
-        >
-      </div>
     </div>
   </div>
-</div>
+</ng-container>

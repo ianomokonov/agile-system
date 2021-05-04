@@ -89,6 +89,10 @@ const routes: Routes = [
         path: 'daily',
         component: DailyComponent,
       },
+      {
+        path: 'task/:id',
+        component: TaskComponent,
+      },
     ],
   },
   {
@@ -113,10 +117,6 @@ const routes: Routes = [
         component: EditUsersComponent,
       },
     ],
-  },
-  {
-    path: 'task/:id',
-    component: TaskComponent,
   },
 ];
 

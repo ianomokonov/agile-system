@@ -1,9 +1,11 @@
 import { Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { takeWhile } from 'rxjs/operators';
+import { Permissions } from 'back/src/models/permissions';
 import { PlanningFullView } from 'back/src/models/responses/planning';
 import { TaskResponse } from 'back/src/models/responses/task.response';
-import { takeWhile } from 'rxjs/operators';
+import { ProjectDataService } from 'src/app/services/project-data.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { SocketService } from 'src/app/services/socket.service';
 
@@ -17,10 +19,12 @@ export class MarkTasksComponent implements OnInit, OnDestroy {
   private rxAlive = true;
   public planning: PlanningFullView | undefined;
   private projectId: number;
+  public permissions = Permissions;
   constructor(
     private activatedRoute: ActivatedRoute,
     private projectService: ProjectService,
     private socketService: SocketService,
+    public projectDataService: ProjectDataService,
     private router: Router,
     private modalService: NgbModal,
   ) {}
@@ -41,10 +45,14 @@ export class MarkTasksComponent implements OnInit, OnDestroy {
       .of('startPocker')
       .pipe(takeWhile(() => this.rxAlive))
       .subscribe(({ taskId, sessionId }) => {
-        const task = this.planning?.notMarkedTasks.find((t) => t.id === taskId);
+        const task =
+          this.planning?.notMarkedTasks.find((t) => t.id === taskId) ||
+          this.planning?.completedSessions.find((s) => s.task.id === taskId);
         if (task) {
           task.activeSessionId = sessionId;
-          this.onStartPokerClick(task);
+          if (task.activeSessionId) {
+            this.router.navigate(['task', task.id], { relativeTo: this.activatedRoute });
+          }
         }
       });
     this.activatedRoute.params.pipe(takeWhile(() => this.rxAlive)).subscribe((params) => {
@@ -58,9 +66,12 @@ export class MarkTasksComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
     this.rxAlive = false;
   }
+  public canStartPocker() {
+    return !this.planning?.notMarkedTasks.some((task) => task.activeSessionId);
+  }
 
   public onRemoveFromSprintClick(taskId: number) {
-    this.socketService.removePlanningTask(taskId);
+    this.socketService.removePlanningTask(this.projectId, taskId);
   }
 
   public getPlanning(projectId: number, id?: number) {
@@ -99,10 +110,6 @@ export class MarkTasksComponent implements OnInit, OnDestroy {
     if (!this.planning) {
       return;
     }
-    if (task.activeSessionId) {
-      this.router.navigate(['task', task.id], { relativeTo: this.activatedRoute });
-      return;
-    }
-    this.socketService.startPocker(task.id);
+    this.socketService.startPocker(this.projectId, task.id);
   }
 }

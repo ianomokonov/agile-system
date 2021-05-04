@@ -23,6 +23,10 @@ class DemoService {
   public async finishTask(taskId: number) {
     return demoRepository.finishDemoTask(taskId);
   }
+
+  public async reopenTask(taskId: number, userId: number) {
+    return demoRepository.reopenDemoTask(taskId, userId);
+  }
 }
 
 export default new DemoService();

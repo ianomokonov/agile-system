@@ -9,7 +9,7 @@
           'btn-primary': !demo.taskToShow?.length
         }"
         (click)="finishDemo(false, createDemoTask)"
-        *ngIf="!demo.isFinished"
+        *ngIf="this.projectDataService.PID[this.permissions.CanStartDemo] && !demo.isFinished"
       >
         Завершить демо
       </div>
@@ -74,21 +74,50 @@
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="mb-0">
               {{ activeTask.task.name }}
-              <span class="badge badge-success" *ngIf="activeTask.isFinished">Принята</span>
+              <span
+                class="badge"
+                [ngClass]="{
+                  'badge-success': activeTask.task.status.id !== 1,
+                  'badge-secondary': activeTask.task.status.id === 1
+                }"
+                *ngIf="activeTask.isFinished"
+                >{{ activeTask.task.status.id === 1 ? 'Переоткрыта' : 'Принята' }}</span
+              >
             </h4>
-            <button
-              class="btn btn-primary"
-              (click)="acceptTask(activeTask.id)"
-              *ngIf="!activeTask.isFinished"
-            >
-              Принять
-            </button>
+            <div class="d-flex justify-content-end align-items-center">
+              <button
+                class="btn btn-outline-secondary"
+                (click)="reopenTask(activeTask.id)"
+                *ngIf="this.projectDataService.PID[this.permissions.CanEditTask]"
+              >
+                Переоткрыть
+              </button>
+              <button
+                class="btn btn-primary ml-2"
+                (click)="acceptTask(activeTask.id)"
+                *ngIf="
+                  this.projectDataService.PID[this.permissions.CanStartDemo] &&
+                  !activeTask.isFinished
+                "
+              >
+                Принять
+              </button>
+            </div>
           </div>
 
           <div class="form-group">
             <small class="text-muted">Описание</small>
             <p [innerHTML]="activeTask.task.description"></p>
           </div>
+          <div class="form-group" *ngIf="activeTask.task.files?.length">
+            <small class="text-muted">Вложения</small>
+            <app-multiple-file-uploader
+              [files]="getTaskFiles(activeTask.task)"
+              (download)="downloadFile($event)"
+              [disabled]="true"
+            ></app-multiple-file-uploader>
+          </div>
+
           <div class="row">
             <div class="col-4">
               <div class="form-group">
@@ -105,9 +134,20 @@
           </div>
         </div>
       </div>
-      <div class="ml-2">
-        <p class="mb-1">Замечания:</p>
-        <ckeditor [editor]="editor" [formControl]="commentControl"></ckeditor>
+      <div class="ml-2" *ngIf="this.projectDataService.PID[this.permissions.CanCreateDemoNotes]">
+        <div class="form-group">
+          <p class="mb-1">Замечания:</p>
+          <ckeditor [editor]="editor" [formControl]="commentControl"></ckeditor>
+        </div>
+
+        <p class="mb-1">
+          Вложения
+          <i class="fas fa-link ml-1 cursor-pointer" (click)="uploader.uploadFiles($event)"></i>
+        </p>
+        <app-multiple-file-uploader
+          [formControl]="filesControl"
+          #uploader
+        ></app-multiple-file-uploader>
       </div>
     </div>
   </div>
@@ -150,6 +190,7 @@
 
   <div class="modal-body" [formGroup]="demoTaskForm">
     <div class="form-group">
+      <label>Название задачи</label>
       <input
         type="text"
         class="form-control"
@@ -158,12 +199,22 @@
         ngbAutofocus
       />
     </div>
+
     <div class="form-group">
-      <ckeditor
-        [editor]="editor"
-        formControlName="comment"
-        [config]="{ placeholder: 'Описание' }"
-      ></ckeditor>
+      <label>Описание</label>
+      <ckeditor [editor]="editor" formControlName="comment"></ckeditor>
+    </div>
+    <div class="form-group">
+      <label
+        >Вложения<i
+          class="fas fa-link ml-1 cursor-pointer"
+          (click)="formUploader.uploadFiles($event)"
+        ></i
+      ></label>
+      <app-multiple-file-uploader
+        formControlName="files"
+        #formUploader
+      ></app-multiple-file-uploader>
     </div>
   </div>
   <div class="modal-footer">

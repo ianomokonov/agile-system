@@ -4,6 +4,7 @@ import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
 import { PlanningFullView } from '../models/responses/planning';
 import { PlanningUpdateRequest } from '../models/requests/planning-update.request';
+// eslint-disable-next-line import/no-cycle
 import taskRepository from './task.repository';
 
 sql.use('mysql');
@@ -14,7 +15,6 @@ class PlanningRepository {
       projectId,
       sprintId,
       activeSprintId,
-      isActive: true,
     });
 
     const [result] = await dbConnection.query<ResultSetHeader>(
@@ -25,17 +25,31 @@ class PlanningRepository {
     return result?.insertId;
   }
 
-  public async update(planningId: number, request: PlanningUpdateRequest) {
-    const query = sql.update('projectplanning', request).where({ id: planningId });
-
-    await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
+  public async getBySprintId(sprintId: number) {
+    const query = sql.select('projectPlanning', '*').where({ activeSprintId: sprintId });
+    const [[planning]] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    return planning;
   }
 
-  public async read(projectId: number) {
+  public async update(planningId: number, request: PlanningUpdateRequest) {
+    let query = sql.update('projectplanning', request).where({ id: planningId });
+
+    await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
+    if (request.activeTaskId) {
+      query = sql
+        .update('projectPlanningTaskSession', { isCanceled: false })
+        .where({ taskId: request.activeTaskId });
+      await dbConnection.query(getQueryText(query.text), query.values);
+    }
+  }
+
+  public async read(planningId: number) {
     const query = sql
       .select('projectplanning', [
         'projectplanning.id',
-        'projectplanning.isActive',
         'projectplanning.activeTaskId',
         'projectplanning.createDate',
         'projectplanning.sprintId',
@@ -43,7 +57,7 @@ class PlanningRepository {
         'projectSprint.name as sprintName',
       ])
       .join('projectSprint', { sprintId: 'projectSprint.id' }, 'LEFT')
-      .where({ 'projectplanning.projectId': projectId, 'projectplanning.isActive': true });
+      .where({ 'projectplanning.id': planningId });
     const [[planning]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
@@ -51,8 +65,14 @@ class PlanningRepository {
     if (!planning) {
       return null;
     }
-    planning.activeSessions = await this.getPlanningSessions(planning.sprintId, true);
-    planning.completedSessions = await this.getPlanningSessions(planning.sprintId, false);
+    planning.activeSessions = await this.getPlanningSessions(
+      planning.sprintId || planning.activeSprintId,
+      true,
+    );
+    planning.completedSessions = await this.getPlanningSessions(
+      planning.sprintId || planning.activeSprintId,
+      false,
+    );
     return planning as PlanningFullView;
   }
 
@@ -134,7 +154,7 @@ class PlanningRepository {
     });
   }
 
-  public async resetSessionCards(sessionId: number, taskId: number) {
+  public async resetSessionCards(sessionId: number, taskId: number, userId: number) {
     let query = sql.deletes('planningTaskSessionCard').where({ sessionId });
     dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
     query = sql
@@ -143,9 +163,7 @@ class PlanningRepository {
 
     dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
 
-    query = sql.update('projectTask', { points: null }).where({ id: taskId });
-
-    await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
+    await taskRepository.update({ id: taskId, points: null }, userId);
   }
 
   public async setShowCards(sessionId: number, showCards: boolean) {
@@ -164,17 +182,27 @@ class PlanningRepository {
   }
 
   public async createSession(planningId: number, taskId: number) {
-    const query = sql.insert('projectPlanningTaskSession', {
+    let query = sql.insert('projectPlanningTaskSession', {
       planningId,
       taskId,
     });
+    let sessionId = 0;
 
-    const [result] = await dbConnection.query<ResultSetHeader>(
-      getQueryText(query.text),
-      query.values,
-    );
+    try {
+      [{ insertId: sessionId }] = await dbConnection.query<ResultSetHeader>(
+        getQueryText(query.text),
+        query.values,
+      );
+    } catch (error) {
+      query = sql.select('projectPlanningTaskSession', '*').where({ taskId });
+      const [[session]] = await dbConnection.query<RowDataPacket[]>(
+        getQueryText(query.text),
+        query.values,
+      );
+      sessionId = session.id;
+    }
 
-    return result?.insertId;
+    return sessionId;
   }
 
   public async setSessionCard(sessionId: number, userId: number, value: number, cardId) {

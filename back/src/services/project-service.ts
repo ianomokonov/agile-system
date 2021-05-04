@@ -9,11 +9,11 @@ import {
 import { Backlog } from '../models/responses/backlog';
 import { ProjectEditInfo } from '../models/responses/project-edit-info';
 import { ProjectResponse } from '../models/responses/project.response';
+import planningRepository from '../repositories/planning.repository';
 import projectRepository from '../repositories/project.repository';
 import retroRepository from '../repositories/retro.repository';
-import { Permissions } from '../utils';
+import { Permissions } from '../models/permissions';
 import demoService from './demo-service';
-import planningService from './planning-service';
 
 class ProjectService {
   public async create(userId: number, project: CreateProjectRequest) {
@@ -58,26 +58,26 @@ class ProjectService {
   }
 
   public async read(projectId: number, userId: number): Promise<ProjectResponse> {
-    const [project, sprint, statuses, users, planning] = await Promise.all([
+    const [project, sprint, statuses, users] = await Promise.all([
       projectRepository.getProject(projectId),
       projectRepository.getProjectActiveSprint(projectId),
       projectRepository.getProjectStatuses(),
       projectRepository.getFullProjectUsers(projectId, userId, true),
-      planningService.read(projectId, true),
     ]);
 
     if (sprint) {
-      const [demo, retro] = await Promise.all([
+      const [demo, retro, planning] = await Promise.all([
         demoService.getBySprintId(sprint?.id),
         retroRepository.getByProjectSprintId(sprint?.id),
+        planningRepository.getBySprintId(sprint?.id),
       ]);
       project.demo = demo;
       project.retro = retro;
+      project.activePlanningId = planning?.id;
     }
     project.sprint = sprint;
     project.statuses = statuses;
     project.users = users;
-    project.activePlanningId = planning?.id;
 
     return project;
   }
@@ -104,8 +104,8 @@ class ProjectService {
     return project;
   }
 
-  public async getPermissions() {
-    return projectRepository.getProjectPermissions();
+  public async getUserPermissions(userId: number, projectId: number) {
+    return projectRepository.getProjectUserPermissions(userId, projectId);
   }
 
   public async checkPermission(userId: number, projectId: number, permission: Permissions) {
@@ -120,8 +120,8 @@ class ProjectService {
     return projectRepository.getProjectSprintNames(projectId);
   }
 
-  public async startSprint(sprintId: number, projectId: number) {
-    return projectRepository.startSprint(sprintId, projectId);
+  public async startSprint(sprintId: number, projectId: number, userId: number) {
+    return projectRepository.startSprint(sprintId, projectId, userId);
   }
 
   public async finishSprint(sprintId: number) {

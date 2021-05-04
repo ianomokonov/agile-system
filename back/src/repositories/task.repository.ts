@@ -9,6 +9,7 @@ import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
 // eslint-disable-next-line import/no-cycle
 import projectRepository from './project.repository';
+import retroRepository from './retro.repository';
 
 sql.use('mysql');
 
@@ -39,16 +40,18 @@ class TaskRepository {
     const [[task]] = await dbConnection.query<RowDataPacket[]>(`SELECT *
         FROM projecttask 
         WHERE id=${taskId}`);
-    const [status, user, creator, sprints] = await Promise.all([
-      await this.getStatus(task.statusId),
+    const [status, user, creator, sprints, history] = await Promise.all([
+      this.getStatus(task.statusId),
       projectRepository.getProjectUser(task.projectUserId),
       projectRepository.getProjectUser(task.creatorId),
       projectRepository.getProjectSprintNames(task.projectId, task.projectSprintId),
+      this.getTaskHistory(taskId),
     ]);
 
     task.status = status;
     task.projectUser = user;
     task.creator = creator;
+    task.history = history;
     task.sprint = task.projectSprintId ? sprints[0] : null;
     task.files = await this.getFiles(taskId);
     return task as TaskResponse;
@@ -75,6 +78,31 @@ class TaskRepository {
     );
 
     return task as TaskShortView;
+  }
+
+  public async searchTasks(searchString: string, projectId: number) {
+    const query = sql
+      .select('projecttask', [
+        'id',
+        'name',
+        'statusId',
+        'typeId',
+        'priorityId',
+        'projectId',
+        'createDate',
+        'projectUserId',
+        'projectSprintId',
+        'points',
+      ])
+      .where({ name: `${searchString}%` }, 'LIKE')
+      .and({ projectId })
+      .limit(20, undefined);
+    const [tasks] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    return tasks as TaskShortView[];
   }
 
   public async getNewSprintTasks(sprintId?: number) {
@@ -108,27 +136,81 @@ class TaskRepository {
     return tasks as TaskResponse[];
   }
 
+  public async getTaskHistory(taskId: number) {
+    if (!taskId) {
+      return [];
+    }
+    const query = sql
+      .select('taskHistoryOperations', [
+        'taskHistoryOperations.id',
+        'taskHistoryOperations.fieldName',
+        'taskHistoryOperations.newValue',
+        'taskHistoryOperations.createDate',
+        'user.name as userName',
+        'user.surname as userSurname',
+      ])
+      .join('user', { 'user.id': 'userId' })
+      .where({ projectTaskId: taskId })
+      .orderby('taskHistoryOperations.createDate DESC');
+    let [historyItems] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    historyItems = await Promise.all(
+      historyItems.map(async (itemTemp) => {
+        const item = itemTemp;
+        if (item.fieldName === 'projectUserId') {
+          item.user = await projectRepository.getProjectUser(item.newValue);
+        }
+        if (item.fieldName === 'projecSprintId') {
+          item.sprint = await projectRepository.getProjectSprintNames(null, item.newValue);
+        }
+        if (item.fieldName === 'statusId') {
+          item.status = await this.getStatus(item.newValue);
+        }
+        return item;
+      }),
+    );
+
+    return historyItems;
+  }
+
   public async create(projectId: number, request: CreateTaskRequest) {
+    const { retroCardId } = request;
+    delete request.retroCardId;
     const { id: creatorId } = await projectRepository.getProjectUserByUserId(
       request.creatorId,
       projectId,
     );
-    const query = sql.insert('projecttask', { ...request, statusId: 1, creatorId, projectId });
+    const query = sql.insert('projecttask', {
+      ...request,
+      statusId: 1,
+      creatorId,
+      projectId,
+      lastEditUserId: request.creatorId,
+    });
 
     const [{ insertId }] = await dbConnection.query<ResultSetHeader>(
       getQueryText(query.text),
       query.values,
     );
-
+    if (retroCardId) {
+      retroRepository.updateRetroCard(retroCardId, { taskId: insertId });
+    }
     return insertId;
   }
 
   public async uploadFiles(taskId: number, files: { name: string; url: string }[]) {
+    const values = [];
     const query = `${`INSERT INTO projecttaskfiles (taskId, name, url) VALUES ${files
-      .map((file) => `(${taskId}, '${file.name}', '${file.url}'), `)
+      .map((file) => {
+        values.push(taskId, file.name, file.url);
+        return `(?, ?, ?), `;
+      })
       .join('')}`.replace(/,\s$/, '')};`;
 
-    await dbConnection.query<ResultSetHeader>(query);
+    await dbConnection.query<ResultSetHeader>(query, values);
   }
 
   public async getFiles(taskId: number) {
@@ -162,7 +244,7 @@ class TaskRepository {
   }
 
   // eslint-disable-next-line complexity
-  public async update(request: Partial<UpdateTaskRequest>) {
+  public async update(request: Partial<UpdateTaskRequest>, userId: number, sprintId?: number) {
     try {
       if ('projectSprintId' in request) {
         const query = sql
@@ -171,7 +253,7 @@ class TaskRepository {
           .and({ resultValue: null }, 'IS');
         dbConnection.query(getQueryText(query.text), query.values);
       }
-      const model = {} as any;
+      const model = { lastEditUserId: userId } as any;
       const specialKeys = ['id'];
       Object.keys(request)
         .filter((key) => specialKeys.indexOf(key) < 0)
@@ -179,11 +261,17 @@ class TaskRepository {
           model[key] = request[key];
         });
 
-      let query = sql.update('projecttask', model).where({ id: request.id });
+      let query = sql.update('projecttask', model);
+
+      if (sprintId) {
+        query = query.where({ projectSprintId: sprintId });
+      } else {
+        query = query.where({ id: request.id });
+      }
 
       await dbConnection.query(getQueryText(query.text), query.values);
 
-      if ('statusId' in request && request.statusId === 7) {
+      if ('statusId' in request && request.statusId === 4) {
         const task = await this.getShortTaskView(request.id);
 
         if (!task.projectSprintId) {
@@ -207,8 +295,8 @@ class TaskRepository {
     }
   }
 
-  public async updateTaskStatus(taskId: number, statusId: number) {
-    this.update({ id: taskId, statusId });
+  public async updateTaskStatus(taskId: number, statusId: number, userId: number) {
+    this.update({ id: taskId, statusId }, userId);
   }
 
   public async delete(taskId: number) {

@@ -38,6 +38,7 @@ export class CreateTaskComponent implements OnInit, OnDestroy {
       typeId: [TaskType.Feature, Validators.required],
       projectSprintId: [null],
       priorityId: [Priority.Low, Validators.required],
+      files: null,
     });
   }
 
@@ -52,6 +53,9 @@ export class CreateTaskComponent implements OnInit, OnDestroy {
 
   public ngOnDestroy(): void {
     this.rxAlive = false;
+  }
+  public patchValue(value) {
+    this.createForm.patchValue(value);
   }
 
   public assignToMe() {

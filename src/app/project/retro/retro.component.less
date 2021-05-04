@@ -38,34 +38,66 @@
     .retro-card {
       position: relative;
       z-index: 2;
-      background-color: #ccffcc;
-      border: 1px solid #ccffcc;
+      background-color: #ffc;
+      border: 1px solid #ffc;
       width: 120px;
       padding: 0.25rem;
-      box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.466);
+      box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.603);
       margin-right: 0.4rem;
       margin-bottom: 0.4rem;
       height: 95px;
       display: flex;
       align-items: center;
       justify-content: center;
-      i {
+      &.hasTask{
+        padding-bottom: 18px;
+      }
+      .actions {
         position: absolute;
-        height: 16px;
-        width: 16px;
         right: -5px;
         top: -5px;
-        font-size: 10px;
-        justify-content: center;
-        align-items: center;
-        border-radius: 50%;
-        background-color: red;
-        color: white;
-        cursor: pointer;
         display: none;
-      }
-      &:hover {
+        align-items: center;
+        background-color: #fff;
+        border-radius: 9px;
+        &.can-create {
+          box-shadow: 1px -1px 3px 0px #888888;
+          padding: 2px;
+          i.fa-plus-circle {
+            margin-right: 2px;
+          }
+        }
+        a {
+          height: 16px;
+          display: flex;
+          align-items: center;
+          margin-right: 2px;
+          margin-left: 2px;
+        }
         i {
+          font-size: 16px;
+          
+          justify-content: center;
+          align-items: center;
+          border-radius: 50%;
+          color: red;
+          cursor: pointer;
+
+          &.fa-plus-circle {
+            color: green;
+          }
+        }
+      }
+      .description-link{
+        position: absolute;
+        bottom: 0;
+        left: 5px;
+        font-size: 12px;
+        color:  black;
+      }
+
+      &:hover {
+        .actions {
           display: flex;
         }
       }
@@ -78,7 +110,8 @@
       cursor: default;
       &.isMy {
         cursor: text;
-        border-color: @primary-color !important;
+        background-color: #66ccff;
+        border-color: #66ccff;
       }
     }
     .create-btn {
@@ -89,26 +122,6 @@
 
       &.complete-retro {
         right: 4rem;
-      }
-    }
-
-    &.bad {
-      .retro-card {
-        background-color: #ffcccc;
-        border-color: #ffcccc;
-      }
-    }
-    &.improvments {
-      .retro-card {
-        background-color: #99ccff86;
-        border-color: #99ccff86;
-      }
-    }
-
-    &.actions {
-      .retro-card {
-        background-color: #cc99ff;
-        border-color: #cc99ff;
       }
     }
   }
@@ -134,7 +147,7 @@
       margin-top: 0.2rem;
 
       &:checked {
-        &~label {
+        & ~ label {
           text-decoration: line-through;
         }
       }

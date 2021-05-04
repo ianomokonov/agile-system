@@ -19,6 +19,10 @@ export class PlanningHandler {
   public async finishTask(taskId: number) {
     return demoService.finishTask(taskId);
   }
+
+  public async reopenTask(taskId: number, userId: number) {
+    return demoService.reopenTask(taskId, userId);
+  }
 }
 
 export default new PlanningHandler();

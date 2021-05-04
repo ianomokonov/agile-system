@@ -11,21 +11,28 @@ class PlanningService {
     return planningRepository.start(projectId, sprintId, activeSprintId);
   }
 
-  public async read(projectId: number, shortView = false) {
-    const planning = await planningRepository.read(projectId);
+  // eslint-disable-next-line complexity
+  public async read(planningId: number, shortView = false) {
+    const planning = await planningRepository.read(planningId);
     if (!planning) {
       return null;
     }
     if (!shortView) {
-      const [newTasks, notMarkedTasks] = await Promise.all([
-        taskService.getNewSprintTasks(planning?.activeSprintId),
-        taskService.getNotMarkedSprintTasks(planning?.sprintId),
-      ]);
+      if (planning.sprintId) {
+        const [newTasks, notMarkedTasks] = await Promise.all([
+          taskService.getNewSprintTasks(planning?.activeSprintId),
+          taskService.getNotMarkedSprintTasks(planning?.sprintId),
+        ]);
 
-      planning.newTasks = newTasks;
-      planning.notMarkedTasks = notMarkedTasks;
+        planning.newTasks = newTasks;
+        planning.notMarkedTasks = notMarkedTasks;
+      } else {
+        const notMarkedTasks = await taskService.getNotMarkedSprintTasks(planning?.activeSprintId);
+        planning.notMarkedTasks = notMarkedTasks;
+      }
+
       planning.activeStep = PlanningStep.MarkTasks;
-      if (newTasks?.length) {
+      if (planning.newTasks?.length) {
         planning.activeStep = PlanningStep.NewTasks;
       }
     }
@@ -57,19 +64,19 @@ class PlanningService {
     return planningRepository.setSessionCard(sessionId, userId, value, card?.id);
   }
 
-  public async reset(sessionId: number, taskId: number) {
+  public async reset(sessionId: number, taskId: number, userId) {
     planningRepository.setShowCards(sessionId, false);
-    return planningRepository.resetSessionCards(sessionId, taskId);
+    return planningRepository.resetSessionCards(sessionId, taskId, userId);
   }
 
   public async setShowCards(sessionId: number, showCards: boolean) {
     return planningRepository.setShowCards(sessionId, showCards);
   }
 
-  public async closeSession(sessionId: number, value: number, taskId: number) {
+  public async closeSession(sessionId: number, value: number, taskId: number, userId: number) {
     await Promise.all([
       planningRepository.closeSession(sessionId, value),
-      taskRepository.update({ id: taskId, points: value }),
+      taskRepository.update({ id: taskId, points: value }, userId),
     ]);
   }
 }

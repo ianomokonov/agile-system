@@ -3,12 +3,12 @@ import { StatusCodes } from 'http-status-codes';
 import retroHandler from '../handlers/retro.handler';
 import logger from '../logger';
 import checkProjectPermissions from '../middleware/check-project-permissions';
-import { Permissions } from '../utils';
+import { Permissions } from '../models/permissions';
 
 const retroRouter = Router({ mergeParams: true });
 retroRouter.use(checkProjectPermissions(Permissions.CanReadProject));
 
-retroRouter.post(`/start`, async (req, res) => {
+retroRouter.post(`/start`, checkProjectPermissions(Permissions.CanStartRetro), async (req, res) => {
   const { sprintId } = req.body;
   const id = await retroHandler.start(sprintId);
   res.status(StatusCodes.OK).json(id);

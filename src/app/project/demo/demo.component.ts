@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DemoService } from 'src/app/services/demo.service';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
@@ -10,6 +10,10 @@ import { Priority } from 'back/src/models/priority';
 import { forkJoin } from 'rxjs';
 import { SocketService } from 'src/app/services/socket.service';
 import { takeWhile } from 'rxjs/operators';
+import { TaskService } from 'src/app/services/task.service';
+import { ProjectDataService } from 'src/app/services/project-data.service';
+import { Permissions } from 'back/src/models/permissions';
+import { getTaskFiles } from 'src/app/utils/constants';
 
 @Component({
   selector: 'app-demo',
@@ -22,9 +26,14 @@ export class DemoComponent implements OnInit, OnDestroy {
   public demo;
   public activeTask: any;
   public editor = ClassicEditor;
+  public permissions = Permissions;
+  public getTaskFiles = getTaskFiles;
   public demoTaskForm: FormGroup;
   public get commentControl(): FormControl {
     return this.demoTaskForm.get('comment') as FormControl;
+  }
+  public get filesControl(): FormControl {
+    return this.demoTaskForm.get('files') as FormControl;
   }
   private readonly commentKey = 'DemoCommentKey';
   constructor(
@@ -34,15 +43,23 @@ export class DemoComponent implements OnInit, OnDestroy {
     public modalService: NgbModal,
     private fb: FormBuilder,
     private projectService: ProjectService,
+    public projectDataService: ProjectDataService,
     private socketService: SocketService,
+    private cdRef: ChangeDetectorRef,
+    private taskService: TaskService,
   ) {
     this.demoTaskForm = this.fb.group({
       name: [null, Validators.required],
       comment: [null],
+      files: null,
     });
     this.commentControl.valueChanges.pipe(takeWhile(() => this.rxAlive)).subscribe((value) => {
       sessionStorage.setItem(this.commentKey, value);
     });
+  }
+
+  public downloadFile(file) {
+    this.taskService.downloadFile(this.activeTask.task.id, file.id).subscribe();
   }
 
   public ngOnInit(): void {
@@ -57,12 +74,13 @@ export class DemoComponent implements OnInit, OnDestroy {
       .onAcceptDemoTask()
       .pipe(takeWhile(() => this.rxAlive))
       .subscribe((taskId) => {
-        const taskIndex = this.demo.taskToShow?.findIndex((t) => t.id === taskId);
-        if ((taskIndex || taskIndex === 0) && taskIndex > -1) {
-          this.demo.taskToShow[taskIndex].isFinished = true;
-          this.demo.shownTasks.unshift(this.demo.taskToShow[taskIndex]);
-          this.demo.taskToShow.splice(taskIndex, 1);
-        }
+        this.onFinishTask(taskId);
+      });
+    this.socketService
+      .of('reopenDemoTask')
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe(() => {
+        this.getDemo(this.demo?.id);
       });
     this.socketService
       .onActiveDemoTask()
@@ -92,6 +110,14 @@ export class DemoComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
     this.rxAlive = false;
   }
+  public onFinishTask(taskId) {
+    const taskIndex = this.demo.taskToShow?.findIndex((t) => t.id === taskId);
+    if ((taskIndex || taskIndex === 0) && taskIndex > -1) {
+      this.demo.taskToShow[taskIndex].isFinished = true;
+      this.demo.shownTasks.unshift(this.demo.taskToShow[taskIndex]);
+      this.demo.taskToShow.splice(taskIndex, 1);
+    }
+  }
 
   public onTaskClick(demoTaskId) {
     this.socketService.activeDemoTask(demoTaskId);
@@ -104,15 +130,28 @@ export class DemoComponent implements OnInit, OnDestroy {
     if (this.demo.taskToShow.length !== 1) {
       this.onTaskClick(this.demo.taskToShow.find((t) => t.id !== demoTaskId).id);
     }
-    this.socketService.acceptDemoTask(demoTaskId);
+    this.socketService.acceptDemoTask(this.projectId, demoTaskId);
   }
 
+  public reopenTask(demoTaskId) {
+    if (!this.activeTask) {
+      return;
+    }
+    if (this.demo.taskToShow.length !== 1) {
+      this.onTaskClick(this.demo.taskToShow.find((t) => t.id !== demoTaskId).id);
+    }
+    this.socketService.reopenDemoTask(this.projectId, demoTaskId);
+  }
+
+  // eslint-disable-next-line complexity
   public finishDemo(createTask = false, template?) {
-    if (!createTask && this.commentControl.value && template) {
+    if (!createTask && (this.commentControl.value || this.filesControl.value) && template) {
       this.commentControl.setValidators(Validators.required);
       this.demoTaskForm.patchValue({
         name: `Замечания с демо от ${new Date().toLocaleDateString()}`,
       });
+      this.demoTaskForm.updateValueAndValidity();
+      this.cdRef.detectChanges();
       this.modalService.open(template);
       return;
     }
@@ -120,14 +159,19 @@ export class DemoComponent implements OnInit, OnDestroy {
     const subscriptions: any[] = [];
 
     if (createTask) {
+      if (this.demoTaskForm.invalid) {
+        this.demoTaskForm.markAllAsTouched();
+        return;
+      }
       const formValue = this.demoTaskForm.getRawValue();
       subscriptions.push(
-        this.projectService.addTask(this.projectId, {
+        this.taskService.addTask(this.projectId, {
           name: formValue.name,
           description: formValue.comment,
           projectSprintId: this.demo.sprintId,
           typeId: TaskType.Bug,
           priorityId: Priority.Critical,
+          files: formValue.files,
         }),
       );
     }
@@ -137,11 +181,11 @@ export class DemoComponent implements OnInit, OnDestroy {
         .pipe(takeWhile(() => this.rxAlive))
         .subscribe(() => {
           this.dismiss();
-          this.socketService.finishDemo();
+          this.socketService.finishDemo(this.projectId);
         });
       return;
     }
-    this.socketService.finishDemo();
+    this.socketService.finishDemo(this.projectId);
   }
 
   public dismiss() {
@@ -160,7 +204,7 @@ export class DemoComponent implements OnInit, OnDestroy {
           return;
         }
         this.demo = demo;
-        this.socketService.enterDemoRoom(demo.id);
+        this.socketService.enterDemoRoom(this.projectId, demo.id);
 
         if (this.activatedRoute.snapshot.queryParams.demoTaskId) {
           this.setActiveTask(this.activatedRoute.snapshot.queryParams.demoTaskId);

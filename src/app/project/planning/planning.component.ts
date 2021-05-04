@@ -47,7 +47,7 @@ export class PlanningComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.rxAlive))
       .subscribe((planning) => {
         this.planning = planning;
-        this.socketService.enterPlanningRoom(this.planning.id);
+        this.socketService.enterPlanningRoom(this.projectId, this.planning.id);
       });
   }
 
