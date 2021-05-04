@@ -8,9 +8,7 @@ import { UpdateCriteriaModalComponent } from './update-criteria-modal/update-cri
   styleUrls: ['./task-acceptance-criteria.component.less'],
 })
 export class TaskAcceptanceCriteriaComponent implements OnInit {
-  public criterias: any[] = [
-    { name: 'Rhbnthbq 1', description: 'dfjdskfjskd sdfsdfdskf jsd sdfjsdfksdfjsd sdf sdf' },
-  ];
+  public criterias: any[];
   constructor(private modalService: NgbModal) {}
 
   ngOnInit(): void {}

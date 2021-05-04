@@ -1,21 +1,28 @@
 <div class="position-relative">
-  <div class="content rounded p-2" *ngFor="let criteria of criterias">
-    <div class="header d-flex" [ngClass]="{ 'mb-1': criteria.isOpened }">
-      <div class="name" (click)="toggleCriteria(criteria)">
-        <span class="d-block mr-2"
-          ><i class="fas fa-chevron-right mr-2" [ngClass]="{ opened: criteria.isOpened }"></i
-          >{{ criteria.name }}</span
-        >
+  <ng-container *ngIf="criterias?.length; else noData"
+    ><div class="content rounded p-2" *ngFor="let criteria of criterias">
+      <div class="header d-flex" [ngClass]="{ 'mb-1': criteria.isOpened }">
+        <div class="name" (click)="toggleCriteria(criteria)">
+          <span class="d-block mr-2"
+            ><i class="fas fa-chevron-right mr-2" [ngClass]="{ opened: criteria.isOpened }"></i
+            >{{ criteria.name }}</span
+          >
+        </div>
+        <button class="btn btn-outline-primary" (click)="openModal(criteria)">
+          <i class="fas fa-edit"></i>
+        </button>
       </div>
-      <button class="btn btn-outline-primary" (click)="openModal(criteria)">
-        <i class="fas fa-edit"></i>
-      </button>
+      <div class="description rounded bg-white p-2" *ngIf="criteria.isOpened">
+        {{ criteria.description }}
+      </div>
     </div>
-    <div class="description rounded bg-white p-2" *ngIf="criteria.isOpened">
-      {{ criteria.description }}
-    </div>
-  </div>
+  </ng-container>
+
   <button class="btn btn-primary create-btn" (click)="openModal()">
     <i class="fas fa-plus"></i>
   </button>
 </div>
+
+<ng-template #noData>
+  <p class="m-0 text-muted">Критерии отсутствуют</p>
+</ng-template>
