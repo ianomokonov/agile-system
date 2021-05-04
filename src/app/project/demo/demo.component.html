@@ -109,6 +109,14 @@
             <small class="text-muted">Описание</small>
             <p [innerHTML]="activeTask.task.description"></p>
           </div>
+          <div class="form-group" *ngIf="activeTask.task.files?.length">
+            <small class="text-muted">Вложения</small>
+            <app-multiple-file-uploader
+              [files]="getTaskFiles(activeTask.task)"
+              [disabled]="true"
+            ></app-multiple-file-uploader>
+          </div>
+
           <div class="row">
             <div class="col-4">
               <div class="form-group">

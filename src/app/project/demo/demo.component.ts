@@ -12,6 +12,7 @@ import { SocketService } from 'src/app/services/socket.service';
 import { TaskService } from 'src/app/services/task.service';
 import { ProjectDataService } from 'src/app/services/project-data.service';
 import { Permissions } from 'back/src/models/permissions';
+import { getTaskFiles } from 'src/app/utils/constants';
 
 @Component({
   selector: 'app-demo',
@@ -24,6 +25,7 @@ export class DemoComponent implements OnInit {
   public activeTask: any;
   public editor = ClassicEditor;
   public permissions = Permissions;
+  public getTaskFiles = getTaskFiles;
   public demoTaskForm: FormGroup;
   public get commentControl(): FormControl {
     return this.demoTaskForm.get('comment') as FormControl;

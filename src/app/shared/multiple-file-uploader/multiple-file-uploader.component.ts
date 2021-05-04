@@ -1,4 +1,12 @@
-import { Component, ElementRef, EventEmitter, forwardRef, Output, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  forwardRef,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { extensions } from 'src/app/utils/constants';
 
@@ -16,11 +24,11 @@ import { extensions } from 'src/app/utils/constants';
   ],
 })
 export class MultipleFileUploaderComponent implements ControlValueAccessor {
-  public files: UploadFile[] | null | undefined;
+  @Input() public files: UploadFile[] | null | undefined;
   @ViewChild('inputFileContainer') private inputFileContainer: ElementRef<HTMLDivElement>;
   @Output() public download: EventEmitter<any> = new EventEmitter();
   @Output() public remove: EventEmitter<UploadFile> = new EventEmitter();
-  public disabled: boolean;
+  @Input() public disabled: boolean;
 
   private onChange: (value?: any) => {};
   private onTouched: () => {};

@@ -4,6 +4,7 @@ import { Permissions } from 'back/src/models/permissions';
 import { ProjectDataService } from 'src/app/services/project-data.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { SocketService } from 'src/app/services/socket.service';
+import { getTaskFiles } from 'src/app/utils/constants';
 
 @Component({
   selector: 'app-scrum-poker',
@@ -16,6 +17,7 @@ export class ScrumPokerComponent {
   public showCards = false;
   public session;
   public permissions = Permissions;
+  public getTaskFiles = getTaskFiles;
   public showResultValue: boolean;
   public mantionedCards: { value: number; count: number }[] = [];
   private projectId: number;
