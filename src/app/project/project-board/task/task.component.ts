@@ -52,7 +52,7 @@ export class TaskComponent implements OnDestroy {
     private projectService: ProjectService,
   ) {
     this.activatedRoute.params.pipe(takeWhile(() => this.rxAlive)).subscribe((params) => {
-      this.getTaskInfo(params.id, true);
+      this.getTaskInfo(params.taskId, true);
     });
 
     this.userControl.valueChanges.pipe(takeWhile(() => this.rxAlive)).subscribe((userId) => {

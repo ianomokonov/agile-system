@@ -8,6 +8,7 @@ import { CreateTaskRequest, UpdateTaskRequest } from 'back/src/models/requests/t
 import { map, switchMap, tap } from 'rxjs/operators';
 import { FileSaverService } from 'ngx-filesaver';
 import { TaskShortView } from 'back/src/models/responses/task-short-view';
+import { TaskHistory } from 'back/src/models/responses/task-history';
 import { ProjectDataService } from './project-data.service';
 import { UploadFile } from '../shared/multiple-file-uploader/multiple-file-uploader.component';
 
@@ -51,6 +52,64 @@ export class TaskService {
       `${this.baseUrl}/${this.projectDataService.project?.id}/task/search?searchString=${
         searchString ? encodeURI(searchString) : ''
       }`,
+    );
+  }
+
+  public getHistory(taskId: number): Observable<TaskHistory[]> {
+    return this.http.get<TaskHistory[]>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/${taskId}/history`,
+    );
+  }
+
+  public getAcceptanceCriteria(taskId: number): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/${taskId}/criteria`,
+    );
+  }
+
+  public createCriteria(taskId, request): Observable<number> {
+    return this.http.post<number>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/${taskId}/create-criteria`,
+      request,
+    );
+  }
+
+  public updateCriteria(criteriaId, request): Observable<void> {
+    return this.http.put<void>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/criteria/${criteriaId}`,
+      request,
+    );
+  }
+
+  public removeCriteria(criteriaId): Observable<void> {
+    return this.http.delete<void>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/criteria/${criteriaId}`,
+    );
+  }
+
+  public getComments(taskId: number): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/${taskId}/comments`,
+    );
+  }
+
+  public createComment(taskId, request): Observable<number> {
+    return this.http.post<number>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/${taskId}/create-comment`,
+      request,
+    );
+  }
+
+  public updateComment(commentId, request): Observable<void> {
+    return this.http.put<void>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/comment/${commentId}`,
+      request,
+    );
+  }
+
+  public removeComment(commentId): Observable<void> {
+    return this.http.delete<void>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/comment/${commentId}`,
     );
   }
 

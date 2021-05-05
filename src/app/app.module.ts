@@ -58,9 +58,10 @@ import { FileUploaderComponent } from './shared/file-uploader/file-uploader.comp
 import { FinishDailyModalComponent } from './project/daily/finish-daily-modal/finish-daily-modal.component';
 import { MultipleFileUploaderComponent } from './shared/multiple-file-uploader/multiple-file-uploader.component';
 import { TaskCommentsComponent } from './project/project-board/task/task-comments/task-comments.component';
-import { TaskAcceptanceTestsComponent } from './project/project-board/task/task-acceptance-tests/task-acceptance-tests.component';
 import { TaskHistoryComponent } from './project/project-board/task/task-history/task-history.component';
 import { EditEpicsComponent } from './project/edit/edit-epics/edit-epics.component';
+import { TaskAcceptanceCriteriaComponent } from './project/project-board/task/task-acceptance-criteria/task-acceptance-criteria.component';
+import { UpdateCriteriaModalComponent } from './project/project-board/task/task-acceptance-criteria/update-criteria-modal/update-criteria-modal.component';
 
 @NgModule({
   declarations: [
@@ -98,9 +99,10 @@ import { EditEpicsComponent } from './project/edit/edit-epics/edit-epics.compone
     FinishDailyModalComponent,
     MultipleFileUploaderComponent,
     TaskCommentsComponent,
-    TaskAcceptanceTestsComponent,
     TaskHistoryComponent,
     EditEpicsComponent,
+    TaskAcceptanceCriteriaComponent,
+    UpdateCriteriaModalComponent,
   ],
   imports: [
     BrowserModule,

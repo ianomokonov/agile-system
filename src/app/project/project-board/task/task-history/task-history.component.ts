@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { TaskService } from 'src/app/services/task.service';
 import { PriorityPipe } from 'src/app/shared/pipes/priority.pipe';
 import { TaskTypePipe } from 'src/app/shared/pipes/task-type.pipe';
 import { taskFields } from 'src/app/utils/constants';
@@ -11,9 +13,24 @@ import { taskFields } from 'src/app/utils/constants';
 export class TaskHistoryComponent implements OnInit {
   public history: any[];
 
-  constructor(private taskTypePipe: TaskTypePipe, private priorityPipe: PriorityPipe) {}
+  constructor(
+    private taskService: TaskService,
+    private taskTypePipe: TaskTypePipe,
+    private priorityPipe: PriorityPipe,
+    private activatedRoute: ActivatedRoute,
+  ) {}
 
-  ngOnInit(): void {}
+  public ngOnInit(): void {
+    this.activatedRoute.parent?.params.subscribe((params) => {
+      this.getHistory(params.taskId);
+    });
+  }
+
+  private getHistory(taskId) {
+    this.taskService.getHistory(taskId).subscribe((history) => {
+      this.history = history;
+    });
+  }
 
   public getHistoryField(item) {
     return taskFields[item.fieldName] || item.fieldName;

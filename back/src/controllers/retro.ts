@@ -24,4 +24,14 @@ retroRouter.get(`/:retroId`, async (req, res) => {
   }
 });
 
+retroRouter.get(`/:retroId/points`, async (req, res) => {
+  try {
+    const points = await retroHandler.getRetroPoints(+req.params.retroId, res.locals.userId);
+    res.status(StatusCodes.OK).json(points);
+  } catch (error) {
+    logger.error(error);
+    res.status(error.statusCode).json(error.error);
+  }
+});
+
 export default retroRouter;

@@ -18,15 +18,4 @@ export interface TaskResponse extends TaskShortView {
   projectSprintId: number;
   activeSessionId?: number;
   files?: { name: string; url: string; id: number }[];
-  history?: {
-    id: number;
-    fieldName: string;
-    newValue: string;
-    createDate: Date;
-    userName: string;
-    userSurname: string;
-    user?: UserShortView;
-    sprint?: IdNameResponse;
-    status?: StatusResponse;
-  }[];
 }

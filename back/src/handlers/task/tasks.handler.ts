@@ -13,6 +13,9 @@ export class TasksHandler {
   public async read(taskId: number) {
     return taskService.read(taskId);
   }
+  public async getHistory(taskId: number) {
+    return taskService.getTaskHistory(taskId);
+  }
   public async search(searchString: string, projectId: number) {
     return taskService.searchTasks(searchString, projectId);
   }
@@ -38,6 +41,38 @@ export class TasksHandler {
   public async removeFile(fileId: number) {
     const url = await taskService.removeFile(fileId);
     removeFile(url);
+  }
+
+  public async getTaskComments(taskId, userId) {
+    return taskService.getTaskComments(taskId, userId);
+  }
+
+  public async createTaskComment(request) {
+    return taskService.createTaskComment(request);
+  }
+
+  public async updateTaskComment(commentId, request, userId) {
+    return taskService.updateTaskComment(commentId, request, userId);
+  }
+
+  public async removeTaskComment(commentId, userId) {
+    return taskService.removeTaskComment(commentId, userId);
+  }
+
+  public async getTaskAcceptanceCriteria(taskId) {
+    return taskService.getTaskAcceptanceCriteria(taskId);
+  }
+
+  public async createTaskAcceptanceCriteria(request) {
+    return taskService.createTaskAcceptanceCriteria(request);
+  }
+
+  public async updateTaskAcceptanceCriteria(criteriaId, request) {
+    return taskService.updateTaskAcceptanceCriteria(criteriaId, request);
+  }
+
+  public async removeTaskAcceptanceCriteria(criteriaId) {
+    return taskService.removeTaskAcceptanceCriteria(criteriaId);
   }
 }
 

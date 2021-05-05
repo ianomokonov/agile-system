@@ -94,7 +94,7 @@
         </h5>
         <div class="section-body">
           <p
-            class="description formatted-text ck-content"
+            class="description formatted-text ck-content ck ck-reset"
             [innerHTML]="task.description"
             *ngIf="!editingDescription"
           ></p>
@@ -142,9 +142,7 @@
             <a class="nav-link" routerLink="comments" [routerLinkActive]="'active'">Комментарии</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="acceptance-tests" [routerLinkActive]="'active'"
-              >Критерии приемки</a
-            >
+            <a class="nav-link" routerLink="acceptance-criteria" [routerLinkActive]="'active'">Критерии приемки</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" routerLink="history" [routerLinkActive]="'active'"

@@ -68,6 +68,10 @@ export class SocketService {
     this.socket.emit('leaveRetro', retroId);
   }
 
+  public setRetroPoint(cardId) {
+    this.socket.emit('setCardPoint', cardId);
+  }
+
   public addRetroCard(projectId: number, retroId, category: RetroCardCategory) {
     this.socket.emit('addRetroCard', { projectId, retroId, category });
   }
@@ -114,6 +118,10 @@ export class SocketService {
 
   public acceptDemoTask(projectId: number, taskId) {
     this.socket.emit('acceptDemoTask', { projectId, taskId });
+  }
+
+  public acceptDemoTaskCriteria(projectId: number, criteriaId, request) {
+    this.socket.emit('acceptDemoTaskCriteria', { projectId, criteriaId, request });
   }
 
   public reopenDemoTask(projectId: number, taskId) {

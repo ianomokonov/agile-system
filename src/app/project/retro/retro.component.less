@@ -60,11 +60,17 @@
         align-items: center;
         background-color: #fff;
         border-radius: 9px;
+        &.static{
+          display: flex !important;
+        }
         &.can-create {
           box-shadow: 1px -1px 3px 0px #888888;
           padding: 2px;
           i.fa-plus-circle {
             margin-right: 2px;
+          }
+          i.fa-thumbs-up {
+            margin-left: 2px;
           }
         }
         a {

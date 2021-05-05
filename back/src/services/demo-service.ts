@@ -4,8 +4,8 @@ class DemoService {
   public async start(projectId: number, sprintId: number) {
     return demoRepository.start(projectId, sprintId);
   }
-  public async read(id: number) {
-    return demoRepository.read(id);
+  public async read(id: number, userId) {
+    return demoRepository.read(id, userId);
   }
 
   public async setActiveTask(demoId: number, taskId: number) {

@@ -18,6 +18,7 @@ import projectSprintHandler from './handlers/project/project-sprint.handler';
 import checkSocketProjectPermissions from './middleware/check-socket-project-permissions';
 import { RetroCardCategory } from './models/retro-card-category';
 import { Permissions } from './models/permissions';
+import retroRepository from './repositories/retro.repository';
 
 const DEFAULT_PORT = 3000;
 
@@ -169,13 +170,23 @@ io.use(authSocketJWT).on('connection', (socket) => {
     ) {
       return;
     }
+
     socket.retroRoom = `retro${retroId}`;
+    socket.retroId = retroId;
     socket.join(socket.retroRoom);
   });
 
-  socket.on('addRetroCard', async ({ projectId, request }) => {
+  socket.on('setCardPoint', async (cardId) => {
+    if (!socket.retroId) {
+      return;
+    }
+    await retroRepository.addCardPoint(cardId, socket.userId);
+    io.sockets.in(socket.retroRoom).emit('setCardPoint');
+  });
+
+  socket.on('addRetroCard', async ({ projectId, category }) => {
     if (
-      request.category === RetroCardCategory.Actions &&
+      category === RetroCardCategory.Actions &&
       !(await checkSocketProjectPermissions(
         projectId,
         socket.userId,
@@ -184,7 +195,15 @@ io.use(authSocketJWT).on('connection', (socket) => {
     ) {
       return;
     }
-    const card = await retroHandler.createCard({ ...request, userId: socket.userId });
+    if (!socket.retroId) {
+      return;
+    }
+
+    const card = await retroHandler.createCard({
+      retroId: socket.retroId,
+      category,
+      userId: socket.userId,
+    });
     socket.broadcast.to(socket.retroRoom).emit('addRetroCard', card);
     card.isMy = true;
     socket.emit('addRetroCard', card);
@@ -260,6 +279,21 @@ io.use(authSocketJWT).on('connection', (socket) => {
     }
     demoHandler.reopenTask(taskId, socket.userId);
     io.sockets.in(socket.demoRoom).emit('reopenDemoTask', taskId);
+  });
+
+  socket.on('acceptDemoTaskCriteria', async ({ projectId, criteriaId, request }) => {
+    if (
+      !(await checkSocketProjectPermissions(projectId, socket.userId, Permissions.CanStartDemo))
+    ) {
+      return;
+    }
+    if (!socket.demoId) {
+      return;
+    }
+    await tasksHandler.updateTaskAcceptanceCriteria(criteriaId, request);
+    io.sockets
+      .in(socket.demoRoom)
+      .emit('acceptDemoTaskCriteria', { criteriaId, isDone: request.isDone });
   });
 
   socket.on('finishDemo', async (projectId) => {

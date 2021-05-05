@@ -34,6 +34,48 @@ taskRouter.get(
   },
 );
 
+taskRouter.get(
+  `/:id/history`,
+  authJWT,
+  checkProjectPermissions(Permissions.CanReadProject),
+  async (req, res) => {
+    try {
+      const result = await tasksHandler.getHistory(+req.params.id);
+      res.status(StatusCodes.OK).json(result);
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
+taskRouter.get(
+  `/:id/comments`,
+  authJWT,
+  checkProjectPermissions(Permissions.CanReadProject),
+  async (req, res) => {
+    try {
+      const result = await tasksHandler.getTaskComments(+req.params.id, res.locals.userId);
+      res.status(StatusCodes.OK).json(result);
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
+taskRouter.get(
+  `/:id/criteria`,
+  authJWT,
+  checkProjectPermissions(Permissions.CanReadProject),
+  async (req, res) => {
+    try {
+      const result = await tasksHandler.getTaskAcceptanceCriteria(+req.params.id);
+      res.status(StatusCodes.OK).json(result);
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
 taskRouter.delete(
   `/:id/remove-file/:fileId`,
   authJWT,
@@ -42,6 +84,34 @@ taskRouter.delete(
     try {
       await tasksHandler.removeFile(+req.params.fileId);
       res.status(StatusCodes.OK).json('Файл удален');
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
+taskRouter.delete(
+  `/comment/:commentId`,
+  authJWT,
+  checkProjectPermissions(Permissions.CanReadProject),
+  async (req, res) => {
+    try {
+      await tasksHandler.removeTaskComment(+req.params.commentId, res.locals.userId);
+      res.status(StatusCodes.OK).json('Комментарий удален');
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
+taskRouter.delete(
+  `/criteria/:criteriaId`,
+  authJWT,
+  checkProjectPermissions(Permissions.CanReadProject),
+  async (req, res) => {
+    try {
+      await tasksHandler.removeTaskAcceptanceCriteria(+req.params.criteriaId);
+      res.status(StatusCodes.OK).json('Критерий удален');
     } catch (error) {
       res.status(error.statusCode).json(error.error);
     }
@@ -84,6 +154,69 @@ taskRouter.put(
     try {
       await tasksHandler.update({ id: +req.params.id, ...req.body }, res.locals.userId);
       res.status(StatusCodes.OK).json('Задача обновлена');
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
+taskRouter.put(
+  `/comment/:commentId`,
+  authJWT,
+  checkProjectPermissions(Permissions.CanReadProject),
+  async (req, res) => {
+    try {
+      await tasksHandler.updateTaskComment(+req.params.commentId, req.body, res.locals.userId);
+      res.status(StatusCodes.OK).json('Комментарий обновлен');
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
+taskRouter.put(
+  `/criteria/:criteriaId`,
+  authJWT,
+  checkProjectPermissions(Permissions.CanEditTask),
+  async (req, res) => {
+    try {
+      await tasksHandler.updateTaskAcceptanceCriteria(+req.params.criteriaId, req.body);
+      res.status(StatusCodes.OK).json('Критерий обновлен');
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
+taskRouter.post(
+  `/:id/create-criteria`,
+  authJWT,
+  checkProjectPermissions(Permissions.CanEditTask),
+  async (req, res) => {
+    try {
+      const id = await tasksHandler.createTaskAcceptanceCriteria({
+        projectTaskId: +req.params.id,
+        ...req.body,
+      });
+      res.status(StatusCodes.OK).json(id);
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
+taskRouter.post(
+  `/:id/create-comment`,
+  authJWT,
+  checkProjectPermissions(Permissions.CanReadProject),
+  async (req, res) => {
+    try {
+      const id = await tasksHandler.createTaskComment({
+        projectTaskId: +req.params.id,
+        userId: res.locals.userId,
+        ...req.body,
+      });
+      res.status(StatusCodes.OK).json(id);
     } catch (error) {
       res.status(error.statusCode).json(error.error);
     }

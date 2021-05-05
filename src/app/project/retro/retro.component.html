@@ -22,7 +22,8 @@
     <div class="improvments m-1">
       <span class="placeholder" *ngIf="improvmentCards.length < 3">Что можно улучшить?</span>
       <ng-container *ngFor="let card of improvmentCards">
-        <ng-container *ngTemplateOutlet="cardTemp; context: { $implicit: card }"> </ng-container>
+        <ng-container *ngTemplateOutlet="cardTemp; context: { $implicit: card, canVote: true }">
+        </ng-container>
       </ng-container>
 
       <button class="btn btn-primary create-btn" (click)="createCard(cardCategory.Improvment)">
@@ -75,7 +76,7 @@
   </div>
 </div>
 
-<ng-template #cardTemp let-card let-canCreateTask="canCreateTask">
+<ng-template #cardTemp let-card let-canCreateTask="canCreateTask" let-canVote="canVote">
   <div
     class="retro-card"
     [ngClass]="{ isMy: card.isMy, hasTask: card.taskId }"
@@ -88,7 +89,13 @@
       [textContent]="card.text"
       (input)="scale($event.target, $event, card, card.taskId)"
     ></span>
-    <div class="actions" [ngClass]="{ 'can-create': canCreateTask && !card.taskId }">
+    <div
+      class="actions"
+      [ngClass]="{
+        'can-create': (canCreateTask && !card.taskId) || canVote,
+        static: canVote && card.points
+      }"
+    >
       <ng-container *ngIf="canCreateTask">
         <i
           class="fas fa-plus-circle"
@@ -96,6 +103,9 @@
           (click)="onCreateTask(card)"
         ></i>
       </ng-container>
+      <span *ngIf="canVote" class="cursor-pointer" (click)="setPoints(card)">
+        {{ card.points || 0 }}<i [ngClass]="{fas: card.hasMy, far: !card.hasMy}" class="fa-thumbs-up mr-1"></i>
+      </span>
 
       <i class="fas fa-times-circle" *ngIf="card.isMy" (click)="onRemoveCard(card.id)"></i>
     </div>

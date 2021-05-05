@@ -154,7 +154,7 @@
 <ng-template #taskTemp let-task let-show="showBtn">
   <div class="col-8 d-flex align-items-center pl-0">
     <small class="text-muted mr-3">#{{ task.id }}</small>
-    <a [routerLink]="['task', task.id]"
+    <a [routerLink]="['../task', task.id]"
       ><h6 class="d-inline text-dark mb-0">{{ task.name }}</h6></a
     >
   </div>

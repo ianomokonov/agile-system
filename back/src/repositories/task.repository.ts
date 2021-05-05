@@ -1,6 +1,8 @@
+import { StatusCodes } from 'http-status-codes';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import * as sql from 'sql-query-generator';
 import logger from '../logger';
+import { WebError } from '../models/error';
 import { CreateTaskRequest, UpdateTaskRequest } from '../models/requests/task.models';
 import { StatusResponse } from '../models/responses/status.response';
 import { TaskShortView } from '../models/responses/task-short-view';
@@ -40,19 +42,17 @@ class TaskRepository {
     const [[task]] = await dbConnection.query<RowDataPacket[]>(`SELECT *
         FROM projecttask 
         WHERE id=${taskId}`);
-    const [status, user, creator, sprints, epic, history] = await Promise.all([
+    const [status, user, creator, sprints, epic] = await Promise.all([
       this.getStatus(task.statusId),
       projectRepository.getProjectUser(task.projectUserId),
       projectRepository.getProjectUser(task.creatorId),
       projectRepository.getProjectSprintNames(task.projectId, task.projectSprintId),
       projectRepository.getEpic(task.epicId),
-      this.getTaskHistory(taskId),
     ]);
 
     task.status = status;
     task.projectUser = user;
     task.creator = creator;
-    task.history = history;
     task.epic = epic;
     task.sprint = task.projectSprintId ? sprints[0] : null;
     task.files = await this.getFiles(taskId);
@@ -178,6 +178,104 @@ class TaskRepository {
     return historyItems;
   }
 
+  public async getTaskComments(taskId: number, userId: number) {
+    if (!taskId) {
+      return [];
+    }
+    const query = sql
+      .select('taskComments', [
+        'taskComments.id',
+        'taskComments.text',
+        'taskComments.createDate',
+        `(user.id = ${userId}) as isMy`,
+        'user.image as userImage',
+        'user.name as userName',
+        'user.surname as userSurname',
+      ])
+      .join('user', { 'user.id': 'userId' })
+      .where({ projectTaskId: taskId })
+      .orderby('createDate');
+    const [comments] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    return comments;
+  }
+
+  public async createTaskComment(request) {
+    if (!request.projectTaskId) {
+      throw new WebError(StatusCodes.BAD_REQUEST, 'Не указан id задачи');
+    }
+    const query = sql.insert('taskComments', request);
+    const [{ insertId }] = await dbConnection.query<ResultSetHeader>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    return insertId;
+  }
+
+  public async updateTaskComment(userId, commentId, request) {
+    if (!commentId) {
+      throw new WebError(StatusCodes.BAD_REQUEST, 'Не указан id комментария');
+    }
+
+    const query = sql.update('taskComments', request).where({ id: commentId, userId });
+
+    await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
+  }
+
+  public async removeTaskComment(userId, commentId) {
+    if (!commentId) {
+      throw new WebError(StatusCodes.BAD_REQUEST, 'Не указан id комментария');
+    }
+    const query = sql.deletes('taskComments').where({ id: commentId, userId });
+    await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
+  }
+
+  public async getTaskAcceptanceCriteria(taskId: number) {
+    if (!taskId) {
+      return [];
+    }
+    const query = sql.select('taskAcceptanceCriteria', '*').where({ projectTaskId: taskId });
+    const [criteria] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    return criteria;
+  }
+
+  public async createTaskAcceptanceCriteria(request) {
+    if (!request.projectTaskId) {
+      throw new WebError(StatusCodes.BAD_REQUEST, 'Не указан id задачи');
+    }
+    const query = sql.insert('taskAcceptanceCriteria', request);
+    const [{ insertId }] = await dbConnection.query<ResultSetHeader>(
+      getQueryText(query.text),
+      query.values,
+    );
+
+    return insertId;
+  }
+
+  public async updateTaskAcceptanceCriteria(criteriaId, request) {
+    if (!criteriaId) {
+      throw new WebError(StatusCodes.BAD_REQUEST, 'Не указан id критерия');
+    }
+    const query = sql.update('taskAcceptanceCriteria', request).where({ id: criteriaId });
+    await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
+  }
+
+  public async removeTaskAcceptanceCriteria(criteriaId) {
+    if (!criteriaId) {
+      throw new WebError(StatusCodes.BAD_REQUEST, 'Не указан id критерия');
+    }
+    const query = sql.deletes('taskAcceptanceCriteria').where({ id: criteriaId });
+    await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
+  }
+
   public async create(projectId: number, request: CreateTaskRequest) {
     const { retroCardId } = request;
     delete request.retroCardId;
@@ -248,7 +346,6 @@ class TaskRepository {
   // eslint-disable-next-line complexity
   public async update(request: Partial<UpdateTaskRequest>, userId: number, sprintId?: number) {
     try {
-      console.log(request, userId, sprintId);
       if ('projectSprintId' in request) {
         const query = sql
           .update('projectPlanningTaskSession', { isCanceled: true })
@@ -263,9 +360,8 @@ class TaskRepository {
         .forEach((key) => {
           model[key] = request[key];
         });
-      
+
       let query = sql.update('projecttask', model);
-      console.log(query);
 
       if (sprintId) {
         query = query.where({ projectSprintId: sprintId });

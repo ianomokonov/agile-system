@@ -5,7 +5,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Permissions } from 'back/src/models/permissions';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
 import { RetroCardCategory } from 'back/src/models/retro-card-category';
-import { Subject } from 'rxjs';
+import { forkJoin, Subject } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
 import { ProjectDataService } from 'src/app/services/project-data.service';
 import { ProjectService } from 'src/app/services/project.service';
@@ -27,18 +27,20 @@ export class RetroComponent implements OnInit, OnDestroy {
   public cardCategory = RetroCardCategory;
   private cardInput$: Subject<any> = new Subject();
   private users: UserShortView[] = [];
+  private points: any[] = [];
+  private myPointsCount = 0;
 
   public get goodCards() {
-    return this.retro?.cards.filter((c) => c.category === RetroCardCategory.Good);
+    return this.retro?.cards.filter((c) => c.category === RetroCardCategory.Good) || [];
   }
   public get badCards() {
-    return this.retro?.cards.filter((c) => c.category === RetroCardCategory.Bad);
+    return this.retro?.cards.filter((c) => c.category === RetroCardCategory.Bad) || [];
   }
-  public get improvmentCards() {
-    return this.retro?.cards.filter((c) => c.category === RetroCardCategory.Improvment);
+  public get improvmentCards(): any[] {
+    return this.retro?.cards.filter((c) => c.category === RetroCardCategory.Improvment) || [];
   }
   public get actionCards() {
-    return this.retro?.cards.filter((c) => c.category === RetroCardCategory.Actions);
+    return this.retro?.cards.filter((c) => c.category === RetroCardCategory.Actions) || [];
   }
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -61,6 +63,7 @@ export class RetroComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.rxAlive))
       .subscribe((cardId) => {
         this.retro.cards = this.retro.cards.filter((c) => c.id !== cardId);
+        this.setCardsPoints();
       });
     this.socketService
       .onUpdateRetroCard()
@@ -91,6 +94,17 @@ export class RetroComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.router.navigate(['../../', 'board'], { relativeTo: this.activatedRoute });
       });
+    this.socketService
+      .of('setCardPoint')
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe(() => {
+        this.getPoints(this.retro?.id)
+          .pipe(takeWhile(() => this.rxAlive))
+          .subscribe((points) => {
+            this.points = points;
+            this.setCardsPoints();
+          });
+      });
   }
 
   public onCreateTask(card) {
@@ -109,6 +123,26 @@ export class RetroComponent implements OnInit, OnDestroy {
       .catch(() => {});
   }
 
+  public setPoints(card) {
+    if (!card.hasMy && this.myPointsCount > 2) {
+      return;
+    }
+    this.socketService.setRetroPoint(card.id);
+  }
+
+  private setCardsPoints() {
+    this.myPointsCount = 0;
+    this.improvmentCards.forEach((cardTemp) => {
+      const card = cardTemp;
+      const cardPoints = this.points?.filter((p) => p.cardId === card.id);
+      card.points = cardPoints?.length || 0;
+      card.hasMy = !!cardPoints.find((p) => p.isMy);
+      if (card.hasMy) {
+        this.myPointsCount += 1;
+      }
+    });
+  }
+
   public ngOnInit(): void {
     this.cardInput$.pipe(takeWhile(() => this.rxAlive)).subscribe((card) => {
       this.socketService.updateRetroCard(card.id, {
@@ -117,6 +151,8 @@ export class RetroComponent implements OnInit, OnDestroy {
       });
     });
     this.activatedRoute.params.pipe(takeWhile(() => this.rxAlive)).subscribe((params) => {
+      this.projectId = params.id;
+
       if (params.retroId) {
         this.socketService.enterRetroRoom(this.projectId, params.retroId);
         this.projectId = params.id;
@@ -130,12 +166,17 @@ export class RetroComponent implements OnInit, OnDestroy {
   }
 
   public getRetro(id: number) {
-    this.retroService
-      .read(this.projectId, id)
+    forkJoin([this.retroService.read(this.projectId, id), this.getPoints(id)])
       .pipe(takeWhile(() => this.rxAlive))
-      .subscribe((retro) => {
+      .subscribe(([retro, points]) => {
         this.retro = retro;
+        this.points = points;
+        this.setCardsPoints();
       });
+  }
+
+  public getPoints(retroId: number) {
+    return this.retroService.getPoints(this.projectId, retroId);
   }
 
   public createCard(category: RetroCardCategory) {
@@ -146,6 +187,7 @@ export class RetroComponent implements OnInit, OnDestroy {
     ) {
       return;
     }
+
     this.socketService.addRetroCard(this.projectId, this.retro.id, category);
   }
 

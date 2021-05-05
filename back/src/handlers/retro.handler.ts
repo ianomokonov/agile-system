@@ -20,6 +20,10 @@ export class PlanningHandler {
     return retroService.createCard(request);
   }
 
+  public async getRetroPoints(retroId, userId) {
+    return retroService.getRetroPoints(retroId, userId);
+  }
+
   public async removeCard(cardId: number) {
     return retroService.removeCard(cardId);
   }

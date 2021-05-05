@@ -16,19 +16,7 @@ export class RetroService {
     return this.http.get<any>(`${this.baseUrl}/${projectId}/retro/${retroId}`);
   }
 
-  public finish(projectId: number, retroId: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${projectId}/retro/${retroId}/finish`);
-  }
-
-  public updateCard(projectId: number, cardId: number, card): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/${projectId}/retro/update-card/${cardId}`, card);
-  }
-
-  public createCard(projectId: number, retroId: number, card): Observable<number> {
-    return this.http.put<number>(`${this.baseUrl}/${projectId}/retro/${retroId}/create-card`, card);
-  }
-
-  public removeCard(projectId: number, cardId: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${projectId}/retro/remove-card/${cardId}`);
+  public getPoints(projectId: number, retroId: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/${projectId}/retro/${retroId}/points`);
   }
 }

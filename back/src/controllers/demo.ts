@@ -18,7 +18,7 @@ demoRouter.get(
   checkProjectPermissions(Permissions.CanReadProject),
   async (req, res) => {
     try {
-      const planning = await demoHandler.read(+req.params.demoId);
+      const planning = await demoHandler.read(+req.params.demoId, res.locals.userId);
       res.status(StatusCodes.OK).json(planning);
     } catch (error) {
       logger.error(error);

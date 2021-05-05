@@ -52,9 +52,44 @@ class TaskService {
   public async getFile(fileId) {
     return taskRepository.getFile(fileId);
   }
+  public async getTaskHistory(taskId) {
+    return taskRepository.getTaskHistory(taskId);
+  }
 
   public async removeFile(fileId: number) {
     return taskRepository.removeFile(fileId);
+  }
+
+  public async getTaskComments(taskId, userId) {
+    return taskRepository.getTaskComments(taskId, userId);
+  }
+
+  public async createTaskComment(request) {
+    return taskRepository.createTaskComment(request);
+  }
+
+  public async updateTaskComment(commentId, request, userId) {
+    return taskRepository.updateTaskComment(userId, commentId, request);
+  }
+
+  public async removeTaskComment(commentId, userId) {
+    return taskRepository.removeTaskComment(userId, commentId);
+  }
+
+  public async getTaskAcceptanceCriteria(taskId) {
+    return taskRepository.getTaskAcceptanceCriteria(taskId);
+  }
+
+  public async createTaskAcceptanceCriteria(request) {
+    return taskRepository.createTaskAcceptanceCriteria(request);
+  }
+
+  public async updateTaskAcceptanceCriteria(criteriaId, request) {
+    return taskRepository.updateTaskAcceptanceCriteria(criteriaId, request);
+  }
+
+  public async removeTaskAcceptanceCriteria(criteriaId) {
+    return taskRepository.removeTaskAcceptanceCriteria(criteriaId);
   }
 }
 
