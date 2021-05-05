@@ -42,6 +42,38 @@ export class TasksHandler {
     const url = await taskService.removeFile(fileId);
     removeFile(url);
   }
+
+  public async getTaskComments(taskId, userId) {
+    return taskService.getTaskComments(taskId, userId);
+  }
+
+  public async createTaskComment(request) {
+    return taskService.createTaskComment(request);
+  }
+
+  public async updateTaskComment(commentId, request, userId) {
+    return taskService.updateTaskComment(userId, commentId, request);
+  }
+
+  public async removeTaskComment(commentId, userId) {
+    return taskService.removeTaskComment(userId, commentId);
+  }
+
+  public async getTaskAcceptanceCriteria(taskId) {
+    return taskService.getTaskAcceptanceCriteria(taskId);
+  }
+
+  public async createTaskAcceptanceCriteria(request) {
+    return taskService.createTaskAcceptanceCriteria(request);
+  }
+
+  public async updateTaskAcceptanceCriteria(criteriaId, request) {
+    return taskService.updateTaskAcceptanceCriteria(criteriaId, request);
+  }
+
+  public async removeTaskAcceptanceCriteria(criteriaId) {
+    return taskService.removeTaskAcceptanceCriteria(criteriaId);
+  }
 }
 
 export default new TasksHandler();

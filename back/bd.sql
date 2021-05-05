@@ -574,12 +574,6 @@ VALUES
   ('на проверке', 3),
   ('сделано', 4);
 
-INSERT INTO
-  `permission` (`name`, `id`)
-VALUES
-  ('CanEditProject', 1),
-  ('CanReadProject', 2);
-
 DELIMITER $$ CREATE TRIGGER create_project_user
 AFTER
 INSERT

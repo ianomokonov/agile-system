@@ -45,7 +45,7 @@
           >
         </div>
       </div>
-      <p *ngIf="!comment.isEditing" class="comment__text m-0 ck-content" [innerHTML]="comment.text"></p>
+      <p *ngIf="!comment.isEditing" class="comment__text m-0 ck-content ck ck-reset" [innerHTML]="comment.text"></p>
       <ckeditor
         [ngClass]="{ 'd-none': !comment.isEditing }"
         [editor]="editor"

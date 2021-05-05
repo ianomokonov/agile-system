@@ -11,12 +11,16 @@
         <button class="btn btn-outline-primary" (click)="openModal(criteria)">
           <i class="fas fa-edit"></i>
         </button>
+        <button class="btn btn-outline-danger ml-2" (click)="removeCriteria(criteria.id)">
+            <i class="fas fa-times"></i>
+          </button>
       </div>
       <div class="description rounded bg-white p-2" *ngIf="criteria.isOpened">
-        <p class="m-0 ck-content" [innerHTML]="criteria.description"></p>
+        <p class="m-0 ck-content ck ck-reset" [innerHTML]="criteria.description"></p>
       </div>
     </div>
   </ng-container>
+  
 
   <button class="btn btn-primary create-btn" (click)="openModal()">
     <i class="fas fa-plus"></i>

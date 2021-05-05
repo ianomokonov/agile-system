@@ -63,43 +63,54 @@ export class TaskService {
 
   public getAcceptanceCriteria(taskId: number): Observable<any[]> {
     return this.http.get<any[]>(
-      `${this.baseUrl}/${this.projectDataService.project?.id}/task/${taskId}/acceptance-criteria`,
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/${taskId}/criteria`,
+    );
+  }
+
+  public createCriteria(taskId, request): Observable<number> {
+    return this.http.post<number>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/${taskId}/create-criteria`,
+      request,
+    );
+  }
+
+  public updateCriteria(criteriaId, request): Observable<void> {
+    return this.http.put<void>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/criteria/${criteriaId}`,
+      request,
+    );
+  }
+
+  public removeCriteria(criteriaId): Observable<void> {
+    return this.http.delete<void>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/criteria/${criteriaId}`,
     );
   }
 
   public getComments(taskId: number): Observable<any[]> {
-    return of([
-      {
-        user: {
-          name: 'Иван',
-          surname: 'Номоконов',
-        },
-        text: `Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-          Consectetur accusantium provident magni officia eligendi
-           voluptates dolore aut error at veritatis tempore ad nostrum 
-           saepe sint consequuntur quo, eaque sequi libero amet ratione, 
-           quasi rerum quisquam placeat consequatur. Magnam quae atque 
-           similique commodi, non distinctio? Molestiae numquam nobis voluptatem odio quae!`,
-        createDate: new Date(),
-      },
-      {
-        user: {
-          name: 'Иван',
-          surname: 'Номоконов',
-        },
-        isMy: true,
-        text: `Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-          Consectetur accusantium provident magni officia eligendi
-           voluptates dolore aut error at veritatis tempore ad nostrum 
-           saepe sint consequuntur quo, eaque sequi libero amet ratione, 
-           quasi rerum quisquam placeat consequatur. Magnam quae atque 
-           similique commodi, non distinctio? Molestiae numquam nobis voluptatem odio quae!`,
-        createDate: new Date(),
-      },
-    ]);
-    // return this.http.get<any[]>(
-    //   `${this.baseUrl}/${this.projectDataService.project?.id}/task/${taskId}/comments`,
-    // );
+    return this.http.get<any[]>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/${taskId}/comments`,
+    );
+  }
+
+  public createComment(taskId, request): Observable<number> {
+    return this.http.post<number>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/${taskId}/create-comment`,
+      request,
+    );
+  }
+
+  public updateComment(commentId, request): Observable<void> {
+    return this.http.put<void>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/comment/${commentId}`,
+      request,
+    );
+  }
+
+  public removeComment(commentId): Observable<void> {
+    return this.http.delete<void>(
+      `${this.baseUrl}/${this.projectDataService.project?.id}/task/comment/${commentId}`,
+    );
   }
 
   public downloadFile(taskId: number, file: UploadFile) {
