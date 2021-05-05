@@ -206,7 +206,18 @@
     <h6 class="d-inline text-dark">{{ task.task.name }}</h6>
     <div class="d-flex">
       <div class="mr-1" [taskType]="task.task.typeId">{{ task.task.typeId | taskType }}</div>
-      <div [taskPriority]="task.task.priorityId">{{ task.task.priorityId | priority }}</div>
+      <!-- <div [taskPriority]="task.task.priorityId">{{ task.task.priorityId | priority }}</div> -->
+      <div
+        class="badge"
+        *ngIf="task.epic"
+        [ngStyle]="{
+          border: '1px solid' + task.epic?.color,
+          'border-left': '10px solid' + task.epic?.color,
+          color: 'black'
+        }"
+      >
+        {{ task.epic.name }}
+      </div>
     </div>
   </div>
 </ng-template>

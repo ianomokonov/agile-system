@@ -163,7 +163,18 @@
       >{{ task.projectUser?.name }} {{ task.projectUser?.surname }}</small
     >
     <div class="mr-1" [taskType]="task.typeId">{{ task.typeId | taskType }}</div>
-    <div class="mr-1" [taskPriority]="task.priorityId">{{ task.priorityId | priority }}</div>
+    <!-- <div class="mr-1" [taskPriority]="task.priorityId">{{ task.priorityId | priority }}</div> -->
+    <div
+      class="badge"
+      *ngIf="task.epic"
+      [ngStyle]="{
+        border: '1px solid' + task.epic?.color,
+        'border-left': '10px solid' + task.epic?.color,
+        color: 'black'
+      }"
+    >
+      {{ task.epic.name }}
+    </div>
     <button
       *ngIf="projectDataService.PID[permissions.CanEditTask] && show"
       class="btn icon-btn ml-3"
