@@ -8,6 +8,14 @@ ng-select {
   }
 }
 
-.ck.ck-balloon-panel{
+.ck.ck-balloon-panel {
   z-index: 1060 !important;
+}
+
+*:not(ckeditor) {
+  &.ck-content {
+    &>p:last-child{
+      margin-bottom: 0 !important;
+    };
+  }
 }
