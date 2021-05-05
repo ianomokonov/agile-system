@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormArray, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
@@ -15,12 +15,16 @@ export class TaskCommentsComponent implements OnInit {
   public editorConfig = { ...editorConfig, placeholder: 'Введите комментарий' };
   public newCommentControl = new FormControl(null, Validators.required);
   public commentTexts: FormArray = new FormArray([]);
-  public comments: any[];
+  @Input() public comments: any[];
   private taskId: number;
+  @Input() public staticView = false;
 
   constructor(private taskService: TaskService, private activatedRoute: ActivatedRoute) {}
 
   public ngOnInit(): void {
+    if (this.staticView) {
+      return;
+    }
     this.activatedRoute.parent?.params.subscribe((params) => {
       this.taskId = params.taskId;
       this.getComments();
@@ -32,6 +36,9 @@ export class TaskCommentsComponent implements OnInit {
   }
 
   public updateComment(commentTemp, commentText: FormControl) {
+    if (this.staticView) {
+      return;
+    }
     const comment = commentTemp;
     if (!comment.isEditing) {
       comment.isEditing = true;
@@ -50,6 +57,9 @@ export class TaskCommentsComponent implements OnInit {
   }
 
   public createComment() {
+    if (this.staticView) {
+      return;
+    }
     if (this.newCommentControl.invalid) {
       this.newCommentControl.markAsTouched();
       return;
@@ -70,6 +80,9 @@ export class TaskCommentsComponent implements OnInit {
   }
 
   public removeComment(comment) {
+    if (this.staticView) {
+      return;
+    }
     if (!comment.isMy) {
       return;
     }

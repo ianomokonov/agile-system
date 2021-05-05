@@ -262,6 +262,21 @@ io.use(authSocketJWT).on('connection', (socket) => {
     io.sockets.in(socket.demoRoom).emit('reopenDemoTask', taskId);
   });
 
+  socket.on('acceptDemoTaskCriteria', async ({ projectId, criteriaId, request }) => {
+    if (
+      !(await checkSocketProjectPermissions(projectId, socket.userId, Permissions.CanStartDemo))
+    ) {
+      return;
+    }
+    if (!socket.demoId) {
+      return;
+    }
+    await tasksHandler.updateTaskAcceptanceCriteria(criteriaId, request);
+    io.sockets
+      .in(socket.demoRoom)
+      .emit('acceptDemoTaskCriteria', { criteriaId, isDone: request.isDone });
+  });
+
   socket.on('finishDemo', async (projectId) => {
     if (
       !(await checkSocketProjectPermissions(projectId, socket.userId, Permissions.CanStartDemo))

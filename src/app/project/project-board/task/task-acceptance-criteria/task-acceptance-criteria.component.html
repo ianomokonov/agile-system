@@ -1,28 +1,53 @@
 <div class="position-relative">
   <ng-container *ngIf="criterias?.length; else noData"
     ><div class="content rounded p-2" *ngFor="let criteria of criterias">
-      <div class="header d-flex" [ngClass]="{ 'mb-1': criteria.isOpened }">
+      <div
+        class="header d-flex align-items-center"
+        [ngClass]="{ 'mb-1': criteria.isOpened, done: criteria.isDone }"
+      >
         <div class="name" (click)="toggleCriteria(criteria)">
           <span class="d-block mr-2"
             ><i class="fas fa-chevron-right mr-2" [ngClass]="{ opened: criteria.isOpened }"></i
-            >{{ criteria.name }}</span
+            ><span class="name-value">{{ criteria.name }}</span></span
           >
         </div>
-        <button class="btn btn-outline-primary" (click)="openModal(criteria)">
-          <i class="fas fa-edit"></i>
-        </button>
-        <button class="btn btn-outline-danger ml-2" (click)="removeCriteria(criteria.id)">
+        <ng-container *ngIf="!staticView">
+          <button
+            class="btn btn-outline-primary"
+            (click)="openModal(criteria)"
+            *ngIf="projectDataService.PID[permissions.CanEditTask]"
+          >
+            <i class="fas fa-edit"></i>
+          </button>
+          <button
+            class="btn btn-outline-danger ml-2"
+            (click)="removeCriteria(criteria.id)"
+            *ngIf="projectDataService.PID[permissions.CanEditTask]"
+          >
             <i class="fas fa-times"></i>
           </button>
+        </ng-container>
+        <ng-container *ngIf="staticView">
+          <input
+            *ngIf="projectDataService.PID[permissions.CanStartDemo]"
+            type="checkbox"
+            [(ngModel)]="criteria.isDone"
+            (change)="onIsDoneChanged(criteria)"
+            class="form-check-input position-static m-0"
+          />
+        </ng-container>
       </div>
       <div class="description rounded bg-white p-2" *ngIf="criteria.isOpened">
         <p class="m-0 ck-content ck ck-reset" [innerHTML]="criteria.description"></p>
       </div>
     </div>
   </ng-container>
-  
 
-  <button class="btn btn-primary create-btn" (click)="openModal()">
+  <button
+    class="btn btn-primary create-btn"
+    (click)="openModal()"
+    *ngIf="!staticView && projectDataService.PID[permissions.CanEditTask]"
+  >
     <i class="fas fa-plus"></i>
   </button>
 </div>

@@ -24,7 +24,7 @@ class DemoRepository {
     return demoId;
   }
 
-  public async read(demoId: number) {
+  public async read(demoId: number, userId) {
     const query = sql
       .select('projectDemo', [
         'projectDemo.id',
@@ -42,7 +42,7 @@ class DemoRepository {
     if (!demo) {
       return null;
     }
-    [demo.taskToShow, demo.shownTasks] = await this.getDemoTasks(demo.id);
+    [demo.taskToShow, demo.shownTasks] = await this.getDemoTasks(demo.id, userId);
 
     return demo;
   }
@@ -63,13 +63,15 @@ class DemoRepository {
     return demo as { id: number; isFinished: number };
   }
 
-  private async getDemoTasks(demoId: number) {
+  private async getDemoTasks(demoId: number, userId) {
     const query = sql.select('projectDemoTask', '*').where({ demoId });
     let [tasks] = await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
     tasks = await Promise.all(
       tasks.map(async (taskTemp) => {
         const task = taskTemp;
         task.task = await taskRepository.read(task.taskId);
+        task.task.criteria = await taskRepository.getTaskAcceptanceCriteria(task.taskId);
+        task.task.comments = await taskRepository.getTaskComments(task.taskId, userId);
         return task;
       }),
     );

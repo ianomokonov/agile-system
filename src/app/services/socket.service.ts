@@ -116,6 +116,10 @@ export class SocketService {
     this.socket.emit('acceptDemoTask', { projectId, taskId });
   }
 
+  public acceptDemoTaskCriteria(projectId: number, criteriaId, request) {
+    this.socket.emit('acceptDemoTaskCriteria', { projectId, criteriaId, request });
+  }
+
   public reopenDemoTask(projectId: number, taskId) {
     this.socket.emit('reopenDemoTask', { projectId, taskId });
   }

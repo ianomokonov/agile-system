@@ -25,6 +25,7 @@ export class DemoComponent implements OnInit, OnDestroy {
   private projectId: number;
   public demo;
   public activeTask: any;
+  public activeTab = 1;
   public editor = ClassicEditor;
   public permissions = Permissions;
   public getTaskFiles = getTaskFiles;
@@ -62,7 +63,30 @@ export class DemoComponent implements OnInit, OnDestroy {
     this.taskService.downloadFile(this.activeTask.task.id, file.id).subscribe();
   }
 
+  public canAcceptTask() {
+    if (!this.activeTask || !this.activeTask.task.criteria?.length) {
+      return true;
+    }
+
+    return !this.activeTask.task.criteria.some((c) => !c.isDone);
+  }
+
+  public saveDoneCriteria(criteria) {
+    this.socketService.acceptDemoTaskCriteria(this.projectId, criteria.id, {
+      isDone: !!criteria.isDone,
+    });
+  }
+
   public ngOnInit(): void {
+    this.socketService
+      .of('acceptDemoTaskCriteria')
+      .pipe(takeWhile(() => this.rxAlive))
+      .subscribe(({ isDone, criteriaId }) => {
+        const criteria = this.activeTask.task.criteria?.find((c) => c.id === criteriaId);
+        if (criteria) {
+          criteria.isDone = isDone;
+        }
+      });
     this.socketService
       .onFinishDemo()
       .pipe(takeWhile(() => this.rxAlive))
@@ -81,15 +105,6 @@ export class DemoComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.rxAlive))
       .subscribe(() => {
         this.getDemo(this.demo?.id);
-      });
-    this.socketService
-      .onActiveDemoTask()
-      .pipe(takeWhile(() => this.rxAlive))
-      .subscribe((demoTaskId) => {
-        this.router.navigate([], {
-          queryParams: { demoTaskId },
-          relativeTo: this.activatedRoute,
-        });
       });
     if (sessionStorage.getItem(this.commentKey)) {
       this.commentControl.setValue(sessionStorage.getItem(this.commentKey), { emitEvent: false });
@@ -120,7 +135,10 @@ export class DemoComponent implements OnInit, OnDestroy {
   }
 
   public onTaskClick(demoTaskId) {
-    this.socketService.activeDemoTask(demoTaskId);
+    this.router.navigate([], {
+      queryParams: { demoTaskId },
+      relativeTo: this.activatedRoute,
+    });
   }
 
   public acceptTask(demoTaskId) {
@@ -218,5 +236,11 @@ export class DemoComponent implements OnInit, OnDestroy {
     this.activeTask =
       this.demo.taskToShow?.find((task) => task.id === +demoTaskId) ||
       this.demo.shownTasks?.find((task) => task.id === +demoTaskId);
+    if (!this.activeTask.task.comments?.length) {
+      this.activeTab = 1;
+    }
+    if (!this.activeTask.task.criteria?.length) {
+      this.activeTab = 2;
+    }
   }
 }

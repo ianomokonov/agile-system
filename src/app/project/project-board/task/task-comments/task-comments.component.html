@@ -12,17 +12,15 @@
         "
       ></div>
     </div>
-    
+
     <div class="comment__data pl-2">
       <div class="comment__sender-info d-flex mb-2 align-items-baseline">
-        <div class="comment__user-name mr-2">
-          {{ comment.userName }} {{ comment.userSurname }}
-        </div>
+        <div class="comment__user-name mr-2">{{ comment.userName }} {{ comment.userSurname }}</div>
         <div class="d-flex">
           <small class="comment__date-time text-muted">{{
             comment.createDate | date: 'dd.MM.yyyy HH.mm'
           }}</small>
-          <ng-container *ngIf="comment.isMy"
+          <ng-container *ngIf="!staticView && comment.isMy"
             ><small class="text-muted mx-2">•</small>
             <small class="comment__edit-btn" (click)="updateComment(comment, getTextControl(index))"
               ><a class="text-primary" href="javascript:;">{{
@@ -41,13 +39,20 @@
 
             <small class="text-muted mx-2">•</small>
             <small class="comment__edit-btn"
-              ><a class="text-danger" href="javascript:;" (click)="removeComment(comment)">Удалить</a></small
+              ><a class="text-danger" href="javascript:;" (click)="removeComment(comment)"
+                >Удалить</a
+              ></small
             ></ng-container
           >
         </div>
       </div>
-      <p *ngIf="!comment.isEditing" class="comment__text m-0 ck-content ck ck-reset mw-100" [innerHTML]="comment.text"></p>
+      <p
+        *ngIf="!comment.isEditing"
+        class="comment__text m-0 ck-content ck ck-reset mw-100"
+        [innerHTML]="comment.text"
+      ></p>
       <ckeditor
+        *ngIf="!staticView"
         [ngClass]="{ 'd-none': !comment.isEditing }"
         [editor]="editor"
         [config]="editorConfig"
@@ -56,8 +61,13 @@
     </div>
   </div>
 </div>
-
-<div class="form-group">
-  <ckeditor [editor]="editor" [config]="editorConfig" [formControl]="newCommentControl"></ckeditor>
-</div>
-<button class="btn btn-primary" (click)="createComment()">Сохранить</button>
+<ng-container *ngIf="!staticView"
+  ><div class="form-group">
+    <ckeditor
+      [editor]="editor"
+      [config]="editorConfig"
+      [formControl]="newCommentControl"
+    ></ckeditor>
+  </div>
+  <button class="btn btn-primary" (click)="createComment()">Сохранить</button>
+</ng-container>

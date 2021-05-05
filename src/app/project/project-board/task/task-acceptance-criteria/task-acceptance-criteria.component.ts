@@ -1,8 +1,10 @@
 /* eslint-disable no-restricted-globals */
 /* eslint-disable no-param-reassign */
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Permissions } from 'back/src/models/permissions';
+import { ProjectDataService } from 'src/app/services/project-data.service';
 import { TaskService } from 'src/app/services/task.service';
 import { UpdateCriteriaModalComponent } from './update-criteria-modal/update-criteria-modal.component';
 
@@ -11,18 +13,30 @@ import { UpdateCriteriaModalComponent } from './update-criteria-modal/update-cri
   templateUrl: './task-acceptance-criteria.component.html',
   styleUrls: ['./task-acceptance-criteria.component.less'],
 })
-export class TaskAcceptanceCriteriaComponent {
-  public criterias: any[] = [];
+export class TaskAcceptanceCriteriaComponent implements OnInit {
+  @Input() public criterias: any[] = [];
   private taskId: number;
+  @Input() public staticView = false;
+  @Output() public done: EventEmitter<any> = new EventEmitter();
+  public permissions = Permissions;
   constructor(
     private modalService: NgbModal,
     private taskService: TaskService,
     private activatedRoute: ActivatedRoute,
-  ) {
-    this.activatedRoute.parent?.params.subscribe((params) => {
-      this.taskId = params.taskId;
-      this.getCriteria();
-    });
+    public projectDataService: ProjectDataService,
+  ) {}
+
+  public ngOnInit() {
+    if (!this.staticView) {
+      this.activatedRoute.parent?.params.subscribe((params) => {
+        this.taskId = params.taskId;
+        this.getCriteria();
+      });
+    }
+  }
+
+  public onIsDoneChanged(criteria) {
+    this.done.emit(criteria);
   }
 
   private getCriteria() {
@@ -37,6 +51,9 @@ export class TaskAcceptanceCriteriaComponent {
   }
 
   public openModal(value?) {
+    if (this.staticView) {
+      return;
+    }
     const modal = this.modalService.open(UpdateCriteriaModalComponent);
     modal.componentInstance.setCriteria(value);
     modal.closed.subscribe((result) => {
@@ -64,6 +81,9 @@ export class TaskAcceptanceCriteriaComponent {
   }
 
   public removeCriteria(criteriaId) {
+    if (this.staticView) {
+      return;
+    }
     // eslint-disable-next-line no-alert
     if (!confirm('Вы уверены, что хотите удалить критерий?')) {
       return;
