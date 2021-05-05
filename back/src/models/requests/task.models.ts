@@ -23,6 +23,7 @@ export interface UpdateTaskRequest {
   statusId: number;
   typeId: number;
   projectSprintId?: number | null;
+  epicId?: number | null;
   priorityId: number;
   points: number;
 }

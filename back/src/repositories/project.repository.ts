@@ -26,6 +26,11 @@ import { WebError } from '../models/error';
 // eslint-disable-next-line import/no-cycle
 import planningRepository from './planning.repository';
 import { Permissions } from '../models/permissions';
+import { ProjectEpicResponse } from '../models/responses/project-epic.response';
+import {
+  CreateProjectEpicRequest,
+  UpdateProjectEpicRequest,
+} from '../models/requests/project-epic.models';
 
 sql.use('mysql');
 
@@ -125,6 +130,71 @@ class ProjectRepository {
       }),
     );
     return users as UserShortView[];
+  }
+
+  public async getEpic(epicId: number) {
+    if (epicId) {
+      const query = sql
+        .select('epics', ['epics.id', 'epics.name', 'epics.description', 'epics.color'])
+        .where({ 'epics.id': epicId });
+      const [[epics]] = await dbConnection.query<RowDataPacket[]>(
+        getQueryText(query.text),
+        query.values,
+      );
+      return epics as ProjectEpicResponse;
+    }
+    return null;
+  }
+
+  public async getProjectEpics(projectId: number) {
+    const query = sql
+      .select('epics', ['epics.id', 'epics.name', 'epics.description', 'epics.color'])
+      .where({ 'epics.projectId': projectId });
+    const [epics] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    return epics as ProjectEpicResponse[];
+  }
+
+  public async addProjectEpic(projectId: number, request: CreateProjectEpicRequest) {
+    const query = sql.insert('epics', {
+      projectId,
+      name: request.name,
+      description: request.description,
+      color: request.color,
+    });
+    try {
+      const result = await dbConnection.query(getQueryText(query.text), query.values);
+      return result;
+    } catch (e) {
+      throw new WebError(
+        StatusCodes.CONFLICT,
+        'Пользователь уже в проекте или является создателем проекта',
+      );
+    }
+  }
+
+  public async editProjectEpic(request: UpdateProjectEpicRequest) {
+    const query = sql
+      .update('epics', {
+        name: request.name,
+        description: request.description,
+        color: request.color,
+      })
+      .where({ id: request.epicId });
+    await dbConnection.query(getQueryText(query.text), query.values);
+  }
+
+  public async removeProjectEpic(epicId: number) {
+    if (!epicId) {
+      console.error('Укажите id пользователя проекта');
+      return;
+    }
+
+    const query = sql.deletes('epics').where({ id: epicId });
+
+    await dbConnection.query(getQueryText(query.text), query.values);
   }
 
   public async getProjectSprints(projectId: number) {
@@ -399,6 +469,7 @@ class ProjectRepository {
       'id',
       'name',
       'statusId',
+      'epicId',
       'typeId',
       'priorityId',
       'createDate',
@@ -417,6 +488,7 @@ class ProjectRepository {
       tasks.map(async (taskTemp) => {
         const task = taskTemp;
         task.projectUser = await this.getProjectUser(task.projectUserId);
+        task.epic = await this.getEpic(task.epicId);
         return task;
       }),
     );

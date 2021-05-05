@@ -40,11 +40,12 @@ class TaskRepository {
     const [[task]] = await dbConnection.query<RowDataPacket[]>(`SELECT *
         FROM projecttask 
         WHERE id=${taskId}`);
-    const [status, user, creator, sprints, history] = await Promise.all([
+    const [status, user, creator, sprints, epic, history] = await Promise.all([
       this.getStatus(task.statusId),
       projectRepository.getProjectUser(task.projectUserId),
       projectRepository.getProjectUser(task.creatorId),
       projectRepository.getProjectSprintNames(task.projectId, task.projectSprintId),
+      projectRepository.getEpic(task.epicId),
       this.getTaskHistory(taskId),
     ]);
 
@@ -52,6 +53,7 @@ class TaskRepository {
     task.projectUser = user;
     task.creator = creator;
     task.history = history;
+    task.epic = epic;
     task.sprint = task.projectSprintId ? sprints[0] : null;
     task.files = await this.getFiles(taskId);
     return task as TaskResponse;
@@ -246,12 +248,13 @@ class TaskRepository {
   // eslint-disable-next-line complexity
   public async update(request: Partial<UpdateTaskRequest>, userId: number, sprintId?: number) {
     try {
+      console.log(request, userId, sprintId);
       if ('projectSprintId' in request) {
         const query = sql
           .update('projectPlanningTaskSession', { isCanceled: true })
           .where({ taskId: request.id })
           .and({ resultValue: null }, 'IS');
-        dbConnection.query(getQueryText(query.text), query.values);
+        await dbConnection.query(getQueryText(query.text), query.values);
       }
       const model = { lastEditUserId: userId } as any;
       const specialKeys = ['id'];
@@ -260,8 +263,9 @@ class TaskRepository {
         .forEach((key) => {
           model[key] = request[key];
         });
-
+      
       let query = sql.update('projecttask', model);
+      console.log(query);
 
       if (sprintId) {
         query = query.where({ projectSprintId: sprintId });

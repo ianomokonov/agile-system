@@ -16,6 +16,7 @@ import { ProjectService } from 'src/app/services/project.service';
 import { editorConfig, userSearchFn } from 'src/app/utils/constants';
 import { UploadFile } from 'src/app/shared/multiple-file-uploader/multiple-file-uploader.component';
 import { Permissions } from 'back/src/models/permissions';
+import { ProjectEpicResponse } from 'back/src/models/responses/project-epic.response';
 import { EditTaskComponent } from './edit-task/edit-task.component';
 
 @Component({
@@ -32,6 +33,7 @@ export class TaskComponent implements OnDestroy {
   public editingDescription = false;
   public editingName = false;
   public sprints: IdNameResponse[] = [];
+  public epics: ProjectEpicResponse[] = [];
   public userSerachFn = userSearchFn;
 
   public project: ProjectResponse;
@@ -86,11 +88,13 @@ export class TaskComponent implements OnDestroy {
           forkJoin([
             this.projectDataService.getProject(task.projectId),
             this.projectService.getProjectSprints(task.projectId),
+            this.projectService.getProjectEpics(task.projectId),
           ])
             .pipe(takeWhile(() => this.rxAlive))
-            .subscribe(([project, sprints]) => {
+            .subscribe(([project, sprints, epics]) => {
               this.project = project;
               this.sprints = sprints;
+              this.epics = epics;
             });
         }
         this.task = task;
@@ -168,17 +172,16 @@ export class TaskComponent implements OnDestroy {
     const modal = this.modalService.open(EditTaskComponent);
     modal.componentInstance.statuses = this.project.statuses;
     modal.componentInstance.sprints = this.sprints;
+    modal.componentInstance.epics = this.epics;
     modal.componentInstance.task = this.task;
-    modal.result
-      .then((result) => {
-        this.taskService
-          .editTask(this.task.id, result)
-          .pipe(takeWhile(() => this.rxAlive))
-          .subscribe(() => {
-            this.getTaskInfo(this.task.id);
-          });
-      })
-      .catch(() => {});
+    modal.closed.subscribe((result) => {
+      this.taskService
+        .editTask(this.task.id, result)
+        .pipe(takeWhile(() => this.rxAlive))
+        .subscribe(() => {
+          this.getTaskInfo(this.task.id);
+        });
+    });
   }
 
   public deleteTask() {

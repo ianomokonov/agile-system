@@ -48,6 +48,19 @@
     >
     </ng-select>
   </div>
+
+  <div class="form-group">
+    <label>Эпик</label>
+    <ng-select
+      [items]="epics"
+      formControlName="epicId"
+      bindValue="id"
+      bindLabel="name"
+      [closeOnSelect]="true"
+    >
+    </ng-select>
+  </div>
+
   <div class="form-group">
     <label>Статус</label>
     <ng-select

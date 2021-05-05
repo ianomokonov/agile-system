@@ -6,6 +6,7 @@ import getProjectEditInfoHandler from '../handlers/project/get-project-edit-info
 import getProjectPermissionsHandler from '../handlers/project/get-project-permissions.handler';
 import getProjectHandler from '../handlers/project/get-project.handler';
 import projectBacklogHandler from '../handlers/project/project-backlog.handler';
+import projectEpicsHandler from '../handlers/project/project-epics.handler';
 import projectRolesHandler from '../handlers/project/project-roles.handler';
 import projectSprintHandler from '../handlers/project/project-sprint.handler';
 import projectUsersHandler from '../handlers/project/project-users.handler';
@@ -133,6 +134,46 @@ projectRouter.get(
   async (req, res) => {
     const users = await projectUsersHandler.read(res.locals.projectId, res.locals.userId);
     res.status(StatusCodes.OK).json(users);
+  },
+);
+
+projectRouter.get(
+  `/:projectId/epics`,
+  checkPermissions(Permissions.CanReadProject),
+  async (req, res) => {
+    const epics = await projectEpicsHandler.read(res.locals.projectId);
+    res.status(StatusCodes.OK).json(epics);
+  },
+);
+
+projectRouter.post(
+  `/:projectId/add-epic`,
+  checkPermissions(Permissions.CanEditProject),
+  async (req, res) => {
+    try {
+      await projectEpicsHandler.create(res.locals.projectId, req.body);
+      res.status(StatusCodes.CREATED).json('Пользователь добавлен');
+    } catch (error) {
+      res.status(error.statusCode).json(error.error);
+    }
+  },
+);
+
+projectRouter.put(
+  `/:projectId/edit-epic`,
+  checkPermissions(Permissions.CanEditProject),
+  async (req, res) => {
+    await projectEpicsHandler.update(req.body);
+    res.status(StatusCodes.OK).json('Пользователь обновлен');
+  },
+);
+
+projectRouter.delete(
+  `/:projectId/remove-epic`,
+  checkPermissions(Permissions.CanEditProject),
+  async (req, res) => {
+    await projectEpicsHandler.delete(+req.query.projectEpicId);
+    res.status(StatusCodes.OK).json('Пользователь удален');
   },
 );
 

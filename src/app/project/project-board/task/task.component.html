@@ -58,8 +58,15 @@
               <small class="text-muted">Статус</small>
               <h6>{{ task.status.name }}</h6>
             </div>
-            <div class="col-4">
-              <small class="text-muted" *ngIf="task.points">Оценка</small>
+            <div class="col-4" *ngIf="task.epic">
+              <small class="text-muted">Эпик</small>
+              <div class="d-flex">
+                <h6 class="mr-2">{{ task.epic?.name }}</h6>
+                <div class="epic-color" [ngStyle]="{ 'background-color': task.epic.color }" ></div>
+              </div>
+            </div>
+            <div class="col-4" *ngIf="task.points">
+              <small class="text-muted">Оценка</small>
               <h6>{{ task.points }}</h6>
             </div>
             <div class="col-4">
@@ -135,10 +142,14 @@
             <a class="nav-link" routerLink="comments" [routerLinkActive]="'active'">Комментарии</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="acceptance-tests" [routerLinkActive]="'active'">Критерии приемки</a>
+            <a class="nav-link" routerLink="acceptance-tests" [routerLinkActive]="'active'"
+              >Критерии приемки</a
+            >
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="history" [routerLinkActive]="'active'">История изменений</a>
+            <a class="nav-link" routerLink="history" [routerLinkActive]="'active'"
+              >История изменений</a
+            >
           </li>
         </ul>
         <router-outlet></router-outlet>

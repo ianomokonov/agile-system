@@ -27,6 +27,7 @@
     "@ng-select/ng-select": "^6.1.0",
     "bootstrap": "^4.5.0",
     "file-saver": "^2.0.5",
+    "ngx-color-picker": "^11.0.0",
     "ngx-filesaver": "^11.0.0",
     "ngx-socket-io": "^4.0.0",
     "rxjs": "~6.6.0",

@@ -14,6 +14,10 @@ import projectRepository from '../repositories/project.repository';
 import retroRepository from '../repositories/retro.repository';
 import { Permissions } from '../models/permissions';
 import demoService from './demo-service';
+import {
+  CreateProjectEpicRequest,
+  UpdateProjectEpicRequest,
+} from '../models/requests/project-epic.models';
 
 class ProjectService {
   public async create(userId: number, project: CreateProjectRequest) {
@@ -55,6 +59,22 @@ class ProjectService {
 
   public async getProjectUsers(projectId: number, userId: number) {
     return projectRepository.getFullProjectUsers(projectId, userId, false);
+  }
+
+  public async getProjectEpics(projectId: number) {
+    return projectRepository.getProjectEpics(projectId);
+  }
+
+  public async addProjectEpic(projectId: number, request: CreateProjectEpicRequest) {
+    return projectRepository.addProjectEpic(projectId, request);
+  }
+
+  public async editProjectEpic(request: UpdateProjectEpicRequest) {
+    return projectRepository.editProjectEpic(request);
+  }
+
+  public async removeProjectEpic(epicId: number) {
+    return projectRepository.removeProjectEpic(epicId);
   }
 
   public async read(projectId: number, userId: number): Promise<ProjectResponse> {

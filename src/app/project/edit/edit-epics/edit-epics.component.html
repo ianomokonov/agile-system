@@ -1,0 +1,89 @@
+<h5>Эпики проекта</h5>
+<ng-container *ngIf="projectEpics?.length; else noData">
+  <div class="d-flex flex-wrap">
+    <div
+      class="rounded p-2 mr-3 mb-3 cursor-pointer"
+      [ngClass]="{ 'bg-primary text-white': epic.id === editingEpic?.id }"
+      [ngStyle]="{
+        'border-bottom': epic.color !== '' ? '10px solid' + epic.color : '0px solid white'
+      }"
+      *ngFor="let epic of projectEpics"
+      (click)="onEpicClick(epic)"
+    >
+      <p class="m-0">{{ epic.name }}</p>
+    </div>
+    <div
+      (click)="onEpicClick()"
+      class="rounded border border-primary p-2 px-3 mr-3 mb-3 cursor-pointer d-flex align-items-center"
+      [ngClass]="{ 'bg-primary text-white': !editingEpic, 'text-primary': editingEpic }"
+    >
+      <i class="fas fa-plus"></i>
+    </div>
+  </div>
+</ng-container>
+<ng-container>
+  <hr />
+  <form [formGroup]="epicForm" (submit)="saveProjectEpic()">
+    <div class="d-flex justify-content-between align-items-center mb-3 header">
+      <h5 class="m-0">{{ editingEpic ? 'Изменение эпиков' : 'Добавление эпиков' }}</h5>
+      <button
+        type="button"
+        class="btn btn-outline-danger"
+        *ngIf="editingEpic"
+        (click)="removeEpic(editingEpic?.id)"
+      >
+        Удалить эпик
+      </button>
+    </div>
+
+    <div class="row">
+      <div class="col-8 form-group">
+        <label>Название</label>
+        <input type="text" class="form-control" formControlName="name" />
+      </div>
+      <div class="col-4 form-group">
+        <label>Цвет</label>
+        <input
+          class="form-control"
+          formControlName="color"
+          [ngStyle]="{
+            'border-right':
+              color !== ''
+                ? '30px solid' + color
+                : '1px solid #ced4da'
+          }"
+          [(colorPicker)]="color"
+        />
+        <div *ngIf="epicForm.controls['color'].errors">
+          <small
+            class="text-danger"
+            *ngIf="epicForm.controls['color'].touched && epicForm.controls['color'].errors?.noValue"
+          >
+            Укажите цвет!
+          </small>
+          <small
+            class="text-danger"
+            *ngIf="
+              epicForm.controls['color'].touched && epicForm.controls['color'].errors?.badFormat
+            "
+          >
+            Неверный формат цвета!
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Описание</label>
+      <input type="text" class="form-control" formControlName="description" />
+    </div>
+
+    <div class="text-right">
+      <button class="btn btn-primary">Сохранить</button>
+    </div>
+  </form>
+</ng-container>
+
+<ng-template #noData>
+  <p class="m-0 py-4 text-muted">Эпики отсутствуют</p>
+</ng-template>

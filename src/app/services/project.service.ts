@@ -19,6 +19,11 @@ import { CreateSprintRequest } from 'back/src/models/requests/create-sprint.requ
 import { IdNameResponse } from 'back/src/models/responses/id-name.response';
 import { PlanningFullView } from 'back/src/models/responses/planning';
 import { PlanningUpdateRequest } from 'back/src/models/requests/planning-update.request';
+import { ProjectEpicResponse } from 'back/src/models/responses/project-epic.response';
+import {
+  CreateProjectEpicRequest,
+  UpdateProjectEpicRequest,
+} from 'back/src/models/requests/project-epic.models';
 
 @Injectable()
 export class ProjectService {
@@ -62,6 +67,28 @@ export class ProjectService {
       `${this.baseUrl}/${projectId}/remove-user?projectUserId=${userId}`,
     );
   }
+
+  // ------ Epics
+
+  public getProjectEpics(projectId: number): Observable<ProjectEpicResponse[]> {
+    return this.http.get<ProjectEpicResponse[]>(`${this.baseUrl}/${projectId}/epics`);
+  }
+
+  public editProjectEpic(projectId: number, epic: UpdateProjectEpicRequest): Observable<string> {
+    return this.http.put<string>(`${this.baseUrl}/${projectId}/edit-epic`, epic);
+  }
+
+  public addProjectEpic(projectId: number, epic: CreateProjectEpicRequest): Observable<string> {
+    return this.http.post<string>(`${this.baseUrl}/${projectId}/add-epic`, epic);
+  }
+
+  public removeProjectEpic(projectId: number, epicId: number): Observable<string> {
+    return this.http.delete<string>(
+      `${this.baseUrl}/${projectId}/remove-epic?projectEpicId=${epicId}`,
+    );
+  }
+
+  //
 
   public addProjectRole(projectId: number, role: CreateProjectRoleRequest): Observable<string> {
     return this.http.post<string>(`${this.baseUrl}/${projectId}/add-role`, role);

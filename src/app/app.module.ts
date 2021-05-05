@@ -10,6 +10,7 @@ import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SocketIoModule } from 'ngx-socket-io';
 import { FileSaverModule } from 'ngx-filesaver';
+import { ColorPickerModule } from 'ngx-color-picker';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SingUpComponent } from './security/sing-up/sing-up.component';
@@ -59,6 +60,7 @@ import { MultipleFileUploaderComponent } from './shared/multiple-file-uploader/m
 import { TaskCommentsComponent } from './project/project-board/task/task-comments/task-comments.component';
 import { TaskAcceptanceTestsComponent } from './project/project-board/task/task-acceptance-tests/task-acceptance-tests.component';
 import { TaskHistoryComponent } from './project/project-board/task/task-history/task-history.component';
+import { EditEpicsComponent } from './project/edit/edit-epics/edit-epics.component';
 
 @NgModule({
   declarations: [
@@ -98,6 +100,7 @@ import { TaskHistoryComponent } from './project/project-board/task/task-history/
     TaskCommentsComponent,
     TaskAcceptanceTestsComponent,
     TaskHistoryComponent,
+    EditEpicsComponent,
   ],
   imports: [
     BrowserModule,
@@ -112,6 +115,7 @@ import { TaskHistoryComponent } from './project/project-board/task/task-history/
     DragDropModule,
     SocketIoModule,
     FileSaverModule,
+    ColorPickerModule,
   ],
   providers: [
     FormBuilder,

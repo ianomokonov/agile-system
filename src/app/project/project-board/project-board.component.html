@@ -45,7 +45,12 @@
       (cdkDropListDropped)="changeStatus($event)"
     >
       <div class="content">
-        <div class="task rounded" *ngFor="let task of tasksStatus" cdkDrag [cdkDragDisabled]="first && !task.projectUser">
+        <div
+          class="task rounded"
+          *ngFor="let task of tasksStatus"
+          cdkDrag
+          [cdkDragDisabled]="first && !task.projectUser"
+        >
           <div class="d-flex justify-content-between mb-1">
             <small class="text-muted">#{{ task.id }}</small>
             <div class="badge bg-secondary" *ngIf="task.points">{{ task.points }}</div>
@@ -53,11 +58,33 @@
           <h6 [routerLink]="['../task', task.id]">{{ task.name }}</h6>
           <div class="d-flex">
             <div class="mr-1" [taskType]="task.typeId">{{ task.typeId | taskType }}</div>
-            <div [taskPriority]="task.priorityId">{{ task.priorityId | priority }}</div>
+            <div class="mr-1" [taskPriority]="task.priorityId">{{ task.priorityId | priority }}</div>
+            <!-- <div
+              class="badge"
+              *ngIf="task.epic"
+              [ngStyle]="{
+                border: '2px solid' + task.epic?.color,
+                'border-left': '10px solid' + task.epic?.color,
+                'color': 'black'
+              }"
+            >
+              {{ task.epic.name }}
+            </div> -->
           </div>
           <small class="text-muted"
             >{{ task.projectUser?.name }} {{ task.projectUser?.surname }}</small
           >
+          <div
+              class="badge d-block mt-2"
+              *ngIf="task.epic"
+              [ngStyle]="{
+                border: '2px solid' + task.epic?.color,
+                'border-left': '10px solid' + task.epic?.color,
+                'color': 'black'
+              }"
+            >
+              {{ task.epic.name }}
+            </div>
         </div>
       </div>
       <div

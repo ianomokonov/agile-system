@@ -5,6 +5,7 @@ import { CreateComponent } from './profile/projects/create/create.component';
 import { DailyComponent } from './project/daily/daily.component';
 import { DemoComponent } from './project/demo/demo.component';
 import { EditProjectFormComponent } from './project/edit-project-form/edit-project-form.component';
+import { EditEpicsComponent } from './project/edit/edit-epics/edit-epics.component';
 import { EditRolesComponent } from './project/edit/edit-roles/edit-roles.component';
 import { EditUsersComponent } from './project/edit/edit-users/edit-users.component';
 import { MarkTasksComponent } from './project/planning/mark-tasks/mark-tasks.component';
@@ -129,6 +130,10 @@ const routes: Routes = [
       {
         path: 'info',
         component: EditProjectFormComponent,
+      },
+      {
+        path: 'epics',
+        component: EditEpicsComponent,
       },
       {
         path: 'roles',
