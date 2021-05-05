@@ -68,6 +68,10 @@ export class SocketService {
     this.socket.emit('leaveRetro', retroId);
   }
 
+  public setRetroPoint(cardId) {
+    this.socket.emit('setCardPoint', cardId);
+  }
+
   public addRetroCard(projectId: number, retroId, category: RetroCardCategory) {
     this.socket.emit('addRetroCard', { projectId, retroId, category });
   }

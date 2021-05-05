@@ -37,6 +37,10 @@ class RetroService {
   public async getByProjectSprintId(sprintId) {
     return retroRepository.getByProjectSprintId(sprintId);
   }
+
+  public async getRetroPoints(retroId, userId) {
+    return retroRepository.getRetroPoints(retroId, userId);
+  }
 }
 
 export default new RetroService();

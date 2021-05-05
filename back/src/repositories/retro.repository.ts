@@ -28,6 +28,25 @@ class RetroRepository {
     return this.getCard(cardId);
   }
 
+  public async addCardPoint(cardId, userId) {
+    try {
+      const query = sql.insert('retroCardPoint', { cardId, userId });
+      const [{ insertId: pointId }] = await dbConnection.query<ResultSetHeader>(
+        getQueryText(query.text),
+        query.values,
+      );
+      return pointId;
+    } catch (error) {
+      await this.removeCardPoint(cardId, userId);
+      return null;
+    }
+  }
+
+  public async removeCardPoint(cardId, userId) {
+    const query = sql.deletes('retroCardPoint').where({ cardId, userId });
+    await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
+  }
+
   public async removeCard(cardId: number) {
     const query = sql.deletes('projectRetroCard').where({ id: cardId });
 
@@ -65,6 +84,24 @@ class RetroRepository {
     );
 
     return retro as { id: number; isFinished: number };
+  }
+
+  public async getRetroPoints(retroId: number, userId: number) {
+    const query = sql
+      .select('retroCardPoint', [
+        'retroCardPoint.id',
+        'retroCardPoint.userId',
+        'retroCardPoint.cardId',
+        `(user.id = ${userId}) as isMy`,
+      ])
+      .join('user', { 'retroCardPoint.userId': 'user.id' })
+      .join('projectRetroCard', { 'projectRetroCard.id': 'retroCardPoint.cardId' })
+      .where({ 'projectRetroCard.retroId': retroId });
+    const [points] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    return points;
   }
 
   public async getRetroCards(retroId: number, userId: number) {

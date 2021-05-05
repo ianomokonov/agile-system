@@ -24,15 +24,15 @@ CREATE TABLE `taskAcceptanceCriteria` (
 ALTER TABLE
   `taskComments`
 ADD
-  FOREIGN KEY (userId) REFERENCES `user` (`id`);
+  FOREIGN KEY (userId) REFERENCES `user` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE
   `taskComments`
 ADD
-  FOREIGN KEY (projectTaskId) REFERENCES `projectTask` (`id`);
+  FOREIGN KEY (projectTaskId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE
   `taskAcceptanceCriteria`
 ADD
-  FOREIGN KEY (projectTaskId) REFERENCES `projectTask` (`id`);
+  FOREIGN KEY (projectTaskId) REFERENCES `projectTask` (`id`) ON DELETE CASCADE;
 
