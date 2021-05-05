@@ -50,7 +50,7 @@ export class DemoComponent implements OnInit, OnDestroy {
     private taskService: TaskService,
   ) {
     this.demoTaskForm = this.fb.group({
-      name: [null, Validators.required],
+      name: [`Замечания с демо от ${new Date().toLocaleDateString()}`, Validators.required],
       comment: [null],
       files: null,
     });
@@ -92,6 +92,7 @@ export class DemoComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.rxAlive))
       .subscribe(() => {
         sessionStorage.removeItem(this.commentKey);
+        this.dismiss();
         this.router.navigate(['../../', 'board'], { relativeTo: this.activatedRoute });
       });
     this.socketService
@@ -161,13 +162,18 @@ export class DemoComponent implements OnInit, OnDestroy {
     this.socketService.reopenDemoTask(this.projectId, demoTaskId);
   }
 
+  public openNotes(template) {
+    this.modalService.open(template);
+  }
+
+  public finishDemoWithoutTask() {
+    this.socketService.finishDemo(this.projectId);
+  }
+
   // eslint-disable-next-line complexity
   public finishDemo(createTask = false, template?) {
     if (!createTask && (this.commentControl.value || this.filesControl.value) && template) {
       this.commentControl.setValidators(Validators.required);
-      this.demoTaskForm.patchValue({
-        name: `Замечания с демо от ${new Date().toLocaleDateString()}`,
-      });
       this.demoTaskForm.updateValueAndValidity();
       this.cdRef.detectChanges();
       this.modalService.open(template);

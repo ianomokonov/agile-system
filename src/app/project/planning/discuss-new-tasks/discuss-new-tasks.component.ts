@@ -38,9 +38,11 @@ export class DiscussNewTasksComponent implements OnDestroy {
     private socketService: SocketService,
     private router: Router,
   ) {
+    this.activatedRoute.params.pipe(takeWhile(() => this.rxAlive)).subscribe((params) => {
+      this.projectId = params.id;
+    });
     this.activatedRoute.queryParams.pipe(takeWhile(() => this.rxAlive)).subscribe((params) => {
       if (params.taskId && this.tasks?.length) {
-        this.projectId = params.id;
         this.setActiveTask(params.taskId);
       }
     });

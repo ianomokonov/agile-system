@@ -227,11 +227,6 @@ io.use(authSocketJWT).on('connection', (socket) => {
     }
     await retroHandler.finish(retroId);
     io.sockets.in(socket.retroRoom).emit('finishRetro');
-    io.sockets.clients(socket.retroRoom).forEach((s) => {
-      s.leave(s.retroRoom);
-      s.retroId = undefined;
-      s.retroRoom = undefined;
-    });
   });
 
   // --------------------------- RETRO ------------------------------------

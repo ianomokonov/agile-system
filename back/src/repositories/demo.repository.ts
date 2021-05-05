@@ -3,6 +3,8 @@ import * as sql from 'sql-query-generator';
 import { getQueryText } from '../utils';
 import dbConnection from './db-connection';
 // eslint-disable-next-line import/no-cycle
+import projectRepository from './project.repository';
+// eslint-disable-next-line import/no-cycle
 import taskRepository from './task.repository';
 
 sql.use('mysql');
@@ -71,6 +73,7 @@ class DemoRepository {
         const task = taskTemp;
         task.task = await taskRepository.read(task.taskId);
         task.task.criteria = await taskRepository.getTaskAcceptanceCriteria(task.taskId);
+        task.task.epic = await projectRepository.getEpic(task.task.epicId);
         task.task.comments = await taskRepository.getTaskComments(task.taskId, userId);
         return task;
       }),

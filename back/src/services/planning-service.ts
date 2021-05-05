@@ -7,9 +7,9 @@ import taskRepository from '../repositories/task.repository';
 import taskService from './task-service';
 
 class PlanningService {
-  public async start(projectId: number, sprintId: number, activeSprintId: number) {
-    return planningRepository.start(projectId, sprintId, activeSprintId);
-  }
+  // public async start(projectId: number, sprintId: number, activeSprintId: number) {
+  //   return planningRepository.start(projectId, sprintId, activeSprintId);
+  // }
 
   // eslint-disable-next-line complexity
   public async read(planningId: number, shortView = false) {

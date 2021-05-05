@@ -12,10 +12,10 @@ ng-select {
   z-index: 1060 !important;
 }
 
-*:not(ckeditor) {
-  &.ck-content {
+ 
+  .ck-content:not([role=textbox]) {
     &>p:last-child{
       margin-bottom: 0 !important;
     };
   }
-}
+

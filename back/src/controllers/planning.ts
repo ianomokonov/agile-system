@@ -8,13 +8,12 @@ import { Permissions } from '../models/permissions';
 const planningRouter = Router({ mergeParams: true });
 planningRouter.use(checkProjectPermissions(Permissions.CanReadProject));
 
-planningRouter.post(
-  `/start`,
-  checkProjectPermissions(Permissions.CanStartDemo),
+planningRouter.put(
+  `/:planningId/update`,
+  checkProjectPermissions(Permissions.CanStartSprint),
   async (req, res) => {
-    const { sprintId, activeSprintId } = req.body;
-    const planningId = await planningHandler.start(res.locals.projectId, sprintId, activeSprintId);
-    res.status(StatusCodes.OK).json(planningId);
+    await planningHandler.update(+req.params.planningId, req.body);
+    res.status(StatusCodes.OK).json('Планирование изменено');
   },
 );
 

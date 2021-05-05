@@ -13,6 +13,9 @@
       >
         Завершить демо
       </div>
+      <button class="btn btn-outline-primary ml-2" (click)="openNotes(createDemoTask)">
+        <i class="fas fa-align-left"></i>
+      </button>
     </div>
   </div>
   <div class="d-flex">
@@ -70,7 +73,7 @@
     </div>
     <div class="active-task w-75 pl-2">
       <div class="mb-3" *ngIf="activeTask">
-        <div class="task border-bottom pb-3 mb-3">
+        <div class="task pb-3">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="mb-0">
               {{ activeTask.task.name }}
@@ -137,7 +140,10 @@
             </div>
           </div>
         </div>
-        <ul class="nav nav-pills mb-3">
+        <ul
+          class="nav nav-pills mt-3 py-3 border-top"
+          *ngIf="activeTask?.task.criteria?.length || activeTask?.task.comments?.length"
+        >
           <li class="nav-item">
             <button
               *ngIf="activeTask?.task.criteria?.length"
@@ -174,9 +180,9 @@
         </ng-container>
       </div>
 
-      <div
-        class="ml-2"
-        *ngIf="false && this.projectDataService.PID[this.permissions.CanCreateDemoNotes]"
+      <!-- <div
+        class="ml-2 mt-3 py-3 border-top"
+        *ngIf="this.projectDataService.PID[this.permissions.CanCreateDemoNotes]"
       >
         <div class="form-group">
           <p class="mb-1">Замечания:</p>
@@ -191,7 +197,7 @@
           [formControl]="filesControl"
           #uploader
         ></app-multiple-file-uploader>
-      </div>
+      </div> -->
     </div>
   </div>
 </ng-container>
@@ -204,20 +210,22 @@
   >
     <small class="text-muted mr-3">#{{ task.task.id }}</small>
     <h6 class="d-inline text-dark">{{ task.task.name }}</h6>
-    <div class="d-flex">
+    <div class="d-flex mb-2">
       <div class="mr-1" [taskType]="task.task.typeId">{{ task.task.typeId | taskType }}</div>
-      <!-- <div [taskPriority]="task.task.priorityId">{{ task.task.priorityId | priority }}</div> -->
-      <div
-        class="badge"
-        *ngIf="task.epic"
-        [ngStyle]="{
-          border: '1px solid' + task.epic?.color,
-          'border-left': '10px solid' + task.epic?.color,
-          color: 'black'
-        }"
-      >
-        {{ task.epic.name }}
+      <div class="mr-1" [taskPriority]="task.task.priorityId">
+        {{ task.task.priorityId | priority }}
       </div>
+    </div>
+    <div
+      class="badge d-block w-100"
+      *ngIf="task.task.epic"
+      [ngClass]="{'text-dark': activeTask?.id !== task.id}"
+      [ngStyle]="{
+        border: '1px solid' + task.task.epic?.color,
+        'border-left': '10px solid' + task.task.epic?.color
+      }"
+    >
+      {{ task.task.epic.name }}
     </div>
   </div>
 </ng-template>
@@ -272,9 +280,11 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-outline-secondary" (click)="modalService.dismissAll()">
-      Отмена
+    <button class="btn btn-outline-primary" (click)="finishDemoWithoutTask()">
+      Завершить демо
     </button>
-    <button class="btn btn-primary" (click)="finishDemo(true)">Создать и завершить демо</button>
+    <button class="btn btn-primary" (click)="finishDemo(true)">
+      Создать задачу и завершить демо
+    </button>
   </div>
 </ng-template>

@@ -157,6 +157,17 @@ class ProjectRepository {
     return epics as ProjectEpicResponse[];
   }
 
+  public async getProjectEpic(epicId: number) {
+    const query = sql
+      .select('epics', ['epics.id', 'epics.name', 'epics.description', 'epics.color'])
+      .where({ id: epicId });
+    const [[epic]] = await dbConnection.query<RowDataPacket[]>(
+      getQueryText(query.text),
+      query.values,
+    );
+    return epic as ProjectEpicResponse;
+  }
+
   public async addProjectEpic(projectId: number, request: CreateProjectEpicRequest) {
     const query = sql.insert('epics', {
       projectId,
