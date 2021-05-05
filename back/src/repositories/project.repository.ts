@@ -67,7 +67,7 @@ class ProjectRepository {
   }
 
   public async addProjectUser(request: AddProjectUserRequest) {
-    const query = sql.insert('projectuser', {
+    const query = sql.insert('projectUser', {
       projectId: request.projectId,
       userId: request.userId,
     });
@@ -96,15 +96,15 @@ class ProjectRepository {
       return;
     }
 
-    const query = sql.deletes('projectuser').where({ id: projectUserId });
+    const query = sql.deletes('projectUser').where({ id: projectUserId });
 
     await dbConnection.query(getQueryText(query.text), query.values);
   }
 
   public async getFullProjectUsers(projectId: number, userId: number, all = false) {
     let query = sql
-      .select('projectuser', [
-        'projectuser.id',
+      .select('projectUser', [
+        'projectUser.id',
         'user.name',
         'user.surname',
         'user.image',
@@ -112,8 +112,8 @@ class ProjectRepository {
         `(user.id = ${userId}) as isMy`,
         `(user.id = project.ownerId) as isOwner`,
       ])
-      .join('user', { 'projectuser.userId': 'user.id' })
-      .join('project', { 'projectuser.projectId': 'project.id' })
+      .join('user', { 'projectUser.userId': 'user.id' })
+      .join('project', { 'projectUser.projectId': 'project.id' })
       .where({ projectId });
 
     if (!all) {
@@ -210,20 +210,20 @@ class ProjectRepository {
 
   public async getProjectSprints(projectId: number) {
     const query = sql
-      .select('projectsprint', [
-        'projectsprint.id',
-        'projectsprint.startDate',
-        'projectsprint.endDate',
-        'projectsprint.name',
-        'projectsprint.goal',
-        'projectsprint.isActive',
-        'projectsprint.isFinished',
-        'projectsprint.projectId',
-        'projectplanning.id as planningId',
+      .select('projectSprint', [
+        'projectSprint.id',
+        'projectSprint.startDate',
+        'projectSprint.endDate',
+        'projectSprint.name',
+        'projectSprint.goal',
+        'projectSprint.isActive',
+        'projectSprint.isFinished',
+        'projectSprint.projectId',
+        'projectPlanning.id as planningId',
       ])
-      .join('projectplanning', { 'projectsprint.id': 'sprintId' }, 'LEFT')
-      .where({ 'projectsprint.projectId': projectId, 'projectsprint.isFinished': false })
-      .orderby(['isFinished', 'isActive DESC', 'projectsprint.createDate DESC']);
+      .join('projectPlanning', { 'projectSprint.id': 'sprintId' }, 'LEFT')
+      .where({ 'projectSprint.projectId': projectId, 'projectSprint.isFinished': false })
+      .orderby(['isFinished', 'isActive DESC', 'projectSprint.createDate DESC']);
 
     let [sprints] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -246,7 +246,7 @@ class ProjectRepository {
   }
 
   public async addProjectRole(request: CreateProjectRoleRequest) {
-    const query = sql.insert('projectroles', {
+    const query = sql.insert('projectRoles', {
       projectId: request.projectId,
       name: request.roleName,
     });
@@ -259,7 +259,7 @@ class ProjectRepository {
 
   public async editProjectRole(request: UpdateProjectRoleRequest) {
     const query = sql
-      .update('projectroles', { name: request.projectRoleName })
+      .update('projectRoles', { name: request.projectRoleName })
       .where({ id: request.projectRoleId });
     dbConnection.query(getQueryText(query.text), query.values);
     await this.removeProjectRolePermissions(request.projectRoleId);
@@ -282,14 +282,14 @@ class ProjectRepository {
       return;
     }
 
-    const query = sql.deletes('projectroles').where({ id: projectRoleId });
+    const query = sql.deletes('projectRoles').where({ id: projectRoleId });
 
     await dbConnection.query(getQueryText(query.text), query.values);
   }
 
   public async getProjectRoles(projectId: number) {
     let [roles] = await dbConnection.query<RowDataPacket[]>(
-      `SELECT id, name FROM projectroles WHERE projectId='${projectId}'`,
+      `SELECT id, name FROM projectRoles WHERE projectId='${projectId}'`,
     );
     roles = await Promise.all(
       roles.map(async (roleTemp) => {
@@ -312,17 +312,17 @@ class ProjectRepository {
     }
 
     query = sql
-      .select('user', ['projectrolepermission.permissionId'])
+      .select('user', ['projectRolePermission.permissionId'])
       .join('projectuser', { 'user.id': 'projectuser.userId' }, 'RIGHT')
       .join('projectuserrole', { 'projectuserrole.projectUserId': 'projectuser.id' }, 'RIGHT')
       .join(
-        'projectrolepermission',
+        'projectRolePermission',
         {
-          'projectuserrole.projectRoleId': 'projectrolepermission.projectRoleId',
+          'projectUserRole.projectRoleId': 'projectRolePermission.projectRoleId',
         },
         'RIGHT',
       )
-      .where({ 'user.id': userId, 'projectuser.projectId': projectId });
+      .where({ 'user.id': userId, 'projectUser.projectId': projectId });
 
     const [permissions] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -334,7 +334,7 @@ class ProjectRepository {
 
   public async getRolePermissionIds(roleId: number) {
     const [permissions] = await dbConnection.query<RowDataPacket[]>(
-      `SELECT permissionId FROM projectrolepermission WHERE projectRoleId='${roleId}'`,
+      `SELECT permissionId FROM projectRolePermission WHERE projectRoleId='${roleId}'`,
     );
 
     return permissions.map((p) => p.permissionId) as number[];
@@ -342,7 +342,7 @@ class ProjectRepository {
 
   public async getProjectUserRoleIds(userId: number) {
     const [roles] = await dbConnection.query<RowDataPacket[]>(
-      `SELECT projectRoleId FROM projectuserrole WHERE projectUserId='${userId}'`,
+      `SELECT projectRoleId FROM projectUserRole WHERE projectUserId='${userId}'`,
     );
 
     return roles.map((p) => p.projectRoleId) as number[];
@@ -350,7 +350,7 @@ class ProjectRepository {
 
   public async getProjectUsers(projectId: number) {
     const [users] = await dbConnection.query<RowDataPacket[]>(
-      `SELECT u.id, u.name, u.email, u.surname, u.image FROM projectuser pu JOIN user u ON pu.userId = u.id WHERE projectId='${projectId}'`,
+      `SELECT u.id, u.name, u.email, u.surname, u.image FROM projectUser pu JOIN user u ON pu.userId = u.id WHERE projectId='${projectId}'`,
     );
 
     return users as UserShortView[];
@@ -360,7 +360,7 @@ class ProjectRepository {
     const [[user]] = await dbConnection.query<
       RowDataPacket[]
     >(`SELECT pu.id, u.name, u.surname, u.image, u.email 
-    FROM projectuser pu JOIN user u ON pu.userId = u.id 
+    FROM projectUser pu JOIN user u ON pu.userId = u.id 
     WHERE pu.id=${userId}`);
 
     return user;

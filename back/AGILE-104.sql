@@ -18,6 +18,6 @@ ADD
   FOREIGN KEY (projectId) REFERENCES `project` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE
-  `projecttask`
+  `projectTask`
 ADD
   FOREIGN KEY (epicId) REFERENCES `epics` (`id`) ON DELETE SET NULL;

@@ -586,6 +586,6 @@ VALUES
 END $$ DELIMITER ;
 
 ALTER TABLE
-  `projectplanning`
+  `projectPlanning`
 ADD
   FOREIGN KEY (activeTaskId) REFERENCES `projectTask` (`id`) ON DELETE SET NULL;

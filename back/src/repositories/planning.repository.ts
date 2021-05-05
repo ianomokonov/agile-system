@@ -11,7 +11,7 @@ sql.use('mysql');
 
 class PlanningRepository {
   public async start(projectId: number, sprintId: number, activeSprintId: number) {
-    const query = sql.insert('projectplanning', {
+    const query = sql.insert('projectPlanning', {
       projectId,
       sprintId,
       activeSprintId,
@@ -35,7 +35,7 @@ class PlanningRepository {
   }
 
   public async update(planningId: number, request: PlanningUpdateRequest) {
-    let query = sql.update('projectplanning', request).where({ id: planningId });
+    let query = sql.update('projectPlanning', request).where({ id: planningId });
 
     await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
     if (request.activeTaskId) {
@@ -48,16 +48,16 @@ class PlanningRepository {
 
   public async read(planningId: number) {
     const query = sql
-      .select('projectplanning', [
-        'projectplanning.id',
-        'projectplanning.activeTaskId',
-        'projectplanning.createDate',
-        'projectplanning.sprintId',
-        'projectplanning.activeSprintId',
+      .select('projectPlanning', [
+        'projectPlanning.id',
+        'projectPlanning.activeTaskId',
+        'projectPlanning.createDate',
+        'projectPlanning.sprintId',
+        'projectPlanning.activeSprintId',
         'projectSprint.name as sprintName',
       ])
       .join('projectSprint', { sprintId: 'projectSprint.id' }, 'LEFT')
-      .where({ 'projectplanning.id': planningId });
+      .where({ 'projectPlanning.id': planningId });
     const [[planning]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
@@ -102,8 +102,8 @@ class PlanningRepository {
         'projectPlanningTaskSession.showCards',
         'projectPlanningTaskSession.isCanceled',
       ])
-      .join('projecttask', { 'projectPlanningTaskSession.taskId': 'projecttask.id' })
-      .where({ 'projecttask.projectSprintId': sprintId });
+      .join('projectTask', { 'projectPlanningTaskSession.taskId': 'projectTask.id' })
+      .where({ 'projectTask.projectSprintId': sprintId });
 
     if (active) {
       query = query.and({ resultValue: null }, 'IS').and({ isCanceled: false });

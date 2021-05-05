@@ -17,7 +17,7 @@ sql.use('mysql');
 
 class TaskRepository {
   public async getProjectId(taskId: number) {
-    const query = sql.select('projecttask', 'projectId').where({ id: taskId });
+    const query = sql.select('projectTask', 'projectId').where({ id: taskId });
 
     const [[project]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -28,7 +28,7 @@ class TaskRepository {
   }
 
   private async getStatus(statusId: number) {
-    const query = sql.select('projecttaskstatus', '*').where({ id: statusId });
+    const query = sql.select('projectTaskStatus', '*').where({ id: statusId });
 
     const [[status]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -40,7 +40,7 @@ class TaskRepository {
 
   public async read(taskId: number) {
     const [[task]] = await dbConnection.query<RowDataPacket[]>(`SELECT *
-        FROM projecttask 
+        FROM projectTask 
         WHERE id=${taskId}`);
     const [status, user, creator, sprints, epic] = await Promise.all([
       this.getStatus(task.statusId),
@@ -61,7 +61,7 @@ class TaskRepository {
 
   public async getShortTaskView(taskId: number) {
     const query = sql
-      .select('projecttask', [
+      .select('projectTask', [
         'id',
         'name',
         'statusId',
@@ -84,7 +84,7 @@ class TaskRepository {
 
   public async searchTasks(searchString: string, projectId: number) {
     const query = sql
-      .select('projecttask', [
+      .select('projectTask', [
         'id',
         'name',
         'statusId',
@@ -112,7 +112,7 @@ class TaskRepository {
       return [];
     }
     const query = sql
-      .select('projecttask', ['id', 'name', 'description', 'typeId', 'priorityId'])
+      .select('projectTask', ['id', 'name', 'description', 'typeId', 'priorityId'])
       .where({ projectSprintId: sprintId, statusId: 1 });
     const [tasks] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -127,7 +127,7 @@ class TaskRepository {
       return [];
     }
     const query = sql
-      .select('projecttask', ['id', 'name', 'description', 'typeId', 'priorityId'])
+      .select('projectTask', ['id', 'name', 'description', 'typeId', 'priorityId'])
       .where({ projectSprintId: sprintId })
       .and({ points: null }, 'IS');
     const [tasks] = await dbConnection.query<RowDataPacket[]>(
@@ -283,7 +283,7 @@ class TaskRepository {
       request.creatorId,
       projectId,
     );
-    const query = sql.insert('projecttask', {
+    const query = sql.insert('projectTask', {
       ...request,
       statusId: 1,
       creatorId,
@@ -303,7 +303,7 @@ class TaskRepository {
 
   public async uploadFiles(taskId: number, files: { name: string; url: string }[]) {
     const values = [];
-    const query = `${`INSERT INTO projecttaskfiles (taskId, name, url) VALUES ${files
+    const query = `${`INSERT INTO projectTaskFiles (taskId, name, url) VALUES ${files
       .map((file) => {
         values.push(taskId, file.name, file.url);
         return `(?, ?, ?), `;
@@ -325,7 +325,7 @@ class TaskRepository {
   }
 
   public async getFile(fileId) {
-    const query = sql.select('projecttaskfiles', '*').where({ id: fileId });
+    const query = sql.select('projectTaskFiles', '*').where({ id: fileId });
 
     const [[file]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -337,7 +337,7 @@ class TaskRepository {
 
   public async removeFile(fileId: number) {
     const { url } = await this.getFile(fileId);
-    const query = sql.deletes('projecttaskfiles').where({ id: fileId });
+    const query = sql.deletes('projectTaskFiles').where({ id: fileId });
 
     await dbConnection.query(getQueryText(query.text), query.values);
     return url;
@@ -361,7 +361,7 @@ class TaskRepository {
           model[key] = request[key];
         });
 
-      let query = sql.update('projecttask', model);
+      let query = sql.update('projectTask', model);
 
       if (sprintId) {
         query = query.where({ projectSprintId: sprintId });
@@ -378,7 +378,7 @@ class TaskRepository {
           return;
         }
         query = sql
-          .select('projectdemo', '*')
+          .select('projectDemo', '*')
           .where({ sprintId: task.projectSprintId, isFinished: false });
         const [[demo]] = await dbConnection.query<RowDataPacket[]>(
           getQueryText(query.text),
@@ -386,7 +386,7 @@ class TaskRepository {
         );
 
         if (demo) {
-          query = sql.insert('projectdemotask', { demoId: demo.id, taskId: task.id });
+          query = sql.insert('projectDemoTask', { demoId: demo.id, taskId: task.id });
           await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
         }
       }
@@ -405,7 +405,7 @@ class TaskRepository {
       return;
     }
 
-    const query = sql.deletes('projecttask').where({ id: taskId });
+    const query = sql.deletes('projectTask').where({ id: taskId });
 
     await dbConnection.query(getQueryText(query.text), query.values);
   }
