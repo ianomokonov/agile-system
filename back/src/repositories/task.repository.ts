@@ -218,7 +218,9 @@ class TaskRepository {
     if (!commentId) {
       throw new WebError(StatusCodes.BAD_REQUEST, 'Не указан id комментария');
     }
+
     const query = sql.update('taskComments', request).where({ id: commentId, userId });
+
     await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
   }
 

@@ -16,12 +16,14 @@ export class TaskCommentsComponent implements OnInit {
   public newCommentControl = new FormControl(null, Validators.required);
   public commentTexts: FormArray = new FormArray([]);
   public comments: any[];
+  private taskId: number;
 
   constructor(private taskService: TaskService, private activatedRoute: ActivatedRoute) {}
 
   public ngOnInit(): void {
     this.activatedRoute.parent?.params.subscribe((params) => {
-      this.getComments(params.taskId);
+      this.taskId = params.taskId;
+      this.getComments();
     });
   }
 
@@ -41,8 +43,24 @@ export class TaskCommentsComponent implements OnInit {
       return;
     }
 
-    comment.text = commentText.value;
-    comment.isEditing = false;
+    this.taskService.updateComment(comment.id, { text: commentText.value }).subscribe(() => {
+      comment.text = commentText.value;
+      comment.isEditing = false;
+    });
+  }
+
+  public createComment() {
+    if (this.newCommentControl.invalid) {
+      this.newCommentControl.markAsTouched();
+      return;
+    }
+
+    this.taskService
+      .createComment(this.taskId, { text: this.newCommentControl.value })
+      .subscribe(() => {
+        this.newCommentControl.reset();
+        this.getComments();
+      });
   }
 
   public cancelUpdate(commentTemp, commentText: FormControl) {
@@ -51,7 +69,16 @@ export class TaskCommentsComponent implements OnInit {
     commentText.setValue(comment.text);
   }
 
-  private getComments(taskId: number) {
+  public removeComment(comment) {
+    if (!comment.isMy) {
+      return;
+    }
+    this.taskService.removeComment(comment.id).subscribe(() => {
+      this.getComments();
+    });
+  }
+
+  private getComments(taskId: number = this.taskId) {
     this.taskService.getComments(taskId).subscribe((comments) => {
       this.comments = comments;
       this.commentTexts.clear();

@@ -52,11 +52,11 @@ export class TasksHandler {
   }
 
   public async updateTaskComment(commentId, request, userId) {
-    return taskService.updateTaskComment(userId, commentId, request);
+    return taskService.updateTaskComment(commentId, request, userId);
   }
 
   public async removeTaskComment(commentId, userId) {
-    return taskService.removeTaskComment(userId, commentId);
+    return taskService.removeTaskComment(commentId, userId);
   }
 
   public async getTaskAcceptanceCriteria(taskId) {
