@@ -1,64 +1,62 @@
-<div class="comments">
-  <div class="comment d-flex border-bottom pb-3 mb-4">
+<div class="comments" *ngIf="comments?.length">
+  <div
+    class="comment d-flex mb-4"
+    [ngClass]="{ 'border-bottom pb-3': !isLast }"
+    *ngFor="let comment of comments; let isLast = last; let index = index"
+  >
     <div class="comment__user-img">
       <div
         class="profile-img placeholder"
-        [style.background-image]="'url(../../../../../assets/ava.jpg)'"
+        [style.background-image]="
+          'url(' + (comment.user.image || '../../../../../assets/images/default_ava.jpg') + ')'
+        "
       ></div>
     </div>
     <div class="comment__data pl-2">
       <div class="comment__sender-info d-flex mb-2 align-items-baseline">
-        <div class="comment__user-name mr-2">Иван Номоконов</div>
+        <div class="comment__user-name mr-2">
+          {{ comment.user.name }} {{ comment.user.surname }}
+        </div>
         <div class="d-flex">
-          <small class="comment__date-time text-muted">23.12.1998 09:55</small>
-          <small class="text-muted mx-2">•</small>
-          <small class="comment__edit-btn"
-            ><a class="text-primary" href="javascript:;">Изменить</a></small
-          >
-          <small class="text-muted mx-2">•</small>
-          <small class="comment__edit-btn"
-            ><a class="text-danger" href="javascript:;">Удалить</a></small
+          <small class="comment__date-time text-muted">{{
+            comment.createDate | date: 'dd.MM.yyyy HH.mm'
+          }}</small>
+          <ng-container *ngIf="comment.isMy"
+            ><small class="text-muted mx-2">•</small>
+            <small class="comment__edit-btn" (click)="updateComment(comment, getTextControl(index))"
+              ><a class="text-primary" href="javascript:;">{{
+                comment.isEditing ? 'Сохранить' : 'Изменить'
+              }}</a></small
+            >
+
+            <ng-container *ngIf="comment.isEditing"
+              ><small class="text-muted mx-2">•</small>
+              <small
+                class="comment__edit-btn"
+                (click)="cancelUpdate(comment, getTextControl(index))"
+                ><a class="text-secondary" href="javascript:;">Отменить изменения</a></small
+              ></ng-container
+            >
+
+            <small class="text-muted mx-2">•</small>
+            <small class="comment__edit-btn"
+              ><a class="text-danger" href="javascript:;">Удалить</a></small
+            ></ng-container
           >
         </div>
       </div>
-      <p class="comment__text m-0">
-        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aspernatur asperiores eius
-        molestias ut, autem magni exercitationem deserunt fuga, eveniet expedita vitae minus amet
-        dolor voluptatibus odit corporis velit! Nisi obcaecati hic earum vel eius nulla provident
-        quos officia quidem veritatis voluptates amet laboriosam, placeat voluptatibus quam aliquam
-        incidunt? Pariatur, assumenda?
-      </p>
-    </div>
-  </div>
-  <div class="comment d-flex">
-    <div class="comment__user-img">
-      <div
-        class="profile-img placeholder"
-        [style.background-image]="'url(../../../../../assets/ava.jpg)'"
-      ></div>
-    </div>
-    <div class="comment__data pl-2">
-      <div class="comment__sender-info d-flex mb-2 align-items-baseline">
-        <div class="comment__user-name mr-2">Иван Номоконов</div>
-        <div class="d-flex">
-          <small class="comment__date-time text-muted">23.12.1998 09:55</small>
-          <small class="text-muted mx-2">•</small>
-          <small class="comment__edit-btn"
-            ><a class="text-primary" href="javascript:;">Изменить</a></small
-          >
-          <small class="text-muted mx-2">•</small>
-          <small class="comment__edit-btn"
-            ><a class="text-danger" href="javascript:;">Удалить</a></small
-          >
-        </div>
-      </div>
-      <p class="comment__text m-0">
-        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aspernatur asperiores eius
-        molestias ut, autem magni exercitationem deserunt fuga, eveniet expedita vitae minus amet
-        dolor voluptatibus odit corporis velit! Nisi obcaecati hic earum vel eius nulla provident
-        quos officia quidem veritatis voluptates amet laboriosam, placeat voluptatibus quam aliquam
-        incidunt? Pariatur, assumenda?
-      </p>
+      <p *ngIf="!comment.isEditing" class="comment__text m-0 ck-content" [innerHTML]="comment.text"></p>
+      <ckeditor
+        [ngClass]="{ 'd-none': !comment.isEditing }"
+        [editor]="editor"
+        [config]="editorConfig"
+        [formControl]="getTextControl(index)"
+      ></ckeditor>
     </div>
   </div>
 </div>
+
+<div class="form-group">
+  <ckeditor [editor]="editor" [config]="editorConfig" [formControl]="newCommentControl"></ckeditor>
+</div>
+<button class="btn btn-primary">Сохранить</button>

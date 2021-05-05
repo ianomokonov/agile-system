@@ -13,7 +13,7 @@
         </button>
       </div>
       <div class="description rounded bg-white p-2" *ngIf="criteria.isOpened">
-        {{ criteria.description }}
+        <p class="m-0 ck-content" [innerHTML]="criteria.description"></p>
       </div>
     </div>
   </ng-container>
