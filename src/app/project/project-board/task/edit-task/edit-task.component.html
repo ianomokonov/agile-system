@@ -61,7 +61,7 @@
     </ng-select>
   </div>
 
-  <div class="form-group">
+  <div class="form-group" *ngIf="projectDataService.PID[permissions.CanEditTaskStatus]">
     <label>Статус</label>
     <ng-select
       [items]="statuses"

@@ -7,7 +7,9 @@ import { ProjectEpicResponse } from 'back/src/models/responses/project-epic.resp
 import { StatusResponse } from 'back/src/models/responses/status.response';
 import { TaskResponse } from 'back/src/models/responses/task.response';
 import { TaskType } from 'back/src/models/task-type';
+import { Permissions } from 'back/src/models/permissions';
 import { priorities, taskTypes } from 'src/app/utils/constants';
+import { ProjectDataService } from 'src/app/services/project-data.service';
 
 @Component({
   selector: 'app-edit-task',
@@ -18,6 +20,7 @@ export class EditTaskComponent {
   public editForm: FormGroup;
   public priorities = priorities;
   public taskTypes = taskTypes;
+  public permissions = Permissions;
   public statuses: StatusResponse[] = [];
   public sprints: IdNameResponse[] = [];
   public epics: ProjectEpicResponse[] = [];
@@ -30,7 +33,11 @@ export class EditTaskComponent {
       statusId: task.status.id,
     });
   }
-  constructor(private modal: NgbActiveModal, private fb: FormBuilder) {
+  constructor(
+    private modal: NgbActiveModal,
+    private fb: FormBuilder,
+    public projectDataService: ProjectDataService,
+  ) {
     this.editForm = fb.group({
       typeId: [TaskType.Feature, Validators.required],
       projectSprintId: [null],

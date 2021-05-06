@@ -101,6 +101,7 @@
           class="fas fa-plus-circle"
           *ngIf="projectDataService.PID[permissions.CanCreateTask] && !card.taskId"
           (click)="onCreateTask(card)"
+          [ngStyle]="{ 'margin-right': card.isMy ? '2px' : '0px', 'padding-left': card.isMy ? '0px' : '1px' }"
         ></i>
       </ng-container>
       <span *ngIf="canVote" class="cursor-pointer" (click)="setPoints(card)">

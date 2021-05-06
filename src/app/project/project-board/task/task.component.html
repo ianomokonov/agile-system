@@ -62,7 +62,7 @@
               <small class="text-muted">Эпик</small>
               <div class="d-flex">
                 <h6 class="mr-2">{{ task.epic?.name }}</h6>
-                <div class="epic-color" [ngStyle]="{ 'background-color': task.epic.color }" ></div>
+                <div class="epic-color" [ngStyle]="{ 'background-color': task.epic.color }"></div>
               </div>
             </div>
             <div class="col-4" *ngIf="task.points">
@@ -84,7 +84,7 @@
         <h5 class="section-header">
           Описание
           <i
-            *ngIf="!editingDescription"
+            *ngIf="!editingDescription && projectDataService.PID[permissions.CanEditTask]"
             class="fas fa-pencil-alt ml-2 cursor-pointer"
             (click)="
               projectDataService.PID[permissions.CanEditTask] &&
@@ -126,7 +126,11 @@
       <section class="border-top pt-3 mb-3">
         <h5 class="section-header">
           Вложения
-          <i class="fas fa-link ml-2 cursor-pointer" (click)="upload.uploadFiles($event)"></i>
+          <i
+            *ngIf="projectDataService.PID[permissions.CanEditTask]"
+            class="fas fa-link ml-2 cursor-pointer"
+            (click)="upload.uploadFiles($event)"
+          ></i>
         </h5>
         <app-multiple-file-uploader
           [formControl]="filesControl"
@@ -142,7 +146,9 @@
             <a class="nav-link" routerLink="comments" [routerLinkActive]="'active'">Комментарии</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="acceptance-criteria" [routerLinkActive]="'active'">Критерии приемки</a>
+            <a class="nav-link" routerLink="acceptance-criteria" [routerLinkActive]="'active'"
+              >Критерии приемки</a
+            >
           </li>
           <li class="nav-item">
             <a class="nav-link" routerLink="history" [routerLinkActive]="'active'"
@@ -164,6 +170,7 @@
           [closeOnSelect]="true"
           [clearable]="task.status?.id === 1"
           [searchFn]="userSerachFn"
+          [readonly]="!projectDataService.PID[permissions.CanEditTask]"
         >
           <ng-template ng-label-tmp let-item="item">
             {{ item.name }} {{ item.surname }}
