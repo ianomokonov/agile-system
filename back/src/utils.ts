@@ -26,12 +26,12 @@ export const removeFile = (fileName) => {
   try {
     if (fileName.indexOf('userimages') > -1) {
       const file = fileName.split('/userimages/')[1];
-      fs.unlinkSync(path.resolve(`./src/files/userimages/${file}`));
+      fs.unlinkSync(path.resolve(`./files/userimages/${file}`));
       return;
     }
 
     const file = fileName.split('/taskfiles/')[1];
-    fs.unlinkSync(path.resolve(`./src/files/taskfiles/${file}`));
+    fs.unlinkSync(path.resolve(`./files/taskfiles/${file}`));
   } catch (err) {
     logger.error('File not found');
   }

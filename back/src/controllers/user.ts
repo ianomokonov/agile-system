@@ -14,7 +14,7 @@ import getUsersHandler from '../handlers/user/get-users.handler';
 import { getFileExtension } from '../utils';
 
 const storageConfig = multer.diskStorage({
-  destination: 'src/files/userimages/',
+  destination: 'files/userimages/',
   filename: (req, file, callback) => {
     callback(null, `${file.originalname}-${Date.now()}${getFileExtension(file.originalname)}`);
   },
@@ -54,7 +54,7 @@ userRouter.put(
           ...req.body,
           image: `${req.protocol}://${req.get('host')}/${req.file.path
             .replace(/\\/g, '/')
-            .replace('src/files/', '')}`,
+            .replace('files/', '')}`,
         },
         true,
       );
