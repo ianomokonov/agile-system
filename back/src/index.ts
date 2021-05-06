@@ -28,7 +28,7 @@ const io = require('socket.io')(server);
 
 app.use(cors());
 server
-  .listen(DEFAULT_PORT, () => {
+  .listen(process.env.PORT || DEFAULT_PORT, () => {
     logger.success(`Приложение запущено на http://localhost:${DEFAULT_PORT}`);
   })
   .on(`error`, (err: any) => {

@@ -6,6 +6,6 @@ export default (req, res, next): any => {
     next();
   } catch (error) {
     logger.error(error);
-    res.status(error.statusCode || 500).json(error.error);
+    res.status(error.statusCode || 500).json(error);
   }
 };

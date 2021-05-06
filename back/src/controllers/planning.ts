@@ -17,13 +17,22 @@ planningRouter.put(
   },
 );
 
+planningRouter.post(
+  `/start`,
+  checkProjectPermissions(Permissions.CanStartSprint),
+  async (req, res) => {
+    const id = await planningHandler.start(res.locals.projectId, req.body.sprintId);
+    res.status(StatusCodes.OK).json(id);
+  },
+);
+
 planningRouter.get(`/:planningId`, async (req, res) => {
   try {
     const planning = await planningHandler.read(+req.params.planningId);
     res.status(StatusCodes.OK).json(planning);
   } catch (error) {
     logger.error(error);
-    res.status(error.statusCode).json(error.error);
+    res.status(error.statusCode || 500).json(error);
   }
 });
 
@@ -35,7 +44,7 @@ planningRouter.get(`/:planningId/task/:taskId`, async (req, res) => {
     );
     res.status(StatusCodes.OK).json(planning);
   } catch (error) {
-    res.status(error.statusCode).json(error.error);
+    res.status(error.statusCode || 500).json(error);
   }
 });
 

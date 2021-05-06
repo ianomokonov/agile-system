@@ -13,7 +13,7 @@ dailyRouter.get(``, async (req, res) => {
     res.status(StatusCodes.OK).json(daily);
   } catch (error) {
     logger.error(error);
-    res.status(error.statusCode).json(error.error);
+    res.status(error.statusCode || 500).json(error);
   }
 });
 

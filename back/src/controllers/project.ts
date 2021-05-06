@@ -68,9 +68,13 @@ projectRouter.get(
 );
 
 projectRouter.post(`/create`, async (req, res) => {
-  const { userId } = res.locals;
-  const projectId = await createProjectHandler(userId, req.body);
-  res.status(StatusCodes.CREATED).json(projectId);
+  try {
+    const { userId } = res.locals;
+    const projectId = await createProjectHandler(userId, req.body);
+    res.status(StatusCodes.CREATED).json(projectId);
+  } catch (error) {
+    res.status(error.statusCode || 500).json(error);
+  }
 });
 
 projectRouter.post(
@@ -105,7 +109,7 @@ projectRouter.post(
       await projectUsersHandler.create(req.body);
       res.status(StatusCodes.CREATED).json('Пользователь добавлен');
     } catch (error) {
-      res.status(error.statusCode).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );
@@ -154,7 +158,7 @@ projectRouter.post(
       await projectEpicsHandler.create(res.locals.projectId, req.body);
       res.status(StatusCodes.CREATED).json('Пользователь добавлен');
     } catch (error) {
-      res.status(error.statusCode).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );

@@ -8,7 +8,7 @@ sql.use('mysql');
 
 class RetroRepository {
   public async start(sprintId: number) {
-    const query = sql.insert('projectRetro', {
+    const query = sql.insert('projectretro', {
       sprintId,
     });
 
@@ -20,7 +20,7 @@ class RetroRepository {
   }
 
   public async addCard(card) {
-    const query = sql.insert('projectRetroCard', card);
+    const query = sql.insert('projectretrocard', card);
     const [{ insertId: cardId }] = await dbConnection.query<ResultSetHeader>(
       getQueryText(query.text),
       query.values,
@@ -30,7 +30,7 @@ class RetroRepository {
 
   public async addCardPoint(cardId, userId) {
     try {
-      const query = sql.insert('retroCardPoint', { cardId, userId });
+      const query = sql.insert('retrocardpoint', { cardId, userId });
       const [{ insertId: pointId }] = await dbConnection.query<ResultSetHeader>(
         getQueryText(query.text),
         query.values,
@@ -43,28 +43,28 @@ class RetroRepository {
   }
 
   public async removeCardPoint(cardId, userId) {
-    const query = sql.deletes('retroCardPoint').where({ cardId, userId });
+    const query = sql.deletes('retrocardpoint').where({ cardId, userId });
     await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
   }
 
   public async removeCard(cardId: number) {
-    const query = sql.deletes('projectRetroCard').where({ id: cardId });
+    const query = sql.deletes('projectretrocard').where({ id: cardId });
 
     await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
   }
 
   public async read(retroId: number) {
     const query = sql
-      .select('projectRetro', [
-        'projectRetro.id',
-        'projectRetro.createDate',
-        'projectRetro.sprintId',
-        'projectRetro.isFinished',
-        'projectSprint.name as sprintName',
-        'projectSprint.projectId',
+      .select('projectretro', [
+        'projectretro.id',
+        'projectretro.createDate',
+        'projectretro.sprintId',
+        'projectretro.isFinished',
+        'projectsprint.name as sprintName',
+        'projectsprint.projectId',
       ])
-      .join('projectSprint', { sprintId: 'projectSprint.id' }, 'LEFT')
-      .where({ 'projectRetro.id': retroId });
+      .join('projectsprint', { sprintId: 'projectsprint.id' }, 'LEFT')
+      .where({ 'projectretro.id': retroId });
     const [[retro]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
@@ -77,7 +77,7 @@ class RetroRepository {
     if (!sprintId) {
       return null;
     }
-    const query = sql.select('projectRetro', ['id', 'isFinished']).where({ sprintId });
+    const query = sql.select('projectretro', ['id', 'isFinished']).where({ sprintId });
     const [[retro]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
@@ -88,15 +88,15 @@ class RetroRepository {
 
   public async getRetroPoints(retroId: number, userId: number) {
     const query = sql
-      .select('retroCardPoint', [
-        'retroCardPoint.id',
-        'retroCardPoint.userId',
-        'retroCardPoint.cardId',
+      .select('retrocardpoint', [
+        'retrocardpoint.id',
+        'retrocardpoint.userId',
+        'retrocardpoint.cardId',
         `(user.id = ${userId}) as isMy`,
       ])
-      .join('user', { 'retroCardPoint.userId': 'user.id' })
-      .join('projectRetroCard', { 'projectRetroCard.id': 'retroCardPoint.cardId' })
-      .where({ 'projectRetroCard.retroId': retroId });
+      .join('user', { 'retrocardpoint.userId': 'user.id' })
+      .join('projectretrocard', { 'projectretrocard.id': 'retrocardpoint.cardId' })
+      .where({ 'projectretrocard.retroId': retroId });
     const [points] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
@@ -106,8 +106,8 @@ class RetroRepository {
 
   public async getRetroCards(retroId: number, userId: number) {
     const query = sql
-      .select('projectRetroCard', [
-        'projectRetroCard.id',
+      .select('projectretrocard', [
+        'projectretrocard.id',
         'retroId',
         'category',
         'text',
@@ -117,7 +117,7 @@ class RetroRepository {
         'user.surname as userSurname',
         `(user.id = ${userId}) as isMy`,
       ])
-      .join('user', { 'projectRetroCard.userId': 'user.id' })
+      .join('user', { 'projectretrocard.userId': 'user.id' })
       .where({ retroId })
       .orderby('id');
     const [cards] = await dbConnection.query<RowDataPacket[]>(
@@ -129,8 +129,8 @@ class RetroRepository {
 
   private async getCard(cardId: number, userId = 0) {
     const query = sql
-      .select('projectRetroCard', [
-        'projectRetroCard.id',
+      .select('projectretrocard', [
+        'projectretrocard.id',
         'retroId',
         'category',
         'text',
@@ -140,8 +140,8 @@ class RetroRepository {
         'user.surname as userSurname',
         `(user.id = ${userId}) as isMy`,
       ])
-      .join('user', { 'projectRetroCard.userId': 'user.id' })
-      .where({ 'projectRetroCard.id': cardId });
+      .join('user', { 'projectretrocard.userId': 'user.id' })
+      .where({ 'projectretrocard.id': cardId });
     const [[card]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
@@ -154,18 +154,18 @@ class RetroRepository {
       return [];
     }
     const query = sql
-      .select('projectRetroCard', [
-        'projectRetroCard.id',
+      .select('projectretrocard', [
+        'projectretrocard.id',
         'retroId',
         'category',
         'text',
         'taskId',
         'isCompleted',
       ])
-      .join('projectRetro', { 'projectRetroCard.retroId': 'projectRetro.id' })
-      .join('projectSprint', { 'projectRetro.sprintId': 'projectSprint.id' })
+      .join('projectretro', { 'projectretrocard.retroId': 'projectretro.id' })
+      .join('projectsprint', { 'projectretro.sprintId': 'projectsprint.id' })
       .where({ retroId }, '!=')
-      .and({ 'projectSprint.projectId': projectId, category: RetroCardCategory.Actions })
+      .and({ 'projectsprint.projectId': projectId, category: RetroCardCategory.Actions })
       .and({ completeRetroId: retroId, isCompleted: false }, '=', 'OR');
 
     const [cards] = await dbConnection.query<RowDataPacket[]>(
@@ -177,8 +177,8 @@ class RetroRepository {
 
   public async getOldRetroCard(cardId: number) {
     const query = sql
-      .select('projectRetroCard', [
-        'projectRetroCard.id',
+      .select('projectretrocard', [
+        'projectretrocard.id',
         'retroId',
         'category',
         'text',
@@ -186,9 +186,9 @@ class RetroRepository {
         'user.name as executorName',
         'user.surname as executorSurname',
       ])
-      .join('projectRetro', { 'projectRetroCard.retroId': 'projectRetro.id' })
-      .join('projectSprint', { 'projectRetro.sprintId': 'projectSprint.id' })
-      .where({ 'projectRetroCard.id': cardId });
+      .join('projectretro', { 'projectretrocard.retroId': 'projectretro.id' })
+      .join('projectsprint', { 'projectretro.sprintId': 'projectsprint.id' })
+      .where({ 'projectretrocard.id': cardId });
 
     const [[card]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -198,12 +198,12 @@ class RetroRepository {
   }
 
   public async finish(retroId: number) {
-    const query = sql.update('projectRetro', { isFinished: true }).where({ id: retroId });
+    const query = sql.update('projectretro', { isFinished: true }).where({ id: retroId });
     await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
   }
 
   public async updateRetroCard(cardId: number, request) {
-    const query = sql.update('projectRetroCard', request).where({ id: cardId });
+    const query = sql.update('projectretrocard', request).where({ id: cardId });
     await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
     return this.getCard(cardId);
   }

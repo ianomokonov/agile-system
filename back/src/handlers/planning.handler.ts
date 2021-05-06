@@ -3,9 +3,9 @@ import planningService from '../services/planning-service';
 import projectService from '../services/project-service';
 
 export class PlanningHandler {
-  // public async start(projectId: number, sprintId: number, activeSprintId: number) {
-  //   return planningService.start(projectId, sprintId, activeSprintId);
-  // }
+  public async start(projectId: number, sprintId: number, activeSprintId?: number) {
+    return planningService.start(projectId, sprintId, activeSprintId);
+  }
 
   public async read(planningId: number) {
     return planningService.read(planningId);

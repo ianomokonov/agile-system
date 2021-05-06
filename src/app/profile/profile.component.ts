@@ -46,9 +46,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.profileService
       .getUser(true)
       .pipe(takeWhile(() => this.rxAlive))
-      .subscribe((info) => {
-        this.userInfo = info;
-      });
+      .subscribe(
+        (info) => {
+          this.userInfo = info;
+        },
+        () => {
+          this.onLogoutClick();
+        },
+      );
   }
 
   public ngOnDestroy(): void {
@@ -67,8 +72,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.profileService
       .logout()
       .pipe(takeWhile(() => this.rxAlive))
-      .subscribe(() => {
-        this.router.navigate(['/sign-in']);
-      });
+      .subscribe(
+        () => {
+          this.router.navigate(['/sign-in']);
+        },
+        () => {
+          this.router.navigate(['/sign-in']);
+        },
+      );
   }
 }

@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CreateUserRequest } from 'back/src/models/requests/create-user.request';
 import { environment } from 'src/environments/environment';
-import { tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { TokensResponse } from 'back/src/models/responses/tokens.response';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { GetProfileInfoResponse } from 'back/src/models/responses/get-profile-info.response';
 import { UserShortView } from 'back/src/models/responses/user-short-view';
 import { TokenService } from './token.service';
@@ -62,6 +62,10 @@ export class UserService {
       .pipe(
         tap(() => {
           this.tokenService.removeTokens();
+        }),
+        catchError((error) => {
+          this.tokenService.removeTokens();
+          return throwError(error);
         }),
       );
   }

@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  baseUrl: 'http://localhost:3000',
+  baseUrl: 'http://stand1.progoff.ru',
+  // baseUrl: 'http://localhost:3000',
   baseUIUrl: 'http://localhost:4200',
 };
 

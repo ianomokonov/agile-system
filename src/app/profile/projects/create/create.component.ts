@@ -25,7 +25,7 @@ export class CreateComponent implements OnInit, OnDestroy {
   public ngOnInit() {
     this.activatedRoute.params.pipe(takeWhile(() => this.rxAlive)).subscribe((params) => {
       this.projectId = params.id;
-      if (!this.projectDataService.PID[this.permissions.CanReadProject]) {
+      if (this.projectId && !this.projectDataService.PID[this.permissions.CanReadProject]) {
         this.projectService.getUserPermissions(this.projectId).subscribe((p) => {
           this.projectDataService.setPID(p);
           if (!this.projectDataService.PID[this.permissions.CanEditProject]) {

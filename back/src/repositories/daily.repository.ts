@@ -7,20 +7,20 @@ sql.use('mysql');
 
 class DailyRepository {
   public async read(projectId: number) {
-    let query = sql.select('projectDaily', '*').where({ projectId });
+    let query = sql.select('projectdaily', '*').where({ projectId });
     let [[daily]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
     );
 
     if (!daily) {
-      query = sql.insert('projectDaily', {
+      query = sql.insert('projectdaily', {
         projectId,
       });
 
       // eslint-disable-next-line no-param-reassign
       await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
-      query = sql.select('projectDaily', '*').where({ projectId });
+      query = sql.select('projectdaily', '*').where({ projectId });
       [[daily]] = await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
     }
 
@@ -30,7 +30,7 @@ class DailyRepository {
   }
   public async start(dailyId: number) {
     const query = sql
-      .update('projectDaily', {
+      .update('projectdaily', {
         isActive: true,
       })
       .where({ id: dailyId });
@@ -41,20 +41,20 @@ class DailyRepository {
   }
   public async stop(dailyId: number) {
     let query = sql
-      .update('projectDaily', {
+      .update('projectdaily', {
         isActive: false,
       })
       .where({ id: dailyId });
 
     dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
     query = sql
-      .update('projectDailyParticipant', { isDone: false, isActive: false })
+      .update('projectdailyparticipant', { isDone: false, isActive: false })
       .where({ dailyId });
     await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
   }
 
   public async updateParticipant(participantId: number, request) {
-    const query = sql.update('projectDailyParticipant', request).where({ id: participantId });
+    const query = sql.update('projectdailyparticipant', request).where({ id: participantId });
     await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
   }
 
@@ -82,8 +82,8 @@ class DailyRepository {
 
   public async getDailyParticipants(dailyId: number) {
     const query = sql
-      .select('projectDailyParticipant', [
-        'projectDailyParticipant.id',
+      .select('projectdailyparticipant', [
+        'projectdailyparticipant.id',
         'isDone',
         'isActive',
         'dailyId',
@@ -110,12 +110,12 @@ class DailyRepository {
   }
 
   public async exit(participantId: number) {
-    const query = sql.deletes('projectDailyParticipant').where({ id: participantId });
+    const query = sql.deletes('projectdailyparticipant').where({ id: participantId });
     await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
   }
 
   public async getParticipantId(userId: number, dailyId: number) {
-    let query = sql.select('projectDailyParticipant', ['id']).where({ userId, dailyId });
+    let query = sql.select('projectdailyparticipant', ['id']).where({ userId, dailyId });
     const [[participant]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
@@ -124,7 +124,7 @@ class DailyRepository {
     if (participant) {
       return participant.id;
     }
-    query = sql.insert('projectDailyParticipant', { userId, dailyId });
+    query = sql.insert('projectdailyparticipant', { userId, dailyId });
     // eslint-disable-next-line no-param-reassign
     await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
     return this.getParticipantId(userId, dailyId);

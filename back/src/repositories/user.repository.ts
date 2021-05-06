@@ -55,7 +55,7 @@ class UserRepository {
 
   public async isTokenActual(token: string) {
     const [result] = await dbConnection.query<[]>(
-      `SELECT * FROM refreshTokens WHERE token='${token}'`,
+      `SELECT * FROM refreshtokens WHERE token='${token}'`,
     );
     return !!result?.length;
   }
@@ -80,11 +80,11 @@ class UserRepository {
   }
 
   public async addToken(token: string) {
-    await dbConnection.query('INSERT INTO refreshTokens (token) VALUES (?);', [token]);
+    await dbConnection.query('INSERT INTO refreshtokens (token) VALUES (?);', [token]);
   }
 
   public async deleteToken(token: string) {
-    await dbConnection.query('DELETE FROM refreshTokens WHERE token=?;', [token]);
+    await dbConnection.query('DELETE FROM refreshtokens WHERE token=?;', [token]);
   }
 }
 

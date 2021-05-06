@@ -20,7 +20,7 @@ retroRouter.get(`/:retroId`, async (req, res) => {
     res.status(StatusCodes.OK).json(retro);
   } catch (error) {
     logger.error(error);
-    res.status(error.statusCode).json(error.error);
+    res.status(error.statusCode || 500).json(error);
   }
 });
 
@@ -30,7 +30,7 @@ retroRouter.get(`/:retroId/points`, async (req, res) => {
     res.status(StatusCodes.OK).json(points);
   } catch (error) {
     logger.error(error);
-    res.status(error.statusCode).json(error.error);
+    res.status(error.statusCode || 500).json(error);
   }
 });
 

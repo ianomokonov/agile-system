@@ -11,7 +11,7 @@ sql.use('mysql');
 
 class DemoRepository {
   public async start(projectId: number, sprintId: number) {
-    const query = sql.insert('projectDemo', {
+    const query = sql.insert('projectdemo', {
       projectId,
       sprintId,
     });
@@ -21,22 +21,22 @@ class DemoRepository {
       query.values,
     );
     await dbConnection.query<ResultSetHeader>(
-      `INSERT INTO projectDemoTask (taskId, demoId) SELECT pt.id, ${demoId} FROM projecttask pt WHERE pt.statusId=4 AND pt.projectSprintId=${sprintId}`,
+      `INSERT INTO projectdemotask (taskId, demoId) SELECT pt.id, ${demoId} FROM projecttask pt WHERE pt.statusId=4 AND pt.projectSprintId=${sprintId}`,
     );
     return demoId;
   }
 
   public async read(demoId: number, userId) {
     const query = sql
-      .select('projectDemo', [
-        'projectDemo.id',
-        'projectDemo.createDate',
-        'projectDemo.sprintId',
-        'projectDemo.isFinished',
-        'projectSprint.name as sprintName',
+      .select('projectdemo', [
+        'projectdemo.id',
+        'projectdemo.createDate',
+        'projectdemo.sprintId',
+        'projectdemo.isFinished',
+        'projectsprint.name as sprintName',
       ])
-      .join('projectSprint', { sprintId: 'projectSprint.id' }, 'LEFT')
-      .where({ 'projectDemo.id': demoId });
+      .join('projectsprint', { sprintId: 'projectsprint.id' }, 'LEFT')
+      .where({ 'projectdemo.id': demoId });
     const [[demo]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
@@ -53,7 +53,7 @@ class DemoRepository {
     if (!sprintId) {
       return null;
     }
-    const query = sql.select('projectDemo', ['id', 'isFinished']).where({ sprintId });
+    const query = sql.select('projectdemo', ['id', 'isFinished']).where({ sprintId });
     const [[demo]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
@@ -66,7 +66,7 @@ class DemoRepository {
   }
 
   private async getDemoTasks(demoId: number, userId) {
-    const query = sql.select('projectDemoTask', '*').where({ demoId });
+    const query = sql.select('projectdemotask', '*').where({ demoId });
     let [tasks] = await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
     tasks = await Promise.all(
       tasks.map(async (taskTemp) => {
@@ -82,30 +82,30 @@ class DemoRepository {
   }
 
   public async setActiveTask(demoId: number, taskId: number) {
-    const query = sql.update('projectDemo', { activeTaskId: taskId }).where({ id: demoId });
+    const query = sql.update('projectdemo', { activeTaskId: taskId }).where({ id: demoId });
     await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
   }
 
   public async finish(demoId: number) {
-    let query = sql.update('projectDemo', { isFinished: true }).where({ id: demoId });
+    let query = sql.update('projectdemo', { isFinished: true }).where({ id: demoId });
     await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
 
-    query = sql.update('projectDemoTask', { isFinished: true }).where({ demoId });
+    query = sql.update('projectdemotask', { isFinished: true }).where({ demoId });
     await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
   }
 
   public async finishDemoTask(demoTaskId: number) {
-    const query = sql.update('projectDemoTask', { isFinished: true }).where({ id: demoTaskId });
+    const query = sql.update('projectdemotask', { isFinished: true }).where({ id: demoTaskId });
     await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
   }
 
   public async reopenDemoTask(demoTaskId: number, userId: number) {
-    let query = sql.select('projectDemoTask', '*').where({ id: demoTaskId });
+    let query = sql.select('projectdemotask', '*').where({ id: demoTaskId });
     const [[demoTask]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
     );
-    query = sql.update('projectDemoTask', { isFinished: true }).where({ id: demoTaskId });
+    query = sql.update('projectdemotask', { isFinished: true }).where({ id: demoTaskId });
     await Promise.all([
       dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values),
       taskRepository.updateTaskStatus(demoTask.taskId, 1, userId),

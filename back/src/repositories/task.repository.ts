@@ -17,7 +17,7 @@ sql.use('mysql');
 
 class TaskRepository {
   public async getProjectId(taskId: number) {
-    const query = sql.select('projectTask', 'projectId').where({ id: taskId });
+    const query = sql.select('projecttask', 'projectId').where({ id: taskId });
 
     const [[project]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -28,7 +28,7 @@ class TaskRepository {
   }
 
   private async getStatus(statusId: number) {
-    const query = sql.select('projectTaskStatus', '*').where({ id: statusId });
+    const query = sql.select('projecttaskstatus', '*').where({ id: statusId });
 
     const [[status]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -40,7 +40,7 @@ class TaskRepository {
 
   public async read(taskId: number) {
     const [[task]] = await dbConnection.query<RowDataPacket[]>(`SELECT *
-        FROM projectTask 
+        FROM projecttask 
         WHERE id=${taskId}`);
     const [status, user, creator, sprints, epic] = await Promise.all([
       this.getStatus(task.statusId),
@@ -61,7 +61,7 @@ class TaskRepository {
 
   public async getShortTaskView(taskId: number) {
     const query = sql
-      .select('projectTask', [
+      .select('projecttask', [
         'id',
         'name',
         'statusId',
@@ -84,7 +84,7 @@ class TaskRepository {
 
   public async searchTasks(searchString: string, projectId: number) {
     const query = sql
-      .select('projectTask', [
+      .select('projecttask', [
         'id',
         'name',
         'statusId',
@@ -112,7 +112,7 @@ class TaskRepository {
       return [];
     }
     const query = sql
-      .select('projectTask', ['id', 'name', 'description', 'typeId', 'priorityId'])
+      .select('projecttask', ['id', 'name', 'description', 'typeId', 'priorityId'])
       .where({ projectSprintId: sprintId, statusId: 1 });
     const [tasks] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -127,7 +127,7 @@ class TaskRepository {
       return [];
     }
     const query = sql
-      .select('projectTask', ['id', 'name', 'description', 'typeId', 'priorityId'])
+      .select('projecttask', ['id', 'name', 'description', 'typeId', 'priorityId'])
       .where({ projectSprintId: sprintId })
       .and({ points: null }, 'IS');
     const [tasks] = await dbConnection.query<RowDataPacket[]>(
@@ -143,17 +143,17 @@ class TaskRepository {
       return [];
     }
     const query = sql
-      .select('taskHistoryOperations', [
-        'taskHistoryOperations.id',
-        'taskHistoryOperations.fieldName',
-        'taskHistoryOperations.newValue',
-        'taskHistoryOperations.createDate',
+      .select('taskhistoryoperations', [
+        'taskhistoryoperations.id',
+        'taskhistoryoperations.fieldName',
+        'taskhistoryoperations.newValue',
+        'taskhistoryoperations.createDate',
         'user.name as userName',
         'user.surname as userSurname',
       ])
       .join('user', { 'user.id': 'userId' })
       .where({ projectTaskId: taskId })
-      .orderby('taskHistoryOperations.createDate DESC');
+      .orderby('taskhistoryoperations.createDate DESC');
     let [historyItems] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
@@ -162,10 +162,10 @@ class TaskRepository {
     historyItems = await Promise.all(
       historyItems.map(async (itemTemp) => {
         const item = itemTemp;
-        if (item.fieldName === 'projectUserId') {
+        if (item.fieldName === 'projectuserId') {
           item.user = await projectRepository.getProjectUser(item.newValue);
         }
-        if (item.fieldName === 'projecSprintId') {
+        if (item.fieldName === 'projecsprintId') {
           item.sprint = await projectRepository.getProjectSprintNames(null, item.newValue);
         }
         if (item.fieldName === 'statusId') {
@@ -183,10 +183,10 @@ class TaskRepository {
       return [];
     }
     const query = sql
-      .select('taskComments', [
-        'taskComments.id',
-        'taskComments.text',
-        'taskComments.createDate',
+      .select('taskcomments', [
+        'taskcomments.id',
+        'taskcomments.text',
+        'taskcomments.createDate',
         `(user.id = ${userId}) as isMy`,
         'user.image as userImage',
         'user.name as userName',
@@ -207,7 +207,7 @@ class TaskRepository {
     if (!request.projectTaskId) {
       throw new WebError(StatusCodes.BAD_REQUEST, 'Не указан id задачи');
     }
-    const query = sql.insert('taskComments', request);
+    const query = sql.insert('taskcomments', request);
     const [{ insertId }] = await dbConnection.query<ResultSetHeader>(
       getQueryText(query.text),
       query.values,
@@ -221,7 +221,7 @@ class TaskRepository {
       throw new WebError(StatusCodes.BAD_REQUEST, 'Не указан id комментария');
     }
 
-    const query = sql.update('taskComments', request).where({ id: commentId, userId });
+    const query = sql.update('taskcomments', request).where({ id: commentId, userId });
 
     await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
   }
@@ -230,7 +230,7 @@ class TaskRepository {
     if (!commentId) {
       throw new WebError(StatusCodes.BAD_REQUEST, 'Не указан id комментария');
     }
-    const query = sql.deletes('taskComments').where({ id: commentId, userId });
+    const query = sql.deletes('taskcomments').where({ id: commentId, userId });
     await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
   }
 
@@ -238,7 +238,7 @@ class TaskRepository {
     if (!taskId) {
       return [];
     }
-    const query = sql.select('taskAcceptanceCriteria', '*').where({ projectTaskId: taskId });
+    const query = sql.select('taskacceptancecriteria', '*').where({ projectTaskId: taskId });
     const [criteria] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
       query.values,
@@ -251,7 +251,7 @@ class TaskRepository {
     if (!request.projectTaskId) {
       throw new WebError(StatusCodes.BAD_REQUEST, 'Не указан id задачи');
     }
-    const query = sql.insert('taskAcceptanceCriteria', request);
+    const query = sql.insert('taskacceptancecriteria', request);
     const [{ insertId }] = await dbConnection.query<ResultSetHeader>(
       getQueryText(query.text),
       query.values,
@@ -264,7 +264,7 @@ class TaskRepository {
     if (!criteriaId) {
       throw new WebError(StatusCodes.BAD_REQUEST, 'Не указан id критерия');
     }
-    const query = sql.update('taskAcceptanceCriteria', request).where({ id: criteriaId });
+    const query = sql.update('taskacceptancecriteria', request).where({ id: criteriaId });
     await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
   }
 
@@ -272,7 +272,7 @@ class TaskRepository {
     if (!criteriaId) {
       throw new WebError(StatusCodes.BAD_REQUEST, 'Не указан id критерия');
     }
-    const query = sql.deletes('taskAcceptanceCriteria').where({ id: criteriaId });
+    const query = sql.deletes('taskacceptancecriteria').where({ id: criteriaId });
     await dbConnection.query<ResultSetHeader>(getQueryText(query.text), query.values);
   }
 
@@ -283,7 +283,7 @@ class TaskRepository {
       request.creatorId,
       projectId,
     );
-    const query = sql.insert('projectTask', {
+    const query = sql.insert('projecttask', {
       ...request,
       statusId: 1,
       creatorId,
@@ -303,7 +303,7 @@ class TaskRepository {
 
   public async uploadFiles(taskId: number, files: { name: string; url: string }[]) {
     const values = [];
-    const query = `${`INSERT INTO projectTaskFiles (taskId, name, url) VALUES ${files
+    const query = `${`INSERT INTO projecttaskfiles (taskId, name, url) VALUES ${files
       .map((file) => {
         values.push(taskId, file.name, file.url);
         return `(?, ?, ?), `;
@@ -314,7 +314,7 @@ class TaskRepository {
   }
 
   public async getFiles(taskId: number) {
-    const query = sql.select('projectTaskFiles', '*').where({ taskId });
+    const query = sql.select('projecttaskfiles', '*').where({ taskId });
 
     const [files] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -325,7 +325,7 @@ class TaskRepository {
   }
 
   public async getFile(fileId) {
-    const query = sql.select('projectTaskFiles', '*').where({ id: fileId });
+    const query = sql.select('projecttaskfiles', '*').where({ id: fileId });
 
     const [[file]] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),
@@ -337,7 +337,7 @@ class TaskRepository {
 
   public async removeFile(fileId: number) {
     const { url } = await this.getFile(fileId);
-    const query = sql.deletes('projectTaskFiles').where({ id: fileId });
+    const query = sql.deletes('projecttaskfiles').where({ id: fileId });
 
     await dbConnection.query(getQueryText(query.text), query.values);
     return url;
@@ -348,7 +348,7 @@ class TaskRepository {
     try {
       if ('projectSprintId' in request) {
         const query = sql
-          .update('projectPlanningTaskSession', { isCanceled: true })
+          .update('projectplanningtasksession', { isCanceled: true })
           .where({ taskId: request.id })
           .and({ resultValue: null }, 'IS');
         await dbConnection.query(getQueryText(query.text), query.values);
@@ -361,7 +361,7 @@ class TaskRepository {
           model[key] = request[key];
         });
 
-      let query = sql.update('projectTask', model);
+      let query = sql.update('projecttask', model);
 
       if (sprintId) {
         query = query.where({ projectSprintId: sprintId });
@@ -378,7 +378,7 @@ class TaskRepository {
           return;
         }
         query = sql
-          .select('projectDemo', '*')
+          .select('projectdemo', '*')
           .where({ sprintId: task.projectSprintId, isFinished: false });
         const [[demo]] = await dbConnection.query<RowDataPacket[]>(
           getQueryText(query.text),
@@ -386,7 +386,7 @@ class TaskRepository {
         );
 
         if (demo) {
-          query = sql.insert('projectDemoTask', { demoId: demo.id, taskId: task.id });
+          query = sql.insert('projectdemotask', { demoId: demo.id, taskId: task.id });
           await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
         }
       }
@@ -405,7 +405,7 @@ class TaskRepository {
       return;
     }
 
-    const query = sql.deletes('projectTask').where({ id: taskId });
+    const query = sql.deletes('projecttask').where({ id: taskId });
 
     await dbConnection.query(getQueryText(query.text), query.values);
   }

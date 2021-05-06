@@ -22,7 +22,7 @@ demoRouter.get(
       res.status(StatusCodes.OK).json(planning);
     } catch (error) {
       logger.error(error);
-      res.status(error.statusCode).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );

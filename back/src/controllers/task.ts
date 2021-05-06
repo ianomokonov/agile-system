@@ -29,7 +29,7 @@ taskRouter.get(
       );
       res.status(StatusCodes.OK).json(result);
     } catch (error) {
-      res.status(error.statusCode).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );
@@ -43,7 +43,7 @@ taskRouter.get(
       const result = await tasksHandler.getHistory(+req.params.id);
       res.status(StatusCodes.OK).json(result);
     } catch (error) {
-      res.status(error.statusCode).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );
@@ -57,7 +57,7 @@ taskRouter.get(
       const result = await tasksHandler.getTaskComments(+req.params.id, res.locals.userId);
       res.status(StatusCodes.OK).json(result);
     } catch (error) {
-      res.status(error.statusCode).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );
@@ -71,7 +71,7 @@ taskRouter.get(
       const result = await tasksHandler.getTaskAcceptanceCriteria(+req.params.id);
       res.status(StatusCodes.OK).json(result);
     } catch (error) {
-      res.status(error.statusCode).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );
@@ -85,7 +85,7 @@ taskRouter.delete(
       await tasksHandler.removeFile(+req.params.fileId);
       res.status(StatusCodes.OK).json('Файл удален');
     } catch (error) {
-      res.status(error.statusCode).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );
@@ -99,7 +99,7 @@ taskRouter.delete(
       await tasksHandler.removeTaskComment(+req.params.commentId, res.locals.userId);
       res.status(StatusCodes.OK).json('Комментарий удален');
     } catch (error) {
-      res.status(error.statusCode).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );
@@ -113,7 +113,7 @@ taskRouter.delete(
       await tasksHandler.removeTaskAcceptanceCriteria(+req.params.criteriaId);
       res.status(StatusCodes.OK).json('Критерий удален');
     } catch (error) {
-      res.status(error.statusCode).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );
@@ -127,7 +127,7 @@ taskRouter.get(
       const url = await tasksHandler.getFileUrl(+req.params.fileId);
       res.download(url);
     } catch (error) {
-      res.status(error.statusCode).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );
@@ -141,7 +141,7 @@ taskRouter.get(
       res.status(StatusCodes.OK).json(result);
     } catch (error) {
       logger.error(error);
-      res.status(error.statusCode).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );
@@ -155,7 +155,7 @@ taskRouter.put(
       await tasksHandler.update({ id: +req.params.id, ...req.body }, res.locals.userId);
       res.status(StatusCodes.OK).json('Задача обновлена');
     } catch (error) {
-      res.status(error.statusCode).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );
@@ -169,7 +169,7 @@ taskRouter.put(
       await tasksHandler.updateTaskComment(+req.params.commentId, req.body, res.locals.userId);
       res.status(StatusCodes.OK).json('Комментарий обновлен');
     } catch (error) {
-      res.status(error.statusCode).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );
@@ -183,7 +183,7 @@ taskRouter.put(
       await tasksHandler.updateTaskAcceptanceCriteria(+req.params.criteriaId, req.body);
       res.status(StatusCodes.OK).json('Критерий обновлен');
     } catch (error) {
-      res.status(error.statusCode).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );
@@ -200,7 +200,7 @@ taskRouter.post(
       });
       res.status(StatusCodes.OK).json(id);
     } catch (error) {
-      res.status(error.statusCode).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );
@@ -218,7 +218,7 @@ taskRouter.post(
       });
       res.status(StatusCodes.OK).json(id);
     } catch (error) {
-      res.status(error.statusCode).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );
@@ -241,7 +241,7 @@ taskRouter.post(
       await tasksHandler.uploadFiles(+req.params.id, files);
       res.status(StatusCodes.OK).json('Файлы добавлены');
     } catch (error) {
-      res.status(error.statusCode || 500).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );
@@ -255,7 +255,7 @@ taskRouter.delete(
       await tasksHandler.delete(+req.params.id);
       res.status(StatusCodes.OK).json('Задача удалена');
     } catch (error) {
-      res.status(error.statusCode).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );
@@ -269,7 +269,7 @@ taskRouter.put(
       await updateTaskStatusHandler(+req.params.id, req.body.statusId, res.locals.userId);
       res.status(StatusCodes.OK).json('Статус задачи обновлен');
     } catch (error) {
-      res.status(error.statusCode).json(error.error);
+      res.status(error.statusCode || 500).json(error);
     }
   },
 );
