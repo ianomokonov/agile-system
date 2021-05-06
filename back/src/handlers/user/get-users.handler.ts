@@ -1,5 +1,5 @@
 import userService from '../../services/user-service';
 
-export default (searchString?: string) => {
-  return userService.getUsers(searchString);
+export default (userId, searchString?: string) => {
+  return userService.getUsers(userId, searchString);
 };

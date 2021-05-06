@@ -23,8 +23,8 @@ class UserService {
     return userRepository.getUserById(userId, withProjects);
   }
 
-  public async getUsers(searchString?: string) {
-    return userRepository.getUsers(searchString);
+  public async getUsers(userId, searchString?: string) {
+    return userRepository.getUsers(userId, searchString);
   }
 
   public async checkUser(userPassword: string, password: string) {

@@ -11,7 +11,7 @@ import { getFileExtension } from '../utils';
 
 const taskRouter = Router({ mergeParams: true });
 const storageConfig = multer.diskStorage({
-  destination: 'src/files/taskfiles/',
+  destination: 'files/taskfiles/',
   filename: (req, file, callback) => {
     callback(null, `${file.originalname}-${Date.now()}${getFileExtension(file.originalname)}`);
   },
@@ -235,7 +235,7 @@ taskRouter.post(
           name: file.originalname,
           url: `${req.protocol}://${req.get('host')}/${file.path
             .replace(/\\/g, '/')
-            .replace('src/files/', '')}`,
+            .replace('files/', '')}`,
         };
       });
       await tasksHandler.uploadFiles(+req.params.id, files);

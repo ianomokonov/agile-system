@@ -40,10 +40,11 @@ class UserRepository {
     return (user as unknown) as GetProfileInfoResponse;
   }
 
-  public async getUsers(searchString?: string): Promise<UserShortView[]> {
+  public async getUsers(userId: number, searchString?: string): Promise<UserShortView[]> {
     const query = sql
       .select('user', ['id', 'name', 'surname', 'email', 'image'])
       .where({ email: `${searchString}%` }, 'LIKE')
+      .and({ id: userId }, '!=')
       .limit(20, 0);
     const [users] = await dbConnection.query<RowDataPacket[]>(
       getQueryText(query.text),

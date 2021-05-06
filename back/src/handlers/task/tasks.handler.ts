@@ -31,11 +31,11 @@ export class TasksHandler {
     const { url: fileName } = await taskService.getFile(fileId);
     if (fileName.indexOf('userimages') > -1) {
       const file = fileName.split('/userimages/')[1];
-      return path.resolve(`./src/files/userimages/${file}`);
+      return path.resolve(`./files/userimages/${file}`);
     }
 
     const file = fileName.split('/taskfiles/')[1];
-    return path.resolve(`./src/files/taskfiles/${file}`);
+    return path.resolve(`./files/taskfiles/${file}`);
   }
 
   public async removeFile(fileId: number) {
