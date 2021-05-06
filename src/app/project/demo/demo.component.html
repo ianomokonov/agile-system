@@ -13,7 +13,11 @@
       >
         Завершить демо
       </div>
-      <button class="btn btn-outline-primary ml-2" (click)="openNotes(createDemoTask)">
+      <button
+        *ngIf="this.projectDataService.PID[this.permissions.CanCreateDemoNotes]"
+        class="btn btn-outline-primary ml-2"
+        (click)="openNotes(createDemoTask)"
+      >
         <i class="fas fa-align-left"></i>
       </button>
     </div>
@@ -219,7 +223,7 @@
     <div
       class="badge d-block w-100"
       *ngIf="task.task.epic"
-      [ngClass]="{'text-dark': activeTask?.id !== task.id}"
+      [ngClass]="{ 'text-dark': activeTask?.id !== task.id }"
       [ngStyle]="{
         border: '1px solid' + task.task.epic?.color,
         'border-left': '10px solid' + task.task.epic?.color
