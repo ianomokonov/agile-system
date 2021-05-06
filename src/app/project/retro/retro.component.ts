@@ -118,6 +118,9 @@ export class RetroComponent implements OnInit, OnDestroy {
       .then((task) => {
         this.taskService.addTask(this.projectDataService.project.id, task).subscribe((taskId) => {
           card.taskId = taskId;
+          this.socketService.updateRetroCard(card.id, {
+            taskId,
+          });
         });
       })
       .catch(() => {});
