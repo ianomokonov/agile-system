@@ -329,7 +329,7 @@ class ProjectRepository {
       query.values,
     );
 
-    return permissions.map((p) => p.permitionId) as Permissions[];
+    return permissions.map((p) => p.permissionId) as Permissions[];
   }
 
   public async getRolePermissionIds(roleId: number) {
