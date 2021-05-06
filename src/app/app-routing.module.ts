@@ -24,6 +24,7 @@ import { RetroComponent } from './project/retro/retro.component';
 import { ResetPasswordComponent } from './security/reset-password/reset-password.component';
 import { SignInComponent } from './security/sign-in/sign-in.component';
 import { SingUpComponent } from './security/sing-up/sing-up.component';
+import { UpdatePasswordComponent } from './security/update-password/update-password.component';
 import { AuthGuard } from './utils/auth.guard';
 import { PermissionGuard } from './utils/permission.guard';
 
@@ -44,6 +45,10 @@ const routes: Routes = [
   {
     path: 'reset-password',
     component: ResetPasswordComponent,
+  },
+  {
+    path: 'update-password',
+    component: UpdatePasswordComponent,
   },
   {
     path: 'profile',

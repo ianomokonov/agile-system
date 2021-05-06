@@ -64,6 +64,7 @@ import { TaskAcceptanceCriteriaComponent } from './project/project-board/task/ta
 import { UpdateCriteriaModalComponent } from './project/project-board/task/task-acceptance-criteria/update-criteria-modal/update-criteria-modal.component';
 import { PermissionGuard } from './utils/permission.guard';
 import { NotFoundComponent } from './not-found/not-found.component';
+import { UpdatePasswordComponent } from './security/update-password/update-password.component';
 
 @NgModule({
   declarations: [
@@ -106,6 +107,7 @@ import { NotFoundComponent } from './not-found/not-found.component';
     TaskAcceptanceCriteriaComponent,
     UpdateCriteriaModalComponent,
     NotFoundComponent,
+    UpdatePasswordComponent,
   ],
   imports: [
     BrowserModule,

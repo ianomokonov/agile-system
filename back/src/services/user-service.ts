@@ -15,6 +15,11 @@ class UserService {
     return userRepository.editUser(userId, user);
   }
 
+  public async updatePassword(userId: number, password) {
+    const hash = await bcrypt.hash(password, saltRounds);
+    return userRepository.updatePassword(userId, hash);
+  }
+
   public async findByEmail(email) {
     return userRepository.getUserByEmail(email);
   }

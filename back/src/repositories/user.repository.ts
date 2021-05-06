@@ -80,6 +80,15 @@ class UserRepository {
     await dbConnection.query(getQueryText(query.text), query.values);
   }
 
+  public async updatePassword(userId: number, password) {
+    const query = sql
+      .update('user', {
+        password,
+      })
+      .where({ id: userId });
+    await dbConnection.query(getQueryText(query.text), query.values);
+  }
+
   public async addToken(token: string) {
     await dbConnection.query('INSERT INTO refreshtokens (token) VALUES (?);', [token]);
   }

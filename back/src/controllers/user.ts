@@ -12,6 +12,8 @@ import editProfileHandler from '../handlers/user/edit-profile.handler';
 import verifyRefreshToken from '../middleware/verifyRefreshToken';
 import getUsersHandler from '../handlers/user/get-users.handler';
 import { getFileExtension } from '../utils';
+import getUpdatePasswordLinkHandler from '../handlers/user/get-update-password-link.handler';
+import updatePasswordHandler from '../handlers/user/update-password.handler';
 
 const storageConfig = multer.diskStorage({
   destination: 'files/userimages/',
@@ -36,6 +38,22 @@ userRouter.get(`/profile`, authJWT, async (req, res) => {
 
   const result = await getProfileInfoHandler(userId);
   res.json(result);
+});
+userRouter.post(`/get-update-link`, async (req, res) => {
+  try {
+    const result = await getUpdatePasswordLinkHandler(req.headers.origin, req.body.email);
+    res.json(result);
+  } catch (error) {
+    res.status(error.statusCode || 500).json(error);
+  }
+});
+userRouter.post(`/update-password`, authJWT, async (req, res) => {
+  try {
+    const result = await updatePasswordHandler(res.locals.userId, req.body.password);
+    res.json(result);
+  } catch (error) {
+    res.status(error.statusCode || 500).json(error);
+  }
 });
 userRouter.get(`/users`, authJWT, async (req, res) => {
   const result = await getUsersHandler(res.locals.userId, req.query.searchString as string);

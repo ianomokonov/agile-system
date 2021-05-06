@@ -56,6 +56,25 @@ export class UserService {
     return this.http.put(`${this.baseUrl}/profile`, user);
   }
 
+  public getUpdateLink(email: string) {
+    return this.http.post(`${this.baseUrl}/get-update-link`, { email });
+  }
+
+  public updatePassword(token: string, password: string) {
+    this.tokenService.storeTokens({ accessToken: token, refreshToken: token });
+    return this.http
+      .post<TokensResponse>(`${this.baseUrl}/update-password`, { password })
+      .pipe(
+        tap((tokens: TokensResponse) => {
+          this.tokenService.storeTokens(tokens);
+        }),
+        catchError((error) => {
+          this.tokenService.removeTokens();
+          return throwError(error);
+        }),
+      );
+  }
+
   public logout() {
     return this.http
       .delete(`${this.baseUrl}/logout?token=${this.tokenService.getRefreshToken()}`)
