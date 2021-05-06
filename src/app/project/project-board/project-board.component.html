@@ -58,33 +58,22 @@
           <h6 [routerLink]="['../task', task.id]">{{ task.name }}</h6>
           <div class="d-flex">
             <div class="mr-1" [taskType]="task.typeId">{{ task.typeId | taskType }}</div>
-            <div class="mr-1" [taskPriority]="task.priorityId">{{ task.priorityId | priority }}</div>
-            <!-- <div
-              class="badge"
-              *ngIf="task.epic"
-              [ngStyle]="{
-                border: '2px solid' + task.epic?.color,
-                'border-left': '10px solid' + task.epic?.color,
-                'color': 'black'
-              }"
-            >
-              {{ task.epic.name }}
-            </div> -->
+            <div class="mr-1" [taskPriority]="task.priorityId">
+              {{ task.priorityId | priority }}
+            </div>
           </div>
           <small class="text-muted"
             >{{ task.projectUser?.name }} {{ task.projectUser?.surname }}</small
           >
           <div
-              class="badge d-block mt-2"
-              *ngIf="task.epic"
-              [ngStyle]="{
-                border: '1px solid' + task.epic?.color,
-                'border-left': '10px solid' + task.epic?.color,
-                'color': 'black'
-              }"
-            >
-              {{ task.epic.name }}
-            </div>
+            class="badge d-block mt-2 epic-badge"
+            *ngIf="task.epic"
+            [ngStyle]="{
+              'border-color': task.epic?.color
+            }"
+          >
+            {{ task.epic.name }}
+          </div>
         </div>
       </div>
       <div

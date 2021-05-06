@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeWhile } from 'rxjs/operators';
@@ -41,6 +42,7 @@ export class CreateComponent implements OnInit, OnDestroy {
   }
 
   public deleteProject() {
+    // eslint-disable-next-line no-restricted-globals
     if (!confirm('Вы точно хотите удалить проект?')) {
       return;
     }

@@ -3,14 +3,28 @@
     class="container-fluid px-2 d-flex align-items-center justify-content-between border-bottom py-2 mb-2 project-header"
   >
     <h3 class="m-0 d-flex align-items-center">
-      {{ project?.name }} <i *ngIf="projectDataService.PID[permissions.CanEditProject]" class="fas fa-cogs ml-2" routerLink="edit"></i>
+      {{ project?.name }}
+      <i
+        *ngIf="
+          projectDataService.PID[permissions.CanEditProject] ||
+          projectDataService.PID[permissions.CanEditProjectTeam] ||
+          projectDataService.PID[permissions.CanCreateProjectRole] ||
+          projectDataService.PID[permissions.CanCreateEpics]
+        "
+        class="fas fa-cogs ml-2"
+        routerLink="edit"
+      ></i>
     </h3>
     <div class="user-info d-flex" *ngIf="user" routerLink="/profile">
       <div>
         <h6 class="m-0">{{ user.name }} {{ user.surname }}</h6>
         <small>{{ user.email }}</small>
       </div>
-      <div class="profile-img placeholder ava ml-2" [style.background-image]="userImage" alt=""></div>
+      <div
+        class="profile-img placeholder ava ml-2"
+        [style.background-image]="userImage"
+        alt=""
+      ></div>
       <!-- <img
         [src]="user.image || '../../assets/images/default_ava.jpg'"
         class="profile-img placeholder"

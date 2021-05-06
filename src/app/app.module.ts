@@ -62,6 +62,8 @@ import { TaskHistoryComponent } from './project/project-board/task/task-history/
 import { EditEpicsComponent } from './project/edit/edit-epics/edit-epics.component';
 import { TaskAcceptanceCriteriaComponent } from './project/project-board/task/task-acceptance-criteria/task-acceptance-criteria.component';
 import { UpdateCriteriaModalComponent } from './project/project-board/task/task-acceptance-criteria/update-criteria-modal/update-criteria-modal.component';
+import { PermissionGuard } from './utils/permission.guard';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 @NgModule({
   declarations: [
@@ -103,6 +105,7 @@ import { UpdateCriteriaModalComponent } from './project/project-board/task/task-
     EditEpicsComponent,
     TaskAcceptanceCriteriaComponent,
     UpdateCriteriaModalComponent,
+    NotFoundComponent,
   ],
   imports: [
     BrowserModule,
@@ -134,6 +137,7 @@ import { UpdateCriteriaModalComponent } from './project/project-board/task/task-
     DailyService,
     TaskTypePipe,
     PriorityPipe,
+    PermissionGuard,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     // { provide: HTTP_INTERCEPTORS, useClass: ContentTypeInterceptor, multi: true },
   ],

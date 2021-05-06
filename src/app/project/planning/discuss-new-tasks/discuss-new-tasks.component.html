@@ -72,12 +72,10 @@
       <div class="mr-1" [taskType]="task.typeId">{{ task.typeId | taskType }}</div>
       <!-- <div [taskPriority]="task.priorityId">{{ task.priorityId | priority }}</div> -->
       <div
-        class="badge"
+        class="badge epic-badge"
         *ngIf="task.epic"
         [ngStyle]="{
-          border: '1px solid' + task.epic?.color,
-          'border-left': '10px solid' + task.epic?.color,
-          color: 'black'
+          'border-color': task.epic?.color
         }"
       >
         {{ task.epic.name }}

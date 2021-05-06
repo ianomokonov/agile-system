@@ -41,7 +41,6 @@
       >
         Удалить
       </button>
-      <!-- <button class="btn btn-primary ml-1 mb-1">Начать оценку</button> -->
     </div>
   </div>
 
@@ -51,27 +50,38 @@
         <div class="section-body">
           <div class="row">
             <div class="col-4">
-              <small class="text-muted">Тип</small>
-              <h6>{{ task.typeId | taskType }}</h6>
+              <small class="text-muted d-block">Тип</small>
+              <div class="mr-1" [taskType]="task.typeId">{{ task.typeId | taskType }}</div>
+            </div>
+
+            <div class="col-4">
+              <small class="text-muted d-block">Приоритет</small>
+              <div [taskPriority]="task.priorityId">
+                {{ task.priorityId | priority }}
+              </div>
+            </div>
+            <div class="col-4">
+              <small class="text-muted">Эпик</small>
+              <div class="d-flex">
+                <div
+                  class="badge d-block epic-badge"
+                  *ngIf="task.epic"
+                  [ngStyle]="{
+                    'border-color': task.epic?.color
+                  }"
+                >
+                  {{ task.epic.name }}
+                </div>
+                <h6 *ngIf="!task.epic">—</h6>
+              </div>
+            </div>
+            <div class="col-4">
+              <small class="text-muted">Оценка</small>
+              <h6>{{ task.points || '—' }}</h6>
             </div>
             <div class="col-4">
               <small class="text-muted">Статус</small>
-              <h6>{{ task.status.name }}</h6>
-            </div>
-            <div class="col-4" *ngIf="task.epic">
-              <small class="text-muted">Эпик</small>
-              <div class="d-flex">
-                <h6 class="mr-2">{{ task.epic?.name }}</h6>
-                <div class="epic-color" [ngStyle]="{ 'background-color': task.epic.color }" ></div>
-              </div>
-            </div>
-            <div class="col-4" *ngIf="task.points">
-              <small class="text-muted">Оценка</small>
-              <h6>{{ task.points }}</h6>
-            </div>
-            <div class="col-4">
-              <small class="text-muted">Приоритет</small>
-              <h6>{{ task.priorityId | priority }}</h6>
+              <h6>{{ task.status.name || '—' }}</h6>
             </div>
             <div class="col-4">
               <small class="text-muted">Спринт</small>
@@ -142,7 +152,9 @@
             <a class="nav-link" routerLink="comments" [routerLinkActive]="'active'">Комментарии</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="acceptance-criteria" [routerLinkActive]="'active'">Критерии приемки</a>
+            <a class="nav-link" routerLink="acceptance-criteria" [routerLinkActive]="'active'"
+              >Критерии приемки</a
+            >
           </li>
           <li class="nav-item">
             <a class="nav-link" routerLink="history" [routerLinkActive]="'active'"

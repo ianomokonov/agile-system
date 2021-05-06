@@ -221,12 +221,11 @@
       </div>
     </div>
     <div
-      class="badge d-block w-100"
+      class="badge d-block w-100 epic-badge"
       *ngIf="task.task.epic"
       [ngClass]="{ 'text-dark': activeTask?.id !== task.id }"
       [ngStyle]="{
-        border: '1px solid' + task.task.epic?.color,
-        'border-left': '10px solid' + task.task.epic?.color
+        'border-color': task.task.epic?.color
       }"
     >
       {{ task.task.epic.name }}

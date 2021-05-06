@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { Permissions } from 'back/src/models/permissions';
+import { NotFoundComponent } from './not-found/not-found.component';
 import { ProfileComponent } from './profile/profile.component';
 import { CreateComponent } from './profile/projects/create/create.component';
 import { DailyComponent } from './project/daily/daily.component';
@@ -22,6 +24,8 @@ import { RetroComponent } from './project/retro/retro.component';
 import { ResetPasswordComponent } from './security/reset-password/reset-password.component';
 import { SignInComponent } from './security/sign-in/sign-in.component';
 import { SingUpComponent } from './security/sing-up/sing-up.component';
+import { AuthGuard } from './utils/auth.guard';
+import { PermissionGuard } from './utils/permission.guard';
 
 const routes: Routes = [
   {
@@ -44,10 +48,12 @@ const routes: Routes = [
   {
     path: 'profile',
     component: ProfileComponent,
+    canActivate: [AuthGuard],
   },
   {
     path: 'create-project',
     component: CreateComponent,
+    canActivate: [AuthGuard],
   },
   {
     path: 'project/:id',
@@ -121,6 +127,15 @@ const routes: Routes = [
   {
     path: 'project/:id/edit',
     component: CreateComponent,
+    canActivate: [PermissionGuard],
+    data: {
+      roles: [
+        Permissions.CanEditProject,
+        Permissions.CanCreateEpics,
+        Permissions.CanCreateProjectRole,
+        Permissions.CanEditProjectTeam,
+      ],
+    },
     children: [
       {
         path: '',
@@ -130,20 +145,41 @@ const routes: Routes = [
       {
         path: 'info',
         component: EditProjectFormComponent,
+        data: {
+          roles: [Permissions.CanEditProject],
+        },
+        canActivate: [PermissionGuard],
       },
       {
         path: 'epics',
         component: EditEpicsComponent,
+        data: {
+          roles: [Permissions.CanCreateEpics],
+        },
+        canActivate: [PermissionGuard],
       },
       {
         path: 'roles',
         component: EditRolesComponent,
+        data: {
+          roles: [Permissions.CanCreateProjectRole],
+        },
+        canActivate: [PermissionGuard],
       },
       {
         path: 'users',
         component: EditUsersComponent,
+        data: {
+          roles: [Permissions.CanEditProjectTeam],
+        },
+        canActivate: [PermissionGuard],
       },
     ],
+  },
+
+  {
+    path: '**',
+    component: NotFoundComponent,
   },
 ];
 

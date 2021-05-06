@@ -18,4 +18,5 @@ export enum Permissions {
   CanCreateDemoNotes,
   CanStartRetro,
   CanCreateRetroActions,
+  CanCreateEpics,
 }
