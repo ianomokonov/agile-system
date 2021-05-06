@@ -181,10 +181,8 @@ export class RetroComponent implements OnInit, OnDestroy {
 
   public createCard(category: RetroCardCategory) {
     const cards = this.retro?.cards.filter((c) => c.category === category);
-    if (
-      (cards[cards.length - 1]?.text == null || cards[cards.length - 1]?.text === '') &&
-      cards.length !== 0
-    ) {
+    const myEmpty = cards.find((card) => card.isMy && !card.text);
+    if (myEmpty) {
       return;
     }
 
