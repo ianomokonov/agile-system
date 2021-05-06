@@ -133,7 +133,7 @@ export class EditRolesComponent implements OnInit, OnDestroy {
           (control: AbstractControl): { [key: string]: boolean } | null => {
             let iqFlag = false;
             this.roles.forEach((role) => {
-              if (role.name === control.value) {
+              if (role.name === control.value && !this.editingRole) {
                 iqFlag = true;
               }
             });
