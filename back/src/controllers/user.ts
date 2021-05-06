@@ -38,7 +38,7 @@ userRouter.get(`/profile`, authJWT, async (req, res) => {
   res.json(result);
 });
 userRouter.get(`/users`, authJWT, async (req, res) => {
-  const result = await getUsersHandler(req.query.searchString as string);
+  const result = await getUsersHandler(res.locals.userId, req.query.searchString as string);
   res.json(result);
 });
 userRouter.put(
