@@ -124,7 +124,7 @@ export class TaskComponent implements OnDestroy {
 
   public downloadFile(file) {
     this.taskService
-      .downloadFile(this.task.id, file.id)
+      .downloadFile(this.task.id, file)
       .pipe(takeWhile(() => this.rxAlive))
       .subscribe();
   }
