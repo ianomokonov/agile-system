@@ -18,7 +18,12 @@
           <a class="nav-link" routerLink="roles" [routerLinkActive]="'active'">Роли</a>
         </li>
       </ul>
-      <a *ngIf="projectId" class="nav-link btn-del" (click)="deleteProject()">Удалить проект</a>
+      <a
+        *ngIf="projectId && projectDataService.PID[permissions.CanCloseProject]"
+        class="nav-link btn-del"
+        (click)="deleteProject()"
+        >Удалить проект</a
+      >
     </div>
     <ng-container *ngIf="!this.projectId; else pages">
       <app-edit-project-form></app-edit-project-form
