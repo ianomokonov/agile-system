@@ -63,7 +63,7 @@ export class ProjectBacklogComponent implements OnInit, OnDestroy {
   }
 
   public onCreatTask() {
-    const modal = this.modalService.open(CreateTaskComponent);
+    const modal = this.modalService.open(CreateTaskComponent, { size: 'lg' });
     modal.componentInstance.users = this.users;
     modal.result
       .then((task) => {

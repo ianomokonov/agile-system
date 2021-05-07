@@ -5,7 +5,8 @@
       class="rounded p-2 mr-3 mb-3 cursor-pointer"
       [ngClass]="{ 'bg-primary text-white': epic.id === editingEpic?.id }"
       [ngStyle]="{
-        'border-bottom': epic.color !== '' ? '10px solid' + epic.color : '0px solid white'
+        'border-color': epic.color,
+        'border-bottom-width': '10px'
       }"
       *ngFor="let epic of projectEpics"
       (click)="onEpicClick(epic)"

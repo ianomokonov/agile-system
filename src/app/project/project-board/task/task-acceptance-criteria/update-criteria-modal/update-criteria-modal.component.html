@@ -1,5 +1,5 @@
 <div class="modal-header">
-  <h4 class="modal-title" id="modal-title">Создание задачи</h4>
+  <h4 class="modal-title" id="modal-title">{{ isEditing ? 'Изменение' : 'Создание' }} критерия</h4>
   <button
     type="button"
     class="close"
@@ -22,11 +22,7 @@
     />
   </div>
   <div class="form-group">
-    <ckeditor
-      [editor]="editor"
-      [config]="editorConfig"
-      formControlName="description"
-    ></ckeditor>
+    <ckeditor [editor]="editor" [config]="editorConfig" formControlName="description"></ckeditor>
   </div>
 </div>
 <div class="modal-footer">

@@ -493,6 +493,7 @@ class ProjectRepository {
     } else {
       query = query.where({ projectSprintId: null }, 'IS').and({ projectId });
     }
+    query = query.orderby(['priorityId DESC']);
 
     let [tasks] = await dbConnection.query<RowDataPacket[]>(getQueryText(query.text), query.values);
     tasks = await Promise.all(

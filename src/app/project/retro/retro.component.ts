@@ -108,7 +108,7 @@ export class RetroComponent implements OnInit, OnDestroy {
   }
 
   public onCreateTask(card) {
-    const modal = this.modalService.open(CreateTaskComponent);
+    const modal = this.modalService.open(CreateTaskComponent, { size: 'lg' });
     modal.componentInstance.users = this.users;
     modal.componentInstance.patchValue({
       description: card.text,

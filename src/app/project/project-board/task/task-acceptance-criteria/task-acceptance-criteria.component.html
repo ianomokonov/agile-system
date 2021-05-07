@@ -1,6 +1,6 @@
 <div class="position-relative">
   <ng-container *ngIf="criterias?.length; else noData"
-    ><div class="content rounded p-2" *ngFor="let criteria of criterias">
+    ><div class="content rounded p-2 mb-2" *ngFor="let criteria of criterias">
       <div
         class="header d-flex align-items-center"
         [ngClass]="{ 'mb-1': criteria.isOpened, done: criteria.isDone }"

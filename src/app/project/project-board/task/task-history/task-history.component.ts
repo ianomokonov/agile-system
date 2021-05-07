@@ -47,10 +47,10 @@ export class TaskHistoryComponent implements OnInit {
       return item.status?.name;
     }
     if (item.fieldName === 'typeId') {
-      return this.taskTypePipe.transform(item.newValue);
+      return this.taskTypePipe.transform(+item.newValue);
     }
     if (item.fieldName === 'priorityId') {
-      return this.priorityPipe.transform(item.newValue);
+      return this.priorityPipe.transform(+item.newValue);
     }
     return item.newValue;
   }

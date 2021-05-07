@@ -81,7 +81,7 @@ export class ProjectBoardComponent implements OnInit, OnDestroy {
   }
 
   public createTask() {
-    const modal = this.modalService.open(CreateTaskComponent, { centered: true });
+    const modal = this.modalService.open(CreateTaskComponent, { size: 'lg' });
     modal.componentInstance.users = this.users;
     modal.result
       .then((task) => {

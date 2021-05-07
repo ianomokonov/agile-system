@@ -16,10 +16,16 @@
     <label>Название</label>
     <input type="text" class="form-control" formControlName="name" ngbAutofocus />
     <div *ngIf="createForm.controls['name'].errors">
-      <small class="text-danger" *ngIf="createForm.controls['name'].touched && createForm.controls['name'].errors?.maxlength">
+      <small
+        class="text-danger"
+        *ngIf="createForm.controls['name'].touched && createForm.controls['name'].errors?.maxlength"
+      >
         Название задачи должно быть меньше 255 символов
       </small>
-      <small class="text-danger" *ngIf="createForm.controls['name'].touched && createForm.controls['name'].errors?.required">
+      <small
+        class="text-danger"
+        *ngIf="createForm.controls['name'].touched && createForm.controls['name'].errors?.required"
+      >
         Укажите название задачи
       </small>
     </div>
@@ -28,65 +34,82 @@
     <label>Описание</label>
     <ckeditor [editor]="editor" formControlName="description"></ckeditor>
     <div *ngIf="createForm.controls['description'].errors">
-      <small class="text-danger" *ngIf="createForm.controls['description'].touched && createForm.controls['description'].errors?.required">
+      <small
+        class="text-danger"
+        *ngIf="
+          createForm.controls['description'].touched &&
+          createForm.controls['description'].errors?.required
+        "
+      >
         Укажите описание задачи
       </small>
     </div>
   </div>
-  <div class="form-group">
-    <label>Исполнитель</label>
-    <ng-select
-      [items]="users"
-      formControlName="projectUserId"
-      bindValue="id"
-      [closeOnSelect]="true"
-      [searchFn]="userSearchFn"
-    >
-      <ng-template ng-label-tmp let-item="item">
-        {{ item.name }} {{ item.surname }} ({{ item.email }})
-      </ng-template>
-      <ng-template ng-option-tmp let-item="item">
-        <p class="m-0">{{ item.name }} {{ item.surname }}</p>
-        <small class="text-muted">{{ item.email }}</small>
-      </ng-template>
-    </ng-select>
-    <small class="btn btn-link p-0 assign-to-me" (click)="assignToMe()">Взять на себя</small>
+  <div class="row">
+    <div class="col-6">
+      <div class="form-group">
+        <label>Исполнитель</label>
+        <ng-select
+          [items]="users"
+          formControlName="projectUserId"
+          bindValue="id"
+          [closeOnSelect]="true"
+          [searchFn]="userSearchFn"
+        >
+          <ng-template ng-label-tmp let-item="item">
+            {{ item.name }} {{ item.surname }} ({{ item.email }})
+          </ng-template>
+          <ng-template ng-option-tmp let-item="item">
+            <p class="m-0">{{ item.name }} {{ item.surname }}</p>
+            <small class="text-muted">{{ item.email }}</small>
+          </ng-template>
+        </ng-select>
+        <small class="btn btn-link p-0 assign-to-me" (click)="assignToMe()">Взять на себя</small>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="form-group">
+        <label>Тип задачи</label>
+        <ng-select
+          [items]="taskTypes"
+          formControlName="typeId"
+          bindValue="id"
+          [clearable]="false"
+          bindLabel="name"
+          [closeOnSelect]="true"
+        >
+        </ng-select>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="form-group">
+        <label>Приоритет</label>
+        <ng-select
+          [items]="priorities"
+          formControlName="priorityId"
+          bindValue="id"
+          bindLabel="name"
+          [clearable]="false"
+          [closeOnSelect]="true"
+        >
+        </ng-select>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="form-group">
+        <label>Спринт</label>
+        <ng-select
+          [items]="sprints"
+          formControlName="projectSprintId"
+          bindValue="id"
+          bindLabel="name"
+          [closeOnSelect]="true"
+        >
+        </ng-select>
+      </div>
+    </div>
   </div>
-  <div class="form-group">
-    <label>Тип задачи</label>
-    <ng-select
-      [items]="taskTypes"
-      formControlName="typeId"
-      bindValue="id"
-      [clearable]="false"
-      bindLabel="name"
-      [closeOnSelect]="true"
-    >
-    </ng-select>
-  </div>
-  <div class="form-group">
-    <label>Приоритет</label>
-    <ng-select
-      [items]="priorities"
-      formControlName="priorityId"
-      bindValue="id"
-      bindLabel="name"
-      [clearable]="false"
-      [closeOnSelect]="true"
-    >
-    </ng-select>
-  </div>
-  <div class="form-group">
-    <label>Спринт</label>
-    <ng-select
-      [items]="sprints"
-      formControlName="projectSprintId"
-      bindValue="id"
-      bindLabel="name"
-      [closeOnSelect]="true"
-    >
-    </ng-select>
-  </div>
+
   <div class="form-group">
     <label
       >Вложения<i class="fas fa-link ml-2 cursor-pointer" (click)="upload.uploadFiles($event)"></i
