@@ -1,1 +1,15 @@
-<p>not-found works!</p>
+<div class="w-100 h-100 d-flex justify-content-center align-items-center">
+  <img src="../../assets/images/404.png" />
+  <div class="d-flex flex-column align-items-center">
+    <h1 class="mb-3">Страница не найдена!</h1>
+    <span
+      >Проверьте указанный адресс или вернитесь на
+      <b *ngIf="tokenService.getAuthToken()" class="cursor-pointer" routerLink="/profile"
+        >страницу профиля</b
+      >
+      <b *ngIf="!tokenService.getAuthToken()" class="cursor-pointer" routerLink="/sign-in"
+        >страницу входа</b
+      ></span
+    >
+  </div>
+</div>

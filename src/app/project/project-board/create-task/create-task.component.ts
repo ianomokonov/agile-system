@@ -10,6 +10,8 @@ import { IdNameResponse } from 'back/src/models/responses/id-name.response';
 import { TaskType } from 'back/src/models/task-type';
 import { Priority } from 'back/src/models/priority';
 import { takeWhile } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
+import { ProjectEpicResponse } from 'back/src/models/responses/project-epic.response';
 
 @Component({
   selector: 'app-create-task',
@@ -25,6 +27,7 @@ export class CreateTaskComponent implements OnInit, OnDestroy {
   public userSearchFn = userSearchFn;
   public priorities = priorities;
   public sprints: IdNameResponse[] = [];
+  public epics: ProjectEpicResponse[] = [];
   constructor(
     private modal: NgbActiveModal,
     private fb: FormBuilder,
@@ -37,17 +40,21 @@ export class CreateTaskComponent implements OnInit, OnDestroy {
       projectUserId: [null],
       typeId: [TaskType.Feature, Validators.required],
       projectSprintId: [null],
+      epicId: [null],
       priorityId: [Priority.Low, Validators.required],
       files: null,
     });
   }
 
   public ngOnInit() {
-    this.projectService
-      .getProjectSprints(this.projectDataService.project?.id)
+    forkJoin([
+      this.projectService.getProjectSprints(this.projectDataService.project?.id),
+      this.projectService.getProjectEpics(this.projectDataService.project?.id),
+    ])
       .pipe(takeWhile(() => this.rxAlive))
-      .subscribe((sprints) => {
+      .subscribe(([sprints, epics]) => {
         this.sprints = sprints;
+        this.epics = epics;
       });
   }
 
