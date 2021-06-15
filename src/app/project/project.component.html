@@ -3,7 +3,14 @@
     class="container-fluid px-2 d-flex align-items-center justify-content-between border-bottom py-2 mb-2 project-header"
   >
     <h3 class="m-0 d-flex align-items-center">
-      {{ project?.name }}
+      <a
+        class="text-white"
+        href="javascript:;"
+        [ngbPopover]="description"
+        [placement]="'right-top'"
+        #p="ngbPopover"
+        >{{ project?.name }}</a
+      >
       <i
         *ngIf="
           projectDataService.PID[permissions.CanEditProject] ||
@@ -83,3 +90,7 @@
     </div>
   </div>
 </div>
+
+<ng-template #description>
+  <div [innerHTML]="project?.description"></div>
+</ng-template>
