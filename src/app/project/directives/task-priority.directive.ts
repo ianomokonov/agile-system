@@ -1,15 +1,17 @@
-import { Directive, ElementRef, Input, OnInit } from '@angular/core';
+import { Directive, ElementRef, Input } from '@angular/core';
 import { Priority } from 'back/src/models/priority';
 
 @Directive({
   selector: '[taskPriority]',
 })
-export class TaskPriorityDirective implements OnInit {
-  @Input() public taskPriority: Priority;
+export class TaskPriorityDirective {
+  @Input() public set taskPriority(priority: Priority) {
+    this.setStyle(priority);
+  }
   constructor(private elementRef: ElementRef<HTMLElement>) {}
 
-  public ngOnInit() {
-    switch (this.taskPriority) {
+  private setStyle(priority: Priority) {
+    switch (priority) {
       case Priority.Low: {
         this.elementRef.nativeElement.classList.add('badge', 'bg-light', 'text-dark');
         break;
