@@ -40,6 +40,7 @@ export class EditUserComponent implements OnDestroy {
     this.rxAlive = false;
   }
 
+  // eslint-disable-next-line complexity
   public onFormSubmit() {
     if (this.userForm.invalid) {
       this.userForm.markAllAsTouched();
@@ -49,8 +50,13 @@ export class EditUserComponent implements OnDestroy {
     const formData = new FormData();
     formData.append('name', formValue.name);
     formData.append('surname', formValue.surname);
-    formData.append('vk', formValue.vk);
-    formData.append('gitHub', formValue.gitHub);
+    if (formValue.vk) {
+      formData.append('vk', formValue.vk);
+    }
+    if (formValue.gitHub) {
+      formData.append('gitHub', formValue.gitHub);
+    }
+
     if (formValue.image?.file || formValue.image?.path) {
       formData.append('image', formValue.image?.file || formValue.image?.path);
     }
