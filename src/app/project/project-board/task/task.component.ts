@@ -18,6 +18,7 @@ import { UploadFile } from 'src/app/shared/multiple-file-uploader/multiple-file-
 import { Permissions } from 'back/src/models/permissions';
 import { ProjectEpicResponse } from 'back/src/models/responses/project-epic.response';
 import { EditTaskComponent } from './edit-task/edit-task.component';
+import { TaskDataService } from './task-history/task-data.service';
 
 @Component({
   selector: 'app-task',
@@ -50,6 +51,7 @@ export class TaskComponent implements OnDestroy {
     private modalService: NgbModal,
     public projectDataService: ProjectDataService,
     private projectService: ProjectService,
+    private taskDataService: TaskDataService,
   ) {
     this.activatedRoute.params.pipe(takeWhile(() => this.rxAlive)).subscribe((params) => {
       this.getTaskInfo(params.taskId, true);
@@ -62,6 +64,7 @@ export class TaskComponent implements OnDestroy {
         })
         .pipe(takeWhile(() => this.rxAlive))
         .subscribe(() => {
+          this.taskDataService.taskUpdated$.next();
           this.userControl.markAsPristine();
         });
     });
@@ -118,6 +121,7 @@ export class TaskComponent implements OnDestroy {
       })
       .pipe(takeWhile(() => this.rxAlive))
       .subscribe(() => {
+        this.taskDataService.taskUpdated$.next();
         this.getTaskInfo(this.task.id);
       });
   }
@@ -140,6 +144,7 @@ export class TaskComponent implements OnDestroy {
       })
       .pipe(takeWhile(() => this.rxAlive))
       .subscribe(() => {
+        this.taskDataService.taskUpdated$.next();
         this.getTaskInfo(this.task.id);
       });
   }
@@ -152,6 +157,7 @@ export class TaskComponent implements OnDestroy {
       })
       .pipe(takeWhile(() => this.rxAlive))
       .subscribe(() => {
+        this.taskDataService.taskUpdated$.next();
         this.getTaskInfo(this.task.id);
       });
   }
@@ -179,6 +185,7 @@ export class TaskComponent implements OnDestroy {
         .editTask(this.task.id, result)
         .pipe(takeWhile(() => this.rxAlive))
         .subscribe(() => {
+          this.taskDataService.taskUpdated$.next();
           this.getTaskInfo(this.task.id);
         });
     });

@@ -5,7 +5,7 @@
     <div class="col-4">Новое значение</div>
     <div class="col-2 pr-0 text-right">Дата и время</div>
   </div>
-  <div class="row m-0 history__item border-bottom" *ngFor="let item of history">
+  <div class="row m-0 history__item border-bottom py-2" *ngFor="let item of history">
     <div class="col-3 pl-0">{{ item.userName }} {{ item.userSurname }}</div>
     <div class="col-3">
       {{ getHistoryField(item) }}

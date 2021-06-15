@@ -65,6 +65,7 @@ import { UpdateCriteriaModalComponent } from './project/project-board/task/task-
 import { PermissionGuard } from './utils/permission.guard';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { UpdatePasswordComponent } from './security/update-password/update-password.component';
+import { TaskDataService } from './project/project-board/task/task-history/task-data.service';
 
 @NgModule({
   declarations: [
@@ -140,6 +141,7 @@ import { UpdatePasswordComponent } from './security/update-password/update-passw
     TaskTypePipe,
     PriorityPipe,
     PermissionGuard,
+    TaskDataService,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     // { provide: HTTP_INTERCEPTORS, useClass: ContentTypeInterceptor, multi: true },
   ],

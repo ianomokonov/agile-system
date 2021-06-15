@@ -164,8 +164,11 @@ class TaskRepository {
         if (item.fieldName === 'projectuserId') {
           item.user = await projectRepository.getProjectUser(item.newValue);
         }
-        if (item.fieldName === 'projecsprintId') {
+        if (item.fieldName === 'projectsprintId') {
           item.sprint = await projectRepository.getProjectSprintNames(null, item.newValue);
+        }
+        if (item.fieldName === 'epicId') {
+          item.epic = await projectRepository.getEpic(item.newValue);
         }
         if (item.fieldName === 'statusId') {
           item.status = await this.getStatus(item.newValue);

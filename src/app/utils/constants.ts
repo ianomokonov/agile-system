@@ -49,6 +49,7 @@ export const taskFields = {
   projectSprintId: 'Спринт',
   points: 'Оценка',
   name: 'Название',
+  epicId: 'Эпик',
 };
 
 export const extensions = {
