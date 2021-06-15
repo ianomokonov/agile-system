@@ -39,8 +39,8 @@ app.use(express.json());
 app.use(handleError);
 app.use(cors());
 app.use(express.static(path.resolve(__dirname, 'files')));
-app.use('/user', userRouter);
-app.use('/project', projectRouter);
+app.use('/api/user', userRouter);
+app.use('/api/project', projectRouter);
 
 // rooms which are currently available in chat
 const activeDailyTimers = [];
