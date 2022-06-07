@@ -6,7 +6,6 @@ import { WebError } from '../models/error';
 // eslint-disable-next-line consistent-return
 export default (socket, next): any => {
   const { token } = socket.handshake.query;
-
   if (!token) {
     next(new WebError(StatusCodes.UNAUTHORIZED));
   }
