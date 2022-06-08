@@ -2,9 +2,9 @@ import mysql from 'mysql2/promise';
 
 export default mysql.createPool({
   host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'agile',
+  user: 'nomokoiw_agile',
+  password: 'p%cEgu9a',
+  database: 'nomokoiw_agile',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
